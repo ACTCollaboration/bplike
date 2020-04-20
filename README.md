@@ -11,3 +11,21 @@ bandpass corrections.
 
 It currently has dependencies that include soapack and tilec,
 which should ideally be removed.
+
+## Data
+
+You can find the data files here on niagara:
+```
+/scratch/r/rbond/msyriac/data/depot/bplike/data
+```
+You should symlink that directory to the root repository directory.
+
+
+## Running chains with Cobaya
+
+Simply wrap
+```
+cobaya-run act.yml
+```
+
+with your preferred OpenMP-MPI method.
