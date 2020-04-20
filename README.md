@@ -4,7 +4,7 @@ This is a version of Erminia's multi-frequency likelihood
 for the ACT DR4 release, but with the following changes:
 - includes (optional) scale-dependent bandpass corrections 
 - it is re-written in Python 
-- it interfaces with Cobaya
+- it interfaces with Cobaya (use the `devel` branch)
 
 It reproduces Erminia's results when run without the 
 bandpass corrections.
