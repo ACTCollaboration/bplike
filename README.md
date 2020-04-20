@@ -28,4 +28,8 @@ Simply wrap
 cobaya-run act.yml
 ```
 
-with your preferred OpenMP-MPI method.
+with your preferred OpenMP-MPI method. `act.yml` is an example YAML
+file for the run with bandpass corrections. You can copy and modify it,
+e.g. to change priors or add additional parameters. `act_baseline.yml`
+contains an example for reproducing Erminia's runs, i.e. without the
+bandpass corrections.
