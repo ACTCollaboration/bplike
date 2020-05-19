@@ -211,8 +211,7 @@ class act_pylike(_InstallableLikelihood):
         delta = self.sp.spec - ps_vec
         logp = -0.5 * np.dot(delta,np.dot(self.sp.cinv,delta))
         self.log.debug(
-            f"ACT-like {self.flux} Log-likelihood value computed "
-            "= {} (Χ² = {})".format(logp, -2 * logp))
+            f"ACT-like {self.flux} lnLike value = {logp} (chisquare = {-2 * logp})"
         return logp
 
     def prepare_data(self, verbose=False):
