@@ -8,6 +8,7 @@ import utils
 import fg as afg
 from soapack import interfaces as sints
 
+
 sz_temp_file = "data/actpol_2f_full_s1316_2flux_fin/data/Fg/cl_tsz_150_bat.dat"
 sz_x_cib_temp_file = "data/actpol_2f_full_s1316_2flux_fin/data/Fg/sz_x_cib_template.dat"
 ksz_temp_file = "data/actpol_2f_full_s1316_2flux_fin/data/Fg/cl_ksz_bat.dat"
