@@ -1,12 +1,16 @@
 from __future__ import print_function
-from orphics import maps,io,cosmology
-from pixell import enmap
 import numpy as np
 import os,sys
 from tilec import fg as tfg
 import yaml
+from scipy.interpolate import interp1d
 
 fgroot = os.path.dirname(os.path.abspath(__file__)) +  f"/data/actpol_2f_full_s1316_2flux_fin/data/Fg/"
+
+
+def interp(x,y,bounds_error=False,fill_value=0.,**kwargs):
+    return interp1d(x,y,bounds_error=bounds_error,fill_value=fill_value,**kwargs)
+
 
 def config_from_yaml(filename):
     with open(filename) as f:
@@ -25,4 +29,4 @@ def get_erminia_fg(ells,comp):
     with np.errstate(divide='ignore'):
         cls = dls*2.*np.pi/ls**2.
     cls[ls<1] = 0
-    return maps.interp(ls,cls)(ells)
+    return interp(ls,cls)(ells)

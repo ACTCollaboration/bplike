@@ -5,7 +5,7 @@ import yaml
 import camb
 from camb import model
 import matplotlib.pyplot as plt
-from orphics import maps
+# from orphics import maps
 
 # Parse command line
 parser = argparse.ArgumentParser(description='Do a thing.')
@@ -100,7 +100,7 @@ lmap = \
 
 
 print(pparams)
-from orphics import io
+# from orphics import io
 # for ip in pmap.keys():
 #     p = pmap[ip]
 #     print(p)
