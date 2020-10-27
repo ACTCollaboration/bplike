@@ -10,7 +10,7 @@ likelihood:
     # Optional line to do some debugging with an input theory curve
     #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
    
-  # The 100 mJy likelihood
+  # The 15 mJy likelihood
   act_pylike.act15:
     stop_at_error: True
     bandpass: True
@@ -148,5 +148,5 @@ sampler:
   #   covmat: 'data/ACTPol_b5_new_cosmomc_theta2.covmat'
     
 
-output: chains/bandpass_run
+output: chains/bandpass_run_test
 resume: True
