@@ -1,0 +1,70 @@
+# Amplitude of clustered CIB
+a_c:    4.9
+# Amplitude of Poisson CIB
+a_d:    6.9
+# Amplitude of tSZ
+a_tsz:    3.3
+# Amplitude of kSZ
+a_ksz:    4.950210
+# Correlation coefficient between tSZ and CIB
+xi:   1.654936e-2
+# Amplitude of Galactic dust in TT
+a_g_tt:    0.0
+# Amplitude of radio Poisson for a 15 mJy flux cut
+a_p_tt_15:    3.1
+# Amplitude of radio Poisson for a 100 mJy flux cut
+a_p_tt_100:    24.6
+# Amplitude of Galactic syncrotron in EE
+a_s_ee:    0.0
+# Amplitude of radio Poisson in EE
+a_p_ee:    0.0
+# Amplitude of Galactic dust in EE
+a_g_ee:   0.
+# Amplitude of Galactic dust in TE
+a_g_te:   0.
+# Amplitude of Galactic syncrotron in TE
+a_s_te:    0.0
+# Amplitude of radio Poisson in TE
+a_p_te:    0.1
+# These are effective frequencies for ACT
+ftsz_95_15mJy   : 98.38
+ftsz_150_15mJy   : 150.14
+fdust_95_15mJy : 98.77
+fdust_150_15mJy : 151.16
+fsyn_95_15mJy  : 95.76
+fsyn_150_15mJy  : 147.24
+ftsz_95_100mJy   : 98.38
+ftsz_150_100mJy   : 149.94
+fdust_95_100mJy : 98.77
+fdust_150_100mJy : 150.93
+fsyn_95_100mJy  : 95.76
+fsyn_150_100mJy  : 147.14
+# Spectral index for Galactic dust
+beta_galdust : 3.8
+# Spectral index for CIB
+beta_CIB : 2.2
+# Spectral index for radio
+beta_radio : -0.5
+# Spectral index for Galactic synchrotron
+beta_galsyn : -1.
+# CIB dust temperature
+Tdust_CIB : 9.7
+# The power law index in multipole space for clustered CIB
+# cib ~  l(l+1) l^n
+cibc_n : -1.2
+# The power law index in multipole space for Galactic foregrounds
+# gal ~  l^n
+galdust_t_n : -0.7 # dust in temperature
+galdust_p_n : -0.4 # dust in polarization
+galsync_p_n : -0.7 # synchrotron in polarization
+#======
+# The following are properties of the model that shouldn't be varied
+high_ell0 : 3000 # Pivot ell at high ell
+low_ell0 : 500 # Pivot ell at low ell
+nu0 : 150 # Reference frequency
+#======
+# These are CMB calibration parameters, not relevant for foregrounds
+cal_95: 1
+cal_150: 1
+yp_95: 1
+yp_150: 1

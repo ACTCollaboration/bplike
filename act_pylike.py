@@ -1,5 +1,5 @@
 import numpy as np
-from cobaya.conventions import _path_install
+#from cobaya.conventions import _path_install
 from cobaya.log import LoggedError
 from cobaya.tools import are_different_params_lists
 from cobaya.likelihoods._base_classes import _InstallableLikelihood
@@ -7,7 +7,6 @@ import os,sys
 import utils
 import fg as afg
 from soapack import interfaces as sints
-
 
 sz_temp_file = "data/actpol_2f_full_s1316_2flux_fin/data/Fg/cl_tsz_150_bat.dat"
 sz_x_cib_temp_file = "data/actpol_2f_full_s1316_2flux_fin/data/Fg/sz_x_cib_template.dat"
@@ -204,6 +203,7 @@ class act_pylike(_InstallableLikelihood):
         return {'Cl': {'tt': self.l_max,'te': self.l_max,'ee': self.l_max}}
 
     def logp(self, **params_values):
+        return 0
         cl = self.theory.get_Cl(ell_factor=True)
         return self.loglike(cl, **params_values)
 
