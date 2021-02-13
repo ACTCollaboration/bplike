@@ -1,7 +1,9 @@
 # I haven't made bplike into a package yet, so I run everything in the same dir.
 # The stuff you need is all in the fg.py module; note that it depends on tileC.
-import fg 
+import fg
 import numpy as np
+
+output_dir = '/Users/boris/Work/CLASS-SZ/SO-SZ/bplike/output/'
 
 def config_from_yaml(filename):
     import yaml
@@ -21,17 +23,18 @@ flux_cut = '15mJy'
 params = config_from_yaml("fg_defaults.yml")
 
 # Multipoles to evaluate at
-ells = np.arange(2,3000)
+ells = np.arange(2,10000)
 
 # Initialize the power generator
-comps = ['tsz','ksz','cibc','cibp','tsz_x_cib','radio','galdust','galsyn']
+#comps = ['tsz','ksz','cibc','cibp','tsz_x_cib','radio','galdust','galsyn']
+comps = ['cibc']#,'ksz','cibc','cibp','tsz_x_cib','radio','galdust','galsyn']
 fp = fg.ForegroundPowers(params,ells,
                          sz_temp_file,ksz_temp_file,sz_x_cib_temp_file,flux_cut,
                          arrays=None,bp_file_dict=None,beam_file_dict=None,cfreq_dict=None, # Only used with bandpasses
                          comps = comps) # Components to initialize
 
-freq1 = 90. # Ghz
-freq2 = 90.
+freq1 = 143. # Ghz
+freq2 = 143.
 efreq1 = {'dust':freq1,'tsz':freq1,'syn':freq1} # All components have the same effective frequency
 efreq2 = {'dust':freq2,'tsz':freq2,'syn':freq2}
 
@@ -41,16 +44,22 @@ dltt = fp.get_power("TT",
                     params,
                     eff_freq_ghz1=efreq1,array1=None,
                     eff_freq_ghz2=efreq2,array2=None,lmax=None)
+print(np.shape(dltt))
 
 dlee = fp.get_power("EE",
                     comps, # components to include in sum
                     params,
                     eff_freq_ghz1=efreq1,array1=None,
                     eff_freq_ghz2=efreq2,array2=None,lmax=None)
-
+print(np.shape(dlee))
 dlte = fp.get_power("TE",
                     comps, # components to include in sum
                     params,
                     eff_freq_ghz1=efreq1,array1=None,
                     eff_freq_ghz2=efreq2,array2=None,lmax=None)
-        
+
+print(np.shape(dlte))
+try:
+    np.savetxt(output_dir+"spectra_l_dltt_dlee_dlte_"+str(freq1)+"_"+str(freq2)+".txt",np.c_[ells,dltt,dlee,dlte])
+except:
+    np.savetxt(output_dir+"spectra_l_dltt_dlee_dlte_"+str(freq1)+"_"+str(freq2)+".txt",np.c_[ells,dltt])

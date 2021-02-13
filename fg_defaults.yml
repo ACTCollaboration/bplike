@@ -1,3 +1,9 @@
+#Mat 12/20:
+#I've added an example here:
+#https://github.com/ACTCollaboration/bplike/blob/master/power_example.py
+#for how to get foreground spectra in Erminia's model.
+#The available parameters and their defaults are here:
+#https://github.com/ACTCollaboration/bplike/blob/master/fg_defaults.yml
 # Amplitude of clustered CIB
 a_c:    4.9
 # Amplitude of Poisson CIB
@@ -49,6 +55,15 @@ beta_radio : -0.5
 beta_galsyn : -1.
 # CIB dust temperature
 Tdust_CIB : 9.7
+
+Tdust_CIB: 24.0       #CIB effective dust temperature [K] (Table 9 of http://www.aanda.org/articles/aa/pdf/2014/11/aa22093-13.pdf)
+beta_CIB: 1.2         #CIB modified blackbody spectral index (Table 9 of http://www.aanda.org/articles/aa/pdf/2014/11/aa22093-13.pdf ; Table 10 of that paper contains CIB monopoles)
+nu0_CIB_ghz: 353.0    #CIB pivot frequency [GHz]
+kT_e_keV: 5.0         #electron temperature for relativistic SZ evaluation [keV] (for reference, 5 keV is rough temperature for a 3x10^14 Msun/h cluster at z=0 (e.g., Arnaud+2005))
+nu0_radio_ghz: 150.0  #radio pivot frequency [GHz]
+beta_radio: -0.5      #radio power-law index
+
+
 # The power law index in multipole space for clustered CIB
 # cib ~  l(l+1) l^n
 cibc_n : -1.2

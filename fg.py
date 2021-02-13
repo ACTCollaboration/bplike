@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.interpolate import interp1d
+import tilec
 from tilec.fg import ArraySED
 
 def get_template(ells,template_file,ell_pivot=3000):
@@ -37,7 +38,7 @@ class ForegroundPowers(ArraySED):
     def get_component_scale_dependence(self,comp,param_dict):
         p = param_dict
         comp = comp.lower()
-        
+
         if comp == 'tsz':
             return self.tsz_temp
         elif comp == 'ksz':
@@ -47,7 +48,7 @@ class ForegroundPowers(ArraySED):
         elif comp=='cibc':
             return self.ells * (self.ells+1) / p['high_ell0'] / (p['high_ell0']+1.) * (self.ells / p['high_ell0'])**p['cibc_n']
         elif comp=='poisson':
-            return self.ells * (self.ells+1) / p['high_ell0'] / (p['high_ell0']+1.) 
+            return self.ells * (self.ells+1) / p['high_ell0'] / (p['high_ell0']+1.)
         elif comp in ['galdust_t','galdust_p','galsync_t','galsync_p']:
             return (self.ells/p['low_ell0'])**p[f'{comp}_n']
         else:
@@ -75,7 +76,7 @@ class ForegroundPowers(ArraySED):
                                            eff_freq_ghz=e1dusty,params=params,lmax=lmax)
                 f2_cib = self.get_response("CIB",array=array2,norm_freq_ghz=params['nu0'],
                                            eff_freq_ghz=e2dusty,params=params,lmax=lmax)
-            
+
             if ('tsz' in ocomps):
                 tpow = tpow + f1_tsz *f2_tsz *params['a_tsz']*self.get_component_scale_dependence('tSZ',params)
             if ('cibc' in ocomps):
@@ -88,7 +89,7 @@ class ForegroundPowers(ArraySED):
                 a_c = params['a_c']
                 a_sz = params['a_tsz']
                 xi = params['xi']
-                fp = (f1_tsz*f2_cib + f2_tsz*f1_cib)/2. 
+                fp = (f1_tsz*f2_cib + f2_tsz*f1_cib)/2.
                 tpow = tpow - 2.*fp*xi*np.sqrt(a_sz*a_c)*self.get_component_scale_dependence('tsz_x_cib',params)
 
         if 'radio' in ocomps:
@@ -100,11 +101,11 @@ class ForegroundPowers(ArraySED):
                                          eff_freq_ghz=e2syn,params=params,lmax=lmax)
 
             if spec=='tt':
-                if self.fcut == '15mJy': 
+                if self.fcut == '15mJy':
                     fnum = 15
-                elif self.fcut == '100mJy': 
+                elif self.fcut == '100mJy':
                     fnum = 100
-                else: 
+                else:
                     raise ValueError
                 rparam = f'a_p_{spec}_{fnum}'
             else:
@@ -131,7 +132,7 @@ class ForegroundPowers(ArraySED):
                                           eff_freq_ghz=e2syn,params=params,radio_beta_param_name='beta_galsyn',lmax=lmax)
                 scale_str = 'galsync_t' if spec=='tt' else 'galsync_p'
                 tpow = tpow + f1*f2*params[f'a_s_{spec}']*self.get_component_scale_dependence(scale_str,params)
-        
+
         return tpow
 
     def get_ksz_power(self,spec,params,
@@ -140,7 +141,7 @@ class ForegroundPowers(ArraySED):
         return self.get_power(spec,['ksz'],params=params,
                          eff_freq_ghz1=None,array1=None,
                          eff_freq_ghz2=None,array2=None)
-        
+
     def get_tsz_power(self,spec,params,
                       eff_freq_ghz1=None,array1=None,
                       eff_freq_ghz2=None,array2=None):
@@ -192,10 +193,10 @@ class ForegroundPowers(ArraySED):
         return self.get_power(spec,['galsyn'],params=params,
                               eff_freq_ghz1={'syn':eff_freq_ghz1},array1=array1,
                               eff_freq_ghz2={'syn':eff_freq_ghz2},array2=array2)
-    
+
 
     def get_theory(self,ells,bin_func,dltt,dlte,dlee,params,lmax=6000):
-        
+
         if lmax is not None:
             dltt[ells>lmax] = 0
             dlte[ells>lmax] = 0
@@ -272,7 +273,7 @@ class ForegroundPowers(ArraySED):
                 band2 = {0:'95',1:'150',2:'150'}[i]
                 c1 = params[f'cal_{band1}']
                 c2 = params[f'cal_{band2}']
-                
+
                 cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dltt,spec,params) * c1 * c2
 
             elif i>=3 and i<=6:
