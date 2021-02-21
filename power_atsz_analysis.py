@@ -65,43 +65,59 @@ def main():
 
     freqs_asked = []
 
+    # for spec in specs:
+    #     freq1 = int(spec.split('x')[0])
+    #     freq2 = int(spec.split('x')[1])
+    #     freqt = (freq1,freq2)
+    #     freqs_asked.append(freqt)
+    # freqs_asked = tuple(freqs_asked)
+
+    comp_list = []
     for spec in specs:
-        freq1 = int(spec.split('x')[0])
-        freq2 = int(spec.split('x')[0])
-        freqt = (freq1,freq2)
-        freqs_asked.append(freqt)
-    freqs_asked = tuple(freqs_asked)
+        comp1 = spec.split('x')[0]
+        comp2 = spec.split('x')[1]
+        print(comp1,comp2)
+        if comp1 not in comp_list:
+            comp_list.append(comp1)
+        if comp2 not in comp_list:
+            comp_list.append(comp2)
+    comp_list.sort()
+
+    freqs_asked = comp_list
+
+    # for freqs in freqs_asked:
+    #     freq1 = freqs[0] # Ghz
+    #     freq2 = freqs[1]
+    for idf1 in range(len(comp_list)):
+        for idf2 in range(idf1,len(comp_list)):
+            freq1 = comp_list[idf1] # Ghz
+            freq2 = comp_list[idf2]
+
+            efreq1 = {'dust':freq1,'tsz':freq1,'syn':freq1} # All components have the same effective frequency
+            efreq2 = {'dust':freq2,'tsz':freq2,'syn':freq2}
 
 
 
-    for freqs in freqs_asked:
-        freq1 = freqs[0] # Ghz
-        freq2 = freqs[1]
-        efreq1 = {'dust':freq1,'tsz':freq1,'syn':freq1} # All components have the same effective frequency
-        efreq2 = {'dust':freq2,'tsz':freq2,'syn':freq2}
-
-
-
-        # Now get D_ell_foreground = C_ell * l (l+1) / 2 / pi
-        dltt = []
-        dltt.append(ells)
-        dltt_tot = fp.get_power("TT",
-                            comps, # components to include in sum
-                            params,
-                            eff_freq_ghz1=efreq1,array1=None,
-                            eff_freq_ghz2=efreq2,array2=None,lmax=None)
-        dltt.append(dltt_tot)
-        for cp in comps:
-
-            dltt_cp = fp.get_power("TT",
-                                [cp], # components to include in sum
+            # Now get D_ell_foreground = C_ell * l (l+1) / 2 / pi
+            dltt = []
+            dltt.append(ells)
+            dltt_tot = fp.get_power("TT",
+                                comps, # components to include in sum
                                 params,
                                 eff_freq_ghz1=efreq1,array1=None,
                                 eff_freq_ghz2=efreq2,array2=None,lmax=None)
-            dltt.append(dltt_cp)
+            dltt.append(dltt_tot)
+            for cp in comps:
 
-        np.savetxt(output_dir+"spectra_l_dltt_tot_tsz_cibc_cibp_rs_tszxcib_ksz_"+str(freq1)+"_"+str(freq2)+".txt",
-                  np.transpose(dltt))
+                dltt_cp = fp.get_power("TT",
+                                    [cp], # components to include in sum
+                                    params,
+                                    eff_freq_ghz1=efreq1,array1=None,
+                                    eff_freq_ghz2=efreq2,array2=None,lmax=None)
+                dltt.append(dltt_cp)
+
+            np.savetxt(output_dir+"spectra_l_dltt_tot_tsz_cibc_cibp_rs_tszxcib_ksz_"+str(freq1)+"_"+str(freq2)+".txt",
+                      np.transpose(dltt))
 
 
 
