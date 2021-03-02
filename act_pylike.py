@@ -203,7 +203,6 @@ class act_pylike(_InstallableLikelihood):
         return {'Cl': {'tt': self.l_max,'te': self.l_max,'ee': self.l_max}}
 
     def logp(self, **params_values):
-        return 0
         cl = self.theory.get_Cl(ell_factor=True)
         return self.loglike(cl, **params_values)
 
