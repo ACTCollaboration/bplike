@@ -8,7 +8,6 @@ data/COM_*
 data/*
 __pycache__
 output/*
-.DS_Store
 contour_atsz_wo_aksz_symcov.pdf
 contour_atsz_wo_aksz.pdf
 contour_atsz_w_aksz_symcov.pdf
@@ -17,3 +16,4 @@ contour_atsz_w_aksz_aps.pdf
 contour_atsz_w_aksz.pdf
 contour_atsz.pdf
 *.png
+.DS_Store
