@@ -32,10 +32,9 @@ def main():
     # exit(0)
     output_dir = args.output_dir
     specs = ast.literal_eval(args.specs)
-
-    sz_temp_file = "data/cl_tsz_150_bat.dat"
-    sz_x_cib_temp_file = "data/sz_x_cib_template.dat"
-    ksz_temp_file = "data/cl_ksz_bat.dat"
+    sz_temp_file = "data/actpolfull_dr4.01/data/Fg/cl_tsz_150_bat.dat"
+    sz_x_cib_temp_file = "data/actpolfull_dr4.01/data/Fg/sz_x_cib_template.dat"
+    ksz_temp_file = "data/actpolfull_dr4.01/data/Fg/cl_ksz_bat.dat"
 
     bplike_params_dict = ast.literal_eval(args.bplike_params_dict)
 
