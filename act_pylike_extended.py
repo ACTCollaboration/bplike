@@ -8,9 +8,9 @@ import utils
 import fg as afg
 from soapack import interfaces as sints
 
-sz_temp_file = "data/cl_tsz_150_bat.dat"
-sz_x_cib_temp_file = "data/sz_x_cib_template.dat"
-ksz_temp_file = "data/cl_ksz_bat.dat"
+sz_temp_file = "data/actpolfull_dr4.01/data/Fg/cl_tsz_150_bat.dat"
+sz_x_cib_temp_file = "data/actpolfull_dr4.01/data/Fg/sz_x_cib_template.dat"
+ksz_temp_file = "data/actpolfull_dr4.01/data/Fg/cl_ksz_bat.dat"
 
 def get_band(array):
     a = array.split("_")[1]
@@ -203,8 +203,8 @@ class act_pylike_extended(_InstallableLikelihood):
         return {'Cl': {'tt': self.l_max,'te': self.l_max,'ee': self.l_max}}
 
     def logp(self, **params_values):
-        return 0
-        # cl = self.theory.get_Cl(ell_factor=True)
+        # return 0
+        cl = self.theory.get_Cl(ell_factor=True)
         return self.loglike(cl, **params_values)
 
     def loglike(self, cl, **params_values):
