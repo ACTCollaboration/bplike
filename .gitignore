@@ -17,3 +17,9 @@ contour_atsz_w_aksz.pdf
 contour_atsz.pdf
 *.png
 .DS_Store
+bplike.egg-info
+dist
+build
+chains
+bplike/output
+bplike/data

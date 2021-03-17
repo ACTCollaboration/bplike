@@ -4,16 +4,15 @@ timing: True
 # Run with bandpass corrections
 likelihood:
   # The 100 mJy likelihood
-  bplike.act_pylike_extended.act100:
+  act_pylike_extended.act100:
     #path: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/
     stop_at_error: True
     bandpass: True
     # Optional line to do some debugging with an input theory curve
-    # note the file is in the orphics data dir too.
     #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
 
   # The 15 mJy likelihood
-  bplike.act_pylike_extended.act15:
+  act_pylike_extended.act15:
     stop_at_error: True
     bandpass: True
     # Optional line to do some debugging with an input theory curve
