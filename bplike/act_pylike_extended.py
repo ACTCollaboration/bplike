@@ -6,14 +6,21 @@ from cobaya.likelihoods._base_classes import _InstallableLikelihood
 import os,sys
 from .utils import *
 from .fg import *
+# import utils
+# import fg
 from soapack import interfaces as sints
 from pkg_resources import resource_filename
 
 dfroot = resource_filename("bplike","data/actpolfull_dr4.01/data/data_act/")
 
-sz_temp_file = "data/actpolfull_dr4.01/data/Fg/cl_tsz_150_bat.dat"
-sz_x_cib_temp_file = "data/actpolfull_dr4.01/data/Fg/sz_x_cib_template.dat"
-ksz_temp_file = "data/actpolfull_dr4.01/data/Fg/cl_ksz_bat.dat"
+dfroot_coadd_w = resource_filename("bplike","data/bplike_data/big_coadd_weights/200226/")
+dfroot_coadd_d = resource_filename("bplike","data/bplike_data/coadd_data/")
+dfroot_fg = resource_filename("bplike","data/actpolfull_dr4.01/data/Fg/")
+dfroot_bpass = resource_filename("bplike","data/bplike_data/bpass/")
+
+sz_temp_file = dfroot_fg+"cl_tsz_150_bat.dat"
+sz_x_cib_temp_file = dfroot_fg+"sz_x_cib_template.dat"
+ksz_temp_file = dfroot_fg+"cl_ksz_bat.dat"
 
 def get_band(array):
     a = array.split("_")[1]
@@ -45,7 +52,7 @@ def save_coadd_matrix(spec,band1,band2,flux,path_root):
     barrays = []
     icovs = []
     for region in regions:
-        order = np.load(f"data/big_coadd_weights/200226/{region}_all_C_ell_data_order_190918.npy")
+        order = np.load(f"{dfroot_coadd_w}{region}_all_C_ell_data_order_190918.npy")
         df = pd.DataFrame(order,columns=['t1','t2','region','s1','s2','a1','a2']).stack().str.decode('utf-8').unstack()
         df = df[(df.t1==spec[0]) & (df.t2==spec[1]) & (df.region==rmap(region)+"_")]
         arrays = []
@@ -65,7 +72,7 @@ def save_coadd_matrix(spec,band1,band2,flux,path_root):
         """
         Covmat selection
         """
-        cov = np.load(f"data/big_coadd_weights/200226/{region}_all_covmat_190918.npy")
+        cov = np.load(dfroot_coadd_w+f"{region}_all_covmat_190918.npy")
         ocov = cov[oids,:][:,oids]
         icovs.append(np.linalg.inv(ocov))
 
@@ -233,7 +240,7 @@ class act_pylike_extended(_InstallableLikelihood):
                 for bands in sbands[spec]:
                     band1,band2 = bands
                     self.coadd_data[spec][bands] = load_coadd_matrix(spec,band1,band2,
-                                                                     self.flux,"data/coadd_data/coadds_20200305")
+                                                                     self.flux,f"{dfroot_coadd_d}coadds_20200305")
 
             dm = sints.ACTmr3()
             beam_dict = {}
@@ -254,7 +261,7 @@ class act_pylike_extended(_InstallableLikelihood):
                 pname = '_'.join([season,array,freq])
                 pnames.append(pname)
                 beam_dict[pname] = dm.get_beam_fname(season,patch,array+"_"+freq, version=None)
-                bp_dict[pname] = "data/bpass/"+dm.get_bandpass_file_name(array+"_"+freq)
+                bp_dict[pname] = dfroot_bpass+dm.get_bandpass_file_name(array+"_"+freq)
                 cfreq_dict[pname] = cfreqs[array + "_" + freq]
         else:
             pnames = None

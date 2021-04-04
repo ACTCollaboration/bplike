@@ -4,17 +4,17 @@ timing: True
 # Run with bandpass corrections
 likelihood:
   # The 100 mJy likelihood
-  act_pylike_extended.act100:
+  bplike.act100:
     #path: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/
     stop_at_error: True
-    bandpass: True
+    bandpass: False
     # Optional line to do some debugging with an input theory curve
     #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
 
   # The 15 mJy likelihood
-  act_pylike_extended.act15:
+  bplike.act15:
     stop_at_error: True
-    bandpass: True
+    bandpass: False
     # Optional line to do some debugging with an input theory curve
     #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
 
@@ -119,30 +119,30 @@ theory:
 
 sampler:
   # Example for evaluating at a specific point
-  # evaluate:
-  #   override:
-  #     a_c:    4.9
-  #     a_d:    6.9
-  #     a_tsz:    3.3
-  #     a_ksz:    4.950210
-  #     xi:   1.654936e-2
-  #     a_p_tt_15:    3.1
-  #     a_p_tt_100:    24.6
-  #     a_p_ee:    0.0
-  #     a_p_te:    0.1
-  #     beta_CIB : 2.2
-  #     yp_95: 1
-  #     yp_150: 1
+  evaluate:
+    override:
+      a_c:    4.9
+      a_d:    6.9
+      a_tsz:    3.3
+      a_ksz:    4.950210
+      xi:   1.654936e-2
+      a_p_tt_15:    3.1
+      a_p_tt_100:    24.6
+      a_p_ee:    0.0
+      a_p_te:    0.1
+      beta_CIB : 2.2
+      yp_95: 1
+      yp_150: 1
 
   # Example MCMC run
-  mcmc:
-    burn_in: 100
-    max_samples: .inf
-    max_tries: 400
-    learn_proposal: True
-    drag: True
-    # Optionally use a covmat with the right theta convention
-    covmat: 'data/ACTPol_b5_new_cosmomc_theta2.covmat'
+  # mcmc:
+  #   burn_in: 100
+  #   max_samples: .inf
+  #   max_tries: 400
+  #   learn_proposal: True
+  #   drag: True
+  #   # Optionally use a covmat with the right theta convention
+  #   covmat: 'data/ACTPol_b5_new_cosmomc_theta2.covmat'
 
   # Example for running the minimizer
   # minimize:
