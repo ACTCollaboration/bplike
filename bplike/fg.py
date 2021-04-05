@@ -3,6 +3,36 @@ from scipy.interpolate import interp1d
 import tilec
 from tilec.fg import ArraySED
 
+## Full Spectra:
+specs = ['f090xf090','f090xf100','f090xf143','f090xf150',
+ 'f090xf217','f090xf353','f090xf545','f100xf100',
+ 'f100xf143','f143xf143','f100xf150','f143xf150',
+ 'f150xf150','f150xf217','f150xf353','f150xf545',
+ 'f100xf217','f143xf217','f217xf217','f100xf353',
+ 'f143xf353','f217xf353','f353xf353','f100xf545',
+ 'f143xf545','f217xf545','f353xf545','f545xf545']
+
+comp_list = []
+for spec in specs:
+    comp1 = spec.split('x')[0]
+    comp2 = spec.split('x')[1]
+    comp1 = comp1.replace('f', '')
+    comp2 = comp2.replace('f', '')
+    print(comp1,comp2)
+    if comp1 not in comp_list:
+        comp_list.append(comp1)
+    if comp2 not in comp_list:
+        comp_list.append(comp2)
+comp_list.sort()
+print('components used in the analysis: ')
+print(comp_list)
+freqs_asked = comp_list
+print(freqs_asked)
+
+# exit(0)
+
+
+
 def get_template(ells,template_file,ell_pivot=3000):
     ls,pow = np.loadtxt(template_file,unpack=True)
     powfunc = interp1d(ls,pow)

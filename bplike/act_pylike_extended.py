@@ -19,6 +19,7 @@ dfroot = resource_filename("bplike","data/actpolfull_dr4.01/data/data_act/")
 # dfroot_fg = resource_filename("bplike","data")+"/actpolfull_dr4.01/data/Fg/"
 # dfroot_bpass = resource_filename("bplike","data")+"/bplike_data/bpass/"
 
+
 dfroot = path_to_data+"/actpolfull_dr4.01/data/data_act/"
 
 dfroot_coadd_w = path_to_data+"/bplike_data/big_coadd_weights/200226/"
@@ -157,7 +158,57 @@ class StevePower(object):
         elif bls.ndim==2: return bls[sel,sel]
         else: raise ValueError
 
+class StevePower_extended(object):
+    def __init__(self,froot,flux,infval=1e10,tt_lmin=600,tt_lmax=None):
+        spec=np.loadtxt(f"{froot}coadd_cl_{flux}_data_200124.txt")
+        cov =np.loadtxt(f'{froot}coadd_cov_{flux}_200519.txt')
+        self.bbl =np.loadtxt(f'{froot}coadd_bpwf_{flux}_191127_lmin2.txt').reshape((10,52,7924))
+        self.spec = spec[:520]
+        self.cov = cov[:520,:520]
+        nbin = 52
+        self.ells = np.arange(2,7924+2)
+        rells = np.repeat(self.ells[None],10,axis=0)
+        self.ls = self.bin(rells)
+
+        if tt_lmin is not None:
+            n = 3
+            ids = []
+            ids = np.argwhere(self.ls<tt_lmin)[:,0]
+            ids = ids[ids<nbin*3]
+            self.cov[:,ids] = 0
+            self.cov[ids,:] = 0
+            self.cov[ids,ids] = infval
+
+        if tt_lmax is not None:
+            n = 3
+            ids = []
+            ids = np.argwhere(self.ls>tt_lmax)[:,0]
+            ids = ids[ids<nbin*3]
+            self.cov[:,ids] = 0
+            self.cov[ids,:] = 0
+            self.cov[ids,ids] = infval
+
+        self.cinv = np.linalg.inv(self.cov)
+
+    def bin(self,dls):
+        bdl = np.einsum('...k,...k',self.bbl,dls[:,None,:])
+        return bdl.reshape(-1)
+
+    def select(self,bls,spec,band1,band2,shift=52):
+        I = {'tt':0,'te':3,'ee':7}
+        i = { 'tt':{('95','95'): 0,('95','150'): 1,('150','95'): 1,('150','150'): 2},
+              'te':{('95','95'): 0,('95','150'): 1,('150','95'): 2,('150','150'): 3},
+              'ee':{('95','95'): 0,('95','150'): 1,('150','95'): 1,('150','150'): 2} }
+        mind = i[spec][(band1,band2)]
+        sel = np.s_[(I[spec]+mind)*shift:(I[spec]+mind+1)*shift]
+        if bls.ndim==1: return bls[sel]
+        elif bls.ndim==2: return bls[sel,sel]
+        else: raise ValueError
+
+
+
 class act_pylike_extended(_InstallableLikelihood):
+
 
     def initialize(self):
 
@@ -169,6 +220,7 @@ class act_pylike_extended(_InstallableLikelihood):
         self.aparams = config_from_yaml('params_extended.yml')['act_like']
         self.bpmodes = config_from_yaml('params_extended.yml')['bpass_modes']
         self.bands = self.aparams['bands']
+
 
         # Read data
         self.prepare_data()
@@ -234,10 +286,18 @@ class act_pylike_extended(_InstallableLikelihood):
         return logp
 
     def prepare_data(self, verbose=False):
+        str_current = '[bplike prepare_data] '
         flux = self.flux
         # self.sp = StevePower("data/actpol_2f_full_s1316_2flux_fin/data/data_act/ps_200519/",self.flux)
-
-        self.sp = StevePower(dfroot,self.flux)
+        if self.use_act_planck == 'no':
+            data_root = dfroot
+            print(str_current+'Collecting power spectra from %s and with flux %s'%(data_root,self.flux))
+            self.sp = StevePower(data_root,self.flux)
+        else:
+            data_root = path_to_data + '/act_planck_data_210328/'
+            print(str_current+'Collecting power spectra from %s and with flux %s'%(data_root,self.flux))
+            self.sp = StevePower_extended(data_root,self.flux)
+        exit(0)
         if self.bandpass:
             sbands = { 'TT':[('95','95'),('95','150'),('150','150')],
                        'TE':[('95','95'),('95','150'),('150','95'),('150','150')],
@@ -272,14 +332,23 @@ class act_pylike_extended(_InstallableLikelihood):
                 bp_dict[pname] = dfroot_bpass+dm.get_bandpass_file_name(array+"_"+freq)
                 cfreq_dict[pname] = cfreqs[array + "_" + freq]
         else:
+            print(str_current+'Not using bandpass - set in the param file if you want to include these.')
             pnames = None
             bp_dict = None
             beam_dict = None
             cfreq_dict = None
 
+        print(str_current+'frequencies: ')
+        print(cfreq_dict)
         self.fgpower = ForegroundPowers(self.fparams,self.sp.ells,
-                                            sz_temp_file,ksz_temp_file,sz_x_cib_temp_file,flux_cut=self.flux,
-                                            arrays=pnames,bp_file_dict=bp_dict,beam_file_dict=beam_dict,cfreq_dict=cfreq_dict)
+                                            sz_temp_file,
+                                            ksz_temp_file,
+                                            sz_x_cib_temp_file,
+                                            flux_cut=self.flux,
+                                            arrays=pnames,
+                                            bp_file_dict=bp_dict,
+                                            beam_file_dict=beam_dict,
+                                            cfreq_dict=cfreq_dict)
 
     def _get_power_spectra(self, cl, **params_values):
 
@@ -325,6 +394,8 @@ class act_pylike_extended(_InstallableLikelihood):
 
 class act15(act_pylike_extended):
     flux = '15mJy'
+    use_act_planck = 'None'
 
 class act100(act_pylike_extended):
     flux = '100mJy'
+    use_act_planck = 'None'

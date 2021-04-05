@@ -23,3 +23,5 @@ build
 chains
 bplike/output
 bplike/data
+notebooks/.ipynb_checkpoints/bplike_wip-checkpoint.ipynb
+notebooks/bplike_wip.ipynb
