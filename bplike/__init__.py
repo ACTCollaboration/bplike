@@ -1,3 +1,4 @@
+from .config import *
 from .utils import *
 from .fg import *
 from .act_pylike_extended import *

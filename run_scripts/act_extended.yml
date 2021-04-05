@@ -1,4 +1,4 @@
-debug: False
+debug: True
 timing: True
 
 # Run with bandpass corrections

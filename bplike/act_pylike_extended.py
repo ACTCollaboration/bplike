@@ -4,6 +4,7 @@ from cobaya.log import LoggedError
 from cobaya.tools import are_different_params_lists
 from cobaya.likelihoods._base_classes import _InstallableLikelihood
 import os,sys
+from .config import *
 from .utils import *
 from .fg import *
 # import utils
@@ -13,10 +14,17 @@ from pkg_resources import resource_filename
 
 dfroot = resource_filename("bplike","data/actpolfull_dr4.01/data/data_act/")
 
-dfroot_coadd_w = resource_filename("bplike","data/bplike_data/big_coadd_weights/200226/")
-dfroot_coadd_d = resource_filename("bplike","data/bplike_data/coadd_data/")
-dfroot_fg = resource_filename("bplike","data/actpolfull_dr4.01/data/Fg/")
-dfroot_bpass = resource_filename("bplike","data/bplike_data/bpass/")
+# dfroot_coadd_w = resource_filename("bplike","data")+"/bplike_data/big_coadd_weights/200226/"
+# dfroot_coadd_d = resource_filename("bplike","data")+"/bplike_data/coadd_data/"
+# dfroot_fg = resource_filename("bplike","data")+"/actpolfull_dr4.01/data/Fg/"
+# dfroot_bpass = resource_filename("bplike","data")+"/bplike_data/bpass/"
+
+dfroot = path_to_data+"/actpolfull_dr4.01/data/data_act/"
+
+dfroot_coadd_w = path_to_data+"/bplike_data/big_coadd_weights/200226/"
+dfroot_coadd_d = path_to_data+"/bplike_data/coadd_data/"
+dfroot_fg = path_to_data+"/actpolfull_dr4.01/data/Fg/"
+dfroot_bpass = path_to_data+"/bplike_data/bpass/"
 
 sz_temp_file = dfroot_fg+"cl_tsz_150_bat.dat"
 sz_x_cib_temp_file = dfroot_fg+"sz_x_cib_template.dat"
