@@ -3,31 +3,17 @@ from scipy.interpolate import interp1d
 import tilec
 from tilec.fg import ArraySED
 
-## Full Spectra:
-specs = ['f090xf090','f090xf100','f090xf143','f090xf150',
- 'f090xf217','f090xf353','f090xf545','f100xf100',
- 'f100xf143','f143xf143','f100xf150','f143xf150',
- 'f150xf150','f150xf217','f150xf353','f150xf545',
- 'f100xf217','f143xf217','f217xf217','f100xf353',
- 'f143xf353','f217xf353','f353xf353','f100xf545',
- 'f143xf545','f217xf545','f353xf545','f545xf545']
+# ## Full Spectra:
+# specs = ['f090xf090','f090xf100','f090xf143','f090xf150',
+#  'f090xf217','f090xf353','f090xf545','f100xf100',
+#  'f100xf143','f143xf143','f100xf150','f143xf150',
+#  'f150xf150','f150xf217','f150xf353','f150xf545',
+#  'f100xf217','f143xf217','f217xf217','f100xf353',
+#  'f143xf353','f217xf353','f353xf353','f100xf545',
+#  'f143xf545','f217xf545','f353xf545','f545xf545']
+#
 
-comp_list = []
-for spec in specs:
-    comp1 = spec.split('x')[0]
-    comp2 = spec.split('x')[1]
-    comp1 = comp1.replace('f', '')
-    comp2 = comp2.replace('f', '')
-    print(comp1,comp2)
-    if comp1 not in comp_list:
-        comp_list.append(comp1)
-    if comp2 not in comp_list:
-        comp_list.append(comp2)
-comp_list.sort()
-print('components used in the analysis: ')
-print(comp_list)
-freqs_asked = comp_list
-print(freqs_asked)
+
 
 # exit(0)
 
@@ -45,10 +31,18 @@ def get_template(ells,template_file,ell_pivot=3000):
 
 class ForegroundPowers(ArraySED):
     def __init__(self,params,ells,
-                 sz_temp_file,ksz_temp_file,sz_x_cib_temp_file,flux_cut,
-                 arrays=None,bp_file_dict=None,beam_file_dict=None,cfreq_dict=None,
+                 sz_temp_file,
+                 ksz_temp_file,
+                 sz_x_cib_temp_file,
+                 flux_cut,
+                 arrays=None,
+                 bp_file_dict=None,
+                 beam_file_dict=None,
+                 cfreq_dict=None,
+                 lkl_setup = None,
                  comps = ['tsz','ksz','cibc','cibp','tsz_x_cib','radio','galdust','galsyn']
              ):
+        print('getting ells')
         self.ells= ells
         self.tsz_temp = get_template(ells,sz_temp_file,ell_pivot=params['high_ell0'])
         self.ksz_temp = get_template(ells,ksz_temp_file,ell_pivot=params['high_ell0'])
@@ -56,11 +50,18 @@ class ForegroundPowers(ArraySED):
         self.fcut = flux_cut
 
         self.effs = {}
-        self.effs['95'] = {}
-        self.effs['150'] = {}
-        for c in ['tsz','dust','syn']:
-            self.effs['95'][c] = params[f'f{c}_95_{self.fcut}']
-            self.effs['150'][c] = params[f'f{c}_150_{self.fcut}']
+        if lkl_setup.use_act_planck == 'no' or lkl_setup == None:
+            self.effs['95'] = {}
+            self.effs['150'] = {}
+            for c in ['tsz','dust','syn']:
+                self.effs['95'][c] = params[f'f{c}_95_{self.fcut}']
+                self.effs['150'][c] = params[f'f{c}_150_{self.fcut}']
+        elif lkl_setup.use_act_planck == 'yes':
+            for cfreqs in lkl_setup.sp.cfreqs_list:
+                self.effs[cfreqs] = {}
+                for c in ['tsz','dust','syn']:
+                    self.effs[cfreqs][c] = params[f'f{c}_{cfreqs}_{self.fcut}']
+
 
         self.comps = comps
         ArraySED.__init__(self,arrays=arrays,bp_file_dict=bp_file_dict,beam_file_dict=beam_file_dict,cfreq_dict=cfreq_dict)
@@ -91,6 +92,7 @@ class ForegroundPowers(ArraySED):
         ocomps = [comp.lower() for comp in comps]
         spec = spec.lower()
         tpow = 0
+        # print('getting power')
         if spec=='tt':
             if ('tsz' in ocomps) or ('tsz_x_cib' in ocomps):
                 e1tsz = eff_freq_ghz1['tsz'] if eff_freq_ghz1 is not None else None
@@ -225,42 +227,56 @@ class ForegroundPowers(ArraySED):
                               eff_freq_ghz2={'syn':eff_freq_ghz2},array2=array2)
 
 
-    def get_theory(self,ells,bin_func,dltt,dlte,dlee,params,lmax=6000):
-
+    def get_theory(self,ells,bin_func,dltt,dlte,dlee,params,lmax=6000,lkl_setup = None):
+        print('getting theory')
         if lmax is not None:
             dltt[ells>lmax] = 0
             dlte[ells>lmax] = 0
             dlee[ells>lmax] = 0
 
-        dls = np.zeros((10,7924))
-        for i in range(10):
-            if i<3:
-                band1 = {0:'95',1:'95',2:'150'}[i]
-                band2 = {0:'95',1:'150',2:'150'}[i]
+        if lkl_setup.use_act_planck == 'yes':
+            print('use_act_planck :', lkl_setup.use_act_planck)
+            dls = np.zeros((28,3926))
+            for i in range(28):
+                # band1 = {0:'090',1:'100',2:'143',3:'150',4:'217',5:'353',6:'545'}[i]
+                # band2 = {0:'090',1:'100',2:'143',3:'150',4:'217',5:'353',6:'545'}[i]
+                band1 = lkl_setup.sp.fband1[i]
+                band2 = lkl_setup.sp.fband2[i]
                 c1 = params[f'cal_{band1}']
                 c2 = params[f'cal_{band2}']
                 dls[i] = (dltt + self.get_power('TT',self.comps,params,
                                             eff_freq_ghz1=self.effs[band1],array1=None,
                                             eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2
-            elif i>=3 and i<=6:
-                band1 = {0:'95',1:'95',2:'150',3:'150'}[i-3]
-                band2 = {0:'95',1:'150',2:'95',3:'150'}[i-3]
-                c1 = params[f'cal_{band1}']
-                c2 = params[f'cal_{band2}']
-                y = params[f'yp_{band2}']
-                dls[i] = (dlte + self.get_power('TE',self.comps,params,
-                                            eff_freq_ghz1=self.effs[band1],array1=None,
-                                            eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2 * y
-            else:
-                band1 = {0:'95',1:'95',2:'150'}[i-7]
-                band2 = {0:'95',1:'150',2:'150'}[i-7]
-                c1 = params[f'cal_{band1}']
-                c2 = params[f'cal_{band2}']
-                y1 = params[f'yp_{band1}']
-                y2 = params[f'yp_{band2}']
-                dls[i] =  (dlee + self.get_power('EE',self.comps,params,
-                                            eff_freq_ghz1=self.effs[band1],array1=None,
-                                            eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2 * y1 * y2
+        else:
+            dls = np.zeros((10,7924))
+            for i in range(10):
+                if i<3:
+                    band1 = {0:'95',1:'95',2:'150'}[i]
+                    band2 = {0:'95',1:'150',2:'150'}[i]
+                    c1 = params[f'cal_{band1}']
+                    c2 = params[f'cal_{band2}']
+                    dls[i] = (dltt + self.get_power('TT',self.comps,params,
+                                                eff_freq_ghz1=self.effs[band1],array1=None,
+                                                eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2
+                elif i>=3 and i<=6:
+                    band1 = {0:'95',1:'95',2:'150',3:'150'}[i-3]
+                    band2 = {0:'95',1:'150',2:'95',3:'150'}[i-3]
+                    c1 = params[f'cal_{band1}']
+                    c2 = params[f'cal_{band2}']
+                    y = params[f'yp_{band2}']
+                    dls[i] = (dlte + self.get_power('TE',self.comps,params,
+                                                eff_freq_ghz1=self.effs[band1],array1=None,
+                                                eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2 * y
+                else:
+                    band1 = {0:'95',1:'95',2:'150'}[i-7]
+                    band2 = {0:'95',1:'150',2:'150'}[i-7]
+                    c1 = params[f'cal_{band1}']
+                    c2 = params[f'cal_{band2}']
+                    y1 = params[f'yp_{band1}']
+                    y2 = params[f'yp_{band2}']
+                    dls[i] =  (dlee + self.get_power('EE',self.comps,params,
+                                                eff_freq_ghz1=self.effs[band1],array1=None,
+                                                eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2 * y1 * y2
         return bin_func(dls/ells/(ells+1.)*2.*np.pi)
 
 

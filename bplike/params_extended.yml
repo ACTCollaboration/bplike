@@ -1,5 +1,5 @@
 act_like:
-  bands: ['95','150']
+  bands: ['090', '100', '143', '150', '217', '353', '545']
   use_deep: True
   use_wide: True
   nnu: 2   # number of frequencies
@@ -20,18 +20,57 @@ act_like:
   bpass_mode: 'eff_freq_coadd'
 
 fixed:
-  ftsz_95_15mJy   : 98.38
+  ftsz_090_15mJy   : 98.38
+  ftsz_100_15mJy   : 100.14
+  ftsz_143_15mJy   : 143.14
   ftsz_150_15mJy   : 150.14
-  fdust_95_15mJy : 98.77
-  fdust_150_15mJy : 151.16
-  fsyn_95_15mJy  : 95.76
-  fsyn_150_15mJy  : 147.24
-  ftsz_95_100mJy   : 98.38
-  ftsz_150_100mJy   : 149.94
-  fdust_95_100mJy : 98.77
-  fdust_150_100mJy : 150.93
-  fsyn_95_100mJy  : 95.76
-  fsyn_150_100mJy  : 147.14
+  ftsz_217_15mJy   : 217.14
+  ftsz_353_15mJy   : 353.14
+  ftsz_545_15mJy   : 545.14
+
+  fdust_090_15mJy   : 98.38
+  fdust_100_15mJy   : 100.14
+  fdust_143_15mJy   : 143.14
+  fdust_150_15mJy   : 150.14
+  fdust_217_15mJy   : 217.14
+  fdust_353_15mJy   : 353.14
+  fdust_545_15mJy   : 545.14
+
+  fsyn_090_15mJy   : 98.38
+  fsyn_100_15mJy   : 100.14
+  fsyn_143_15mJy   : 143.14
+  fsyn_150_15mJy   : 150.14
+  fsyn_217_15mJy   : 217.14
+  fsyn_353_15mJy   : 353.14
+  fsyn_545_15mJy   : 545.14
+
+
+  ftsz_090_100mJy   : 98.38
+  ftsz_100_100mJy   : 100.14
+  ftsz_143_100mJy   : 143.14
+  ftsz_150_100mJy   : 150.14
+  ftsz_217_100mJy   : 217.14
+  ftsz_353_100mJy   : 353.14
+  ftsz_545_100mJy   : 545.14
+
+  fdust_090_100mJy   : 98.38
+  fdust_100_100mJy   : 100.14
+  fdust_143_100mJy   : 143.14
+  fdust_150_100mJy   : 150.14
+  fdust_217_100mJy   : 217.14
+  fdust_353_100mJy   : 353.14
+  fdust_545_100mJy   : 545.14
+
+  fsyn_090_100mJy   : 98.38
+  fsyn_100_100mJy   : 100.14
+  fsyn_143_100mJy   : 143.14
+  fsyn_150_100mJy   : 150.14
+  fsyn_217_100mJy   : 217.14
+  fsyn_353_100mJy   : 353.14
+  fsyn_545_100mJy   : 545.14
+
+
+
   beta_galdust : 3.8
   beta_radio : -0.5
   beta_galsyn : -1.

@@ -158,17 +158,83 @@ class StevePower(object):
         elif bls.ndim==2: return bls[sel,sel]
         else: raise ValueError
 
+
+
 class StevePower_extended(object):
-    def __init__(self,froot,flux,infval=1e10,tt_lmin=600,tt_lmax=None):
-        spec=np.loadtxt(f"{froot}coadd_cl_{flux}_data_200124.txt")
-        cov =np.loadtxt(f'{froot}coadd_cov_{flux}_200519.txt')
-        self.bbl =np.loadtxt(f'{froot}coadd_bpwf_{flux}_191127_lmin2.txt').reshape((10,52,7924))
-        self.spec = spec[:520]
-        self.cov = cov[:520,:520]
-        nbin = 52
-        self.ells = np.arange(2,7924+2)
-        rells = np.repeat(self.ells[None],10,axis=0)
-        self.ls = self.bin(rells)
+    def __init__(self,data_root,flux,infval=1e10,tt_lmin=600,tt_lmax=None):
+        # data_root = path_to_data + '/act_planck_data_210328/'
+        specs = ['f090xf090','f090xf100','f090xf143','f090xf150',
+         'f090xf217','f090xf353','f090xf545','f100xf100',
+         'f100xf143','f143xf143','f100xf150','f143xf150',
+         'f150xf150','f150xf217','f150xf353','f150xf545',
+         'f100xf217','f143xf217','f217xf217','f100xf353',
+         'f143xf353','f217xf353','f353xf353','f100xf545',
+         'f143xf545','f217xf545','f353xf545','f545xf545']
+
+        freqs_asked = []
+        fband1 = []
+        fband2 = []
+        for spec in specs:
+            comp1 = spec.split('x')[0]
+            comp2 = spec.split('x')[1]
+            comp1 = comp1.replace('f', '')
+            comp2 = comp2.replace('f', '')
+            fband1.append(comp1)
+            fband2.append(comp2)
+            print(comp1,comp2)
+            if comp1 not in freqs_asked:
+                freqs_asked.append(comp1)
+            if comp2 not in freqs_asked:
+                freqs_asked.append(comp2)
+        freqs_asked.sort()
+        print('fband1: ')
+        print(fband1)
+        print('fband2: ')
+        print(fband2)
+        self.fband1 = fband1
+        self.fband2 = fband2
+        print('frequency list used in the analysis: ')
+        print(freqs_asked)
+        self.cfreqs_list = freqs_asked
+
+        if flux == '15mJy':
+            rfroot = 'deep56'
+        if flux == '100mJy':
+            rfroot = 'boss'
+
+        spec = np.load(data_root+f'{rfroot}_all_ps_mean_C_ell_data_210327.npy')
+        cov = np.load(data_root+f'{rfroot}_all_ps_Cov_from_coadd_ps_210327.npy')
+        bbl = np.load(data_root+f'{rfroot}_bpwf_210327.npy')
+
+        n_specs = len(specs)
+        print('n_specs: ',n_specs)
+        n_bins = int(len(spec)/n_specs)
+        print('n_bins: ',n_bins)
+        n_ells = np.shape(bbl)[1]
+        print('n_ells: ',n_ells)
+
+        self.bbl = bbl.reshape((n_specs,n_bins,n_ells))
+        self.spec = spec[:,1]
+        self.cov = cov
+        print('shape cov : ', np.shape(self.cov))
+        nbin = n_bins
+        #self.ells = np.arange(2,n_ells+2)
+        self.ells = np.arange(2,n_ells+2)
+        # self.ells = np.arange(2,7924+2)
+        # self.ells = spec[:,0]
+        #rells = np.repeat(self.ells[None],n_specs,axis=0)
+        #print(np.shape(rells))
+        #self.ls = self.bin(rells)
+        self.ls = spec[:,0]
+
+        # conversion factor to bplike normalisations, i.e., dl's to cl's:
+        fac = self.ls*(self.ls+1.)/2./np.pi
+        self.spec = self.spec/fac
+        print('shape spec : ', np.shape(self.spec))
+        print('shape fac : ', np.shape(fac))
+        self.cov = self.cov/fac**2.
+
+
 
         if tt_lmin is not None:
             n = 3
@@ -190,20 +256,22 @@ class StevePower_extended(object):
 
         self.cinv = np.linalg.inv(self.cov)
 
+    # not used so far
     def bin(self,dls):
         bdl = np.einsum('...k,...k',self.bbl,dls[:,None,:])
         return bdl.reshape(-1)
 
-    def select(self,bls,spec,band1,band2,shift=52):
-        I = {'tt':0,'te':3,'ee':7}
-        i = { 'tt':{('95','95'): 0,('95','150'): 1,('150','95'): 1,('150','150'): 2},
-              'te':{('95','95'): 0,('95','150'): 1,('150','95'): 2,('150','150'): 3},
-              'ee':{('95','95'): 0,('95','150'): 1,('150','95'): 1,('150','150'): 2} }
-        mind = i[spec][(band1,band2)]
-        sel = np.s_[(I[spec]+mind)*shift:(I[spec]+mind+1)*shift]
-        if bls.ndim==1: return bls[sel]
-        elif bls.ndim==2: return bls[sel,sel]
-        else: raise ValueError
+    #
+    # def select(self,bls,spec,band1,band2,shift=52):
+    #     I = {'tt':0,'te':3,'ee':7}
+    #     i = { 'tt':{('95','95'): 0,('95','150'): 1,('150','95'): 1,('150','150'): 2},
+    #           'te':{('95','95'): 0,('95','150'): 1,('150','95'): 2,('150','150'): 3},
+    #           'ee':{('95','95'): 0,('95','150'): 1,('150','95'): 1,('150','150'): 2} }
+    #     mind = i[spec][(band1,band2)]
+    #     sel = np.s_[(I[spec]+mind)*shift:(I[spec]+mind+1)*shift]
+    #     if bls.ndim==1: return bls[sel]
+    #     elif bls.ndim==2: return bls[sel,sel]
+    #     else: raise ValueError
 
 
 
@@ -212,21 +280,10 @@ class act_pylike_extended(_InstallableLikelihood):
 
     def initialize(self):
 
-        self.l_max = 6000
+        self.l_max = 3826
+        # self.l_max = 6000
 
         self.log.info("Initialising.")
-        # Load path_params from yaml file
-        self.fparams = config_from_yaml('params_extended.yml')['fixed']
-        self.aparams = config_from_yaml('params_extended.yml')['act_like']
-        self.bpmodes = config_from_yaml('params_extended.yml')['bpass_modes']
-        self.bands = self.aparams['bands']
-
-
-        # Read data
-        self.prepare_data()
-
-        # State requisites to the theory code
-        self.requested_cls = ["tt", "te", "ee"]
         self.expected_params = [
             "a_tsz", # tSZ
             "xi", # tSZ-CIB cross-correlation coefficient
@@ -242,15 +299,65 @@ class act_pylike_extended(_InstallableLikelihood):
             "a_g_te", # TE Galactic dust at ell=500
             "a_g_ee", # EE Galactic dust at ell=500
             "a_s_te", # TE Synchrotron at ell=500
-            "a_s_ee", # EE Synchrotron at ell=500
+            "a_s_ee"] # EE Synchrotron at ell=500
+        # "cal_95",
+        # "cal_150",
+        # "yp_95",
+        # "yp_150"]
+        # Load path_params from yaml file
+        if self.use_act_planck == 'no':
+            self.fparams = config_from_yaml('params.yml')['fixed']
+            self.aparams = config_from_yaml('params.yml')['act_like']
+            self.bpmodes = config_from_yaml('params.yml')['bpass_modes']
+            # for the act only lkl:
+            cal_yp =[
             "cal_95",
             "cal_150",
             "yp_95",
-            "yp_150"
-        ]
+            "yp_150"]
+
+        elif self.use_act_planck == 'yes':
+            self.fparams = config_from_yaml('params_extended.yml')['fixed']
+            self.aparams = config_from_yaml('params_extended.yml')['act_like']
+            self.bpmodes = config_from_yaml('params_extended.yml')['bpass_modes']
+            # for the act+planck lkl:
+            cal_yp =[
+              "cal_090",
+              "yp_090",
+              "cal_100",
+              "yp_100",
+              "cal_143",
+              "yp_143",
+              "cal_150",
+              "yp_150",
+              "cal_217",
+              "yp_217",
+              "cal_353",
+              "yp_353",
+              "cal_545",
+              "yp_545"
+              ]
+
+
+        self.expected_params = list(np.concatenate((self.expected_params,cal_yp)))
+        print('expected params: ',self.expected_params)
+        self.bands = self.aparams['bands']
+
+
+        # Read data
+        self.prepare_data()
+
+        # State requisites to the theory code
+        self.requested_cls = ["tt", "te", "ee"]
+
+
+
+
+
 
         self.cal_params = []
         nbands = len(self.bands)
+        print('bands: ', self.bands)
         for i in range(nbands):
             self.cal_params.append(f"ct{i}") # Temperature Calibration
             self.cal_params.append(f"yp{i}") # Polarization gain
@@ -261,10 +368,14 @@ class act_pylike_extended(_InstallableLikelihood):
 
     def initialize_with_params(self):
         # Check that the parameters are the right ones
+        print('input params: ',self.input_params)
+        print('expected params: ',self.expected_params)
+
         differences = are_different_params_lists(
             self.input_params, self.expected_params,
             name_A="given", name_B="expected")
         if differences:
+            # self.input_params = self.expected_params
             raise LoggedError(
                 self.log, "Configuration error in parameters: %r.",
                 differences)
@@ -274,11 +385,16 @@ class act_pylike_extended(_InstallableLikelihood):
 
     def logp(self, **params_values):
         # return 0
+        print('doing logp')
         cl = self.theory.get_Cl(ell_factor=True)
+        print("cl's: ",cl)
         return self.loglike(cl, **params_values)
 
     def loglike(self, cl, **params_values):
-        ps_vec = self._get_power_spectra(cl, **params_values)
+        print('doing loglike')
+        ps_vec = self._get_power_spectra(cl, lkl_setup = self, **params_values)
+        print('ps_vec : ', np.shape(ps_vec))
+        print('self.sp.spec : ', np.shape(self.sp.spec))
         delta = self.sp.spec - ps_vec
         logp = -0.5 * np.dot(delta,np.dot(self.sp.cinv,delta))
         self.log.debug(
@@ -297,7 +413,7 @@ class act_pylike_extended(_InstallableLikelihood):
             data_root = path_to_data + '/act_planck_data_210328/'
             print(str_current+'Collecting power spectra from %s and with flux %s'%(data_root,self.flux))
             self.sp = StevePower_extended(data_root,self.flux)
-        exit(0)
+        # exit(0)
         if self.bandpass:
             sbands = { 'TT':[('95','95'),('95','150'),('150','150')],
                        'TE':[('95','95'),('95','150'),('150','95'),('150','150')],
@@ -348,11 +464,14 @@ class act_pylike_extended(_InstallableLikelihood):
                                             arrays=pnames,
                                             bp_file_dict=bp_dict,
                                             beam_file_dict=beam_dict,
-                                            cfreq_dict=cfreq_dict)
+                                            cfreq_dict=cfreq_dict,
+                                            lkl_setup = self)
 
-    def _get_power_spectra(self, cl, **params_values):
+    def _get_power_spectra(self, cl, lkl_setup = None, **params_values):
+        print('getting power spectra')
 
         if self.theory_debug is not None:
+            print('theory debug')
             ells,cltt,clee,clte = np.loadtxt(self.theory_debug,usecols=[0,1,2,4],unpack=True)
             assert ells[0] == 2
             assert ells[1] == 3
@@ -371,7 +490,12 @@ class act_pylike_extended(_InstallableLikelihood):
         fgdict =    {k: params_values[k] for k in self.expected_params}
         fgdict.update(self.fparams)
         nells_camb = cl['ell'].size
+        print('nells_camb: ', nells_camb)
         nells = self.sp.ells.size
+        print('self.sp.ells.size: ', nells)
+        # exit(0)
+        print('camb l0,l1: ',cl['ell'][0],cl['ell'][1])
+        print('sp.ells l0,l1: ',self.sp.ells[0],self.sp.ells[1])
         assert cl['ell'][0]==0
         assert cl['ell'][1]==1
         assert self.sp.ells[0]==2
@@ -384,10 +508,12 @@ class act_pylike_extended(_InstallableLikelihood):
         pee[2:nells_camb] = cl['ee'][2:]
 
         if self.bandpass:
+            print('doing theory bandpass')
             fpower = self.fgpower.get_theory_bandpassed(self.coadd_data,self.sp.ells,
                                                         self.sp.bbl,ptt[2:],pte[2:],pee[2:],fgdict,lmax=self.l_max)
         else:
-            fpower = self.fgpower.get_theory(self.sp.ells,self.sp.bin,ptt[2:],pte[2:],pee[2:],fgdict,lmax=self.l_max)
+            print('doing theory no bandpass')
+            fpower = self.fgpower.get_theory(self.sp.ells,self.sp.bin,ptt[2:],pte[2:],pee[2:],fgdict,lmax=self.l_max,lkl_setup = lkl_setup)
         return fpower
 
 

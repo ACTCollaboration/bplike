@@ -1,5 +1,7 @@
 debug: False
 timing: True
+# boss 100mJy
+# deep56 15mJy
 
 # Run with bandpass corrections
 likelihood:
@@ -133,9 +135,14 @@ sampler:
       a_p_ee:    0.0
       a_p_te:    0.1
       beta_CIB : 2.2
-      yp_95: 1
+      # for the act+planck lkl:
+      yp_090: 1
+      yp_100: 1
+      yp_143: 1
       yp_150: 1
-
+      yp_217: 1
+      yp_353: 1
+      yp_545: 1
   # Example MCMC run
   # mcmc:
   #   burn_in: 100
@@ -151,5 +158,5 @@ sampler:
   #   covmat: 'data/ACTPol_b5_new_cosmomc_theta2.covmat'
 
 
-output: chains/bandpass_run_test
+output: chains/act_plus_planck_run_test
 resume: True

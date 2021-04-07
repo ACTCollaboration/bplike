@@ -1,0 +1,159 @@
+debug: False
+timing: True
+# boss 100mJy
+# deep56 15mJy
+
+# Run with bandpass corrections
+likelihood:
+  # The 100 mJy likelihood
+
+  bplike.act100:
+    #path: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/
+    stop_at_error: True
+    bandpass: False
+    # Optional line to do some debugging with an input theory curve
+    #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
+    use_act_planck: 'no'
+
+  # # The 15 mJy likelihood
+  # bplike.act15:
+  #   stop_at_error: True
+  #   bandpass: False
+  #   # Optional line to do some debugging with an input theory curve
+  #   #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
+
+
+
+params:
+
+  theta_MC_100:
+    prior:
+      min: 0.5
+      max: 10
+    ref:
+      dist: norm
+      loc: 1.04109
+      scale: 0.0004
+    proposal: 0.0002
+    latex: 100\theta_\mathrm{MC}
+    drop: true
+    renames: theta
+
+  cosmomc_theta:
+    value: 'lambda theta_MC_100: 1.e-2*theta_MC_100'
+    derived: false
+
+  logA:
+    prior:
+      min: 2
+      max: 4
+    ref:
+      dist: norm
+      loc:   3.1
+      scale: 0.001
+    proposal: 0.001
+    drop: True
+    latex: \log(10^{10} A_\mathrm{s})
+
+
+  As:
+    value: "lambda logA: 1e-10*np.exp(logA)"
+    latex: A_\mathrm{s}
+  ns:
+    prior:
+      min: 0.8
+      max: 1.2
+    ref:
+      dist: norm
+      loc:   0.96
+      scale: 0.004
+    proposal: 0.002
+    latex: n_\mathrm{s}
+  ombh2:
+    prior:
+      min: 0.005
+      max: 0.1
+    ref:
+      dist: norm
+      loc:   0.0221
+      scale: 0.0001
+    proposal: 0.0001
+    latex: \Omega_\mathrm{b}h^2
+
+  omch2:
+    prior:
+      min: 0.001
+      max: 0.99
+    ref:
+      dist: norm
+      loc:   0.12
+      scale: 0.001
+    proposal: 0.0005
+    latex: \Omega_\mathrm{c}h^2
+  tau:
+    prior:
+      min: 0.01
+      max: 0.8
+    ref:
+      dist: norm
+      loc:   0.065
+      scale: 0.01
+    proposal: 0.005
+    latex: \tau_\mathrm{reio}
+
+  H0:
+    latex: H_0
+  sigma8:
+    latex: \sigma_8
+
+prior:
+  tau_prior: "lambda tau: stats.norm.logpdf(tau, loc=0.065, scale=0.015)"
+  a_c_prior: "lambda a_c: stats.norm.logpdf(a_c, loc=4.9, scale=0.9)"
+  a_p_tt_100_prior: "lambda a_p_tt_100: stats.norm.logpdf(a_p_tt_100, loc=22.5, scale=3.0)"
+  a_p_tt_15_prior: "lambda a_p_tt_15: stats.norm.logpdf(a_p_tt_15, loc=3.1, scale=0.4)"
+
+theory:
+  camb:
+    stop_at_error: False
+    extra_args:
+      lens_potential_accuracy: 1
+      theta_H0_range:
+        - 20
+        - 100
+
+sampler:
+  # Example for evaluating at a specific point
+  evaluate:
+    override:
+      a_c:    4.9
+      a_d:    6.9
+      a_tsz:    3.3
+      a_ksz:    4.950210
+      xi:   1.654936e-2
+      a_p_tt_15:    3.1
+      a_p_tt_100:    24.6
+      a_p_ee:    0.0
+      a_p_te:    0.1
+      beta_CIB : 2.2
+
+      # for the act only lkl
+      yp_95: 1
+      yp_150: 1
+
+  # Example MCMC run
+  # mcmc:
+  #   burn_in: 100
+  #   max_samples: .inf
+  #   max_tries: 400
+  #   learn_proposal: True
+  #   drag: True
+  #   # Optionally use a covmat with the right theta convention
+  #   covmat: 'data/ACTPol_b5_new_cosmomc_theta2.covmat'
+
+  # Example for running the minimizer
+  # minimize:
+  #   covmat: 'data/ACTPol_b5_new_cosmomc_theta2.covmat'
+
+
+output: chains/bandpass_run_test
+resume: True
