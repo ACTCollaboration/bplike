@@ -42,8 +42,9 @@ class ForegroundPowers(ArraySED):
                  lkl_setup = None,
                  comps = ['tsz','ksz','cibc','cibp','tsz_x_cib','radio','galdust','galsyn']
              ):
-        print('getting ells')
+        # print('getting ells')
         self.ells= ells
+        # print('ells in fg: ',ells)
         self.tsz_temp = get_template(ells,sz_temp_file,ell_pivot=params['high_ell0'])
         self.ksz_temp = get_template(ells,ksz_temp_file,ell_pivot=params['high_ell0'])
         self.tsz_x_cib_temp = get_template(ells,sz_x_cib_temp_file,ell_pivot=None)
@@ -228,15 +229,15 @@ class ForegroundPowers(ArraySED):
 
 
     def get_theory(self,ells,bin_func,dltt,dlte,dlee,params,lmax=6000,lkl_setup = None):
-        print('getting theory')
+        # print('getting theory')
         if lmax is not None:
             dltt[ells>lmax] = 0
             dlte[ells>lmax] = 0
             dlee[ells>lmax] = 0
 
         if lkl_setup.use_act_planck == 'yes':
-            print('use_act_planck :', lkl_setup.use_act_planck)
-            dls = np.zeros((28,3926))
+            # print('use_act_planck :', lkl_setup.use_act_planck)
+            dls = np.zeros((28,3924))
             for i in range(28):
                 # band1 = {0:'090',1:'100',2:'143',3:'150',4:'217',5:'353',6:'545'}[i]
                 # band2 = {0:'090',1:'100',2:'143',3:'150',4:'217',5:'353',6:'545'}[i]
@@ -244,9 +245,12 @@ class ForegroundPowers(ArraySED):
                 band2 = lkl_setup.sp.fband2[i]
                 c1 = params[f'cal_{band1}']
                 c2 = params[f'cal_{band2}']
+                # print('dltt 0-10',dltt[0:10])
                 dls[i] = (dltt + self.get_power('TT',self.comps,params,
                                             eff_freq_ghz1=self.effs[band1],array1=None,
                                             eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2
+                # print('dls 0-10',dls[0:10])
+            return bin_func(dls/ells/(ells+1.)*2.*np.pi)
         else:
             dls = np.zeros((10,7924))
             for i in range(10):
@@ -255,9 +259,11 @@ class ForegroundPowers(ArraySED):
                     band2 = {0:'95',1:'150',2:'150'}[i]
                     c1 = params[f'cal_{band1}']
                     c2 = params[f'cal_{band2}']
+                    # print('dltt 0-10',dltt[0:10])
                     dls[i] = (dltt + self.get_power('TT',self.comps,params,
                                                 eff_freq_ghz1=self.effs[band1],array1=None,
                                                 eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2
+                    # print('dls 0-10',dls[0:10])
                 elif i>=3 and i<=6:
                     band1 = {0:'95',1:'95',2:'150',3:'150'}[i-3]
                     band2 = {0:'95',1:'150',2:'95',3:'150'}[i-3]
@@ -277,7 +283,8 @@ class ForegroundPowers(ArraySED):
                     dls[i] =  (dlee + self.get_power('EE',self.comps,params,
                                                 eff_freq_ghz1=self.effs[band1],array1=None,
                                                 eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2 * y1 * y2
-        return bin_func(dls/ells/(ells+1.)*2.*np.pi)
+
+            return bin_func(dls/ells/(ells+1.)*2.*np.pi)
 
 
     def get_coadd_power(self,cdata,ibbl,ells,dl,spec,fparams):

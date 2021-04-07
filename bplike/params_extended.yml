@@ -2,18 +2,18 @@ act_like:
   bands: ['090', '100', '143', '150', '217', '353', '545']
   use_deep: True
   use_wide: True
-  nnu: 2   # number of frequencies
-  nspectot: 10 # nspecf*nspec+2 TE for 90x150 and 150x90
-  nspecf  : 3 # 95, 95x150, 150
-  nspectt : 3   # TT
-  nspecte : 4   # TE
-  nspecee : 3   # EE
-  nbintt: 52  # max nbins in ACT TT data
-  nbinte: 52  # max nbins in ACT TE data
-  nbinee: 52  # max nbins in ACT EE data
-  nbint : 520  # total bins
-  lmax_win: 7925 # ell max of the full window functions
-  bmax0 : 52   # number of bins in full window function
+  nnu: 7   # number of frequencies
+  nspectot: 28 # nspecf*nspec+2 TE for 90x150 and 150x90
+  nspecf  : 7 # 95, 95x150, 150
+  nspectt : 28   # TT
+  nspecte : 0   # TE
+  nspecee : 0   # EE
+  nbintt: 48  # max nbins in ACT TT data
+  nbinte: 48  # max nbins in ACT TE data
+  nbinee: 48  # max nbins in ACT EE data
+  nbint : 1344  # total bins
+  lmax_win: 3926 # ell max of the full window functions
+  bmax0 : 548   # number of bins in full window function
   b0: 5
   b1: 0
   b2: 0

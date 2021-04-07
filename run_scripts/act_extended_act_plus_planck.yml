@@ -16,11 +16,12 @@ likelihood:
     use_act_planck: 'yes'
 
   # # The 15 mJy likelihood
-  # bplike.act15:
-  #   stop_at_error: True
-  #   bandpass: False
-  #   # Optional line to do some debugging with an input theory curve
-  #   #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
+  bplike.act15:
+    stop_at_error: True
+    bandpass: False
+    # Optional line to do some debugging with an input theory curve
+    #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
+    use_act_planck: 'yes'
 
 
 

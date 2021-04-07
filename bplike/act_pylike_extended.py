@@ -12,6 +12,7 @@ from .fg import *
 from soapack import interfaces as sints
 from pkg_resources import resource_filename
 
+
 dfroot = resource_filename("bplike","data/actpolfull_dr4.01/data/data_act/")
 
 # dfroot_coadd_w = resource_filename("bplike","data")+"/bplike_data/big_coadd_weights/200226/"
@@ -115,10 +116,14 @@ class StevePower(object):
     def __init__(self,froot,flux,infval=1e10,tt_lmin=600,tt_lmax=None):
         spec=np.loadtxt(f"{froot}coadd_cl_{flux}_data_200124.txt")
         cov =np.loadtxt(f'{froot}coadd_cov_{flux}_200519.txt')
-        self.bbl =np.loadtxt(f'{froot}coadd_bpwf_{flux}_191127_lmin2.txt').reshape((10,52,7924))
+        bbl = np.loadtxt(f'{froot}coadd_bpwf_{flux}_191127_lmin2.txt')
+        # print('bbl shape:',np.shape(bbl))
+        # exit(0)
+        self.bbl =bbl.reshape((10,52,7924))
         self.spec = spec[:520]
         self.cov = cov[:520,:520]
         nbin = 52
+        self.n_bins = nbin
         self.ells = np.arange(2,7924+2)
         rells = np.repeat(self.ells[None],10,axis=0)
         self.ls = self.bin(rells)
@@ -131,6 +136,8 @@ class StevePower(object):
             self.cov[:,ids] = 0
             self.cov[ids,:] = 0
             self.cov[ids,ids] = infval
+            # print('cov')
+            # print(cov)
 
         if tt_lmax is not None:
             n = 3
@@ -140,10 +147,14 @@ class StevePower(object):
             self.cov[:,ids] = 0
             self.cov[ids,:] = 0
             self.cov[ids,ids] = infval
+            # print('cov')
+            # print(cov)
 
         self.cinv = np.linalg.inv(self.cov)
 
     def bin(self,dls):
+        # print('bbl in bin, size : ',len(self.bbl[0,0,:]) )
+        # print(self.bbl[0,0,:])
         bdl = np.einsum('...k,...k',self.bbl,dls[:,None,:])
         return bdl.reshape(-1)
 
@@ -181,20 +192,20 @@ class StevePower_extended(object):
             comp2 = comp2.replace('f', '')
             fband1.append(comp1)
             fband2.append(comp2)
-            print(comp1,comp2)
+            # print(comp1,comp2)
             if comp1 not in freqs_asked:
                 freqs_asked.append(comp1)
             if comp2 not in freqs_asked:
                 freqs_asked.append(comp2)
         freqs_asked.sort()
-        print('fband1: ')
-        print(fband1)
-        print('fband2: ')
-        print(fband2)
+        # print('fband1: ')
+        # print(fband1)
+        # print('fband2: ')
+        # print(fband2)
         self.fband1 = fband1
         self.fband2 = fband2
-        print('frequency list used in the analysis: ')
-        print(freqs_asked)
+        # print('frequency list used in the analysis: ')
+        # print(freqs_asked)
         self.cfreqs_list = freqs_asked
 
         if flux == '15mJy':
@@ -205,21 +216,32 @@ class StevePower_extended(object):
         spec = np.load(data_root+f'{rfroot}_all_ps_mean_C_ell_data_210327.npy')
         cov = np.load(data_root+f'{rfroot}_all_ps_Cov_from_coadd_ps_210327.npy')
         bbl = np.load(data_root+f'{rfroot}_bpwf_210327.npy')
-
+        l_min = 2
+        # print('bbl shape:',np.shape(bbl))
         n_specs = len(specs)
-        print('n_specs: ',n_specs)
+        # print('n_specs: ',n_specs)
         n_bins = int(len(spec)/n_specs)
-        print('n_bins: ',n_bins)
+        # print('n_bins: ',n_bins)
         n_ells = np.shape(bbl)[1]
-        print('n_ells: ',n_ells)
+        # print('n_ells: ',n_ells)
+        n_ells = n_ells-l_min
+        bbl_2 = np.zeros((n_bins*n_specs,n_ells))
+        for i in range(n_bins*n_specs):
+            bbl_2[i,:] = np.delete(bbl[i,:],[0,1])
+        # print(len(bbl_2[0,:]))
 
-        self.bbl = bbl.reshape((n_specs,n_bins,n_ells))
+
+
+
+        self.n_bins = n_bins
+
+        self.bbl = bbl_2.reshape((n_specs,n_bins,n_ells))
         self.spec = spec[:,1]
         self.cov = cov
-        print('shape cov : ', np.shape(self.cov))
+        # print('shape cov : ', np.shape(self.cov))
         nbin = n_bins
         #self.ells = np.arange(2,n_ells+2)
-        self.ells = np.arange(2,n_ells+2)
+        self.ells = np.arange(l_min,n_ells+2)
         # self.ells = np.arange(2,7924+2)
         # self.ells = spec[:,0]
         #rells = np.repeat(self.ells[None],n_specs,axis=0)
@@ -230,34 +252,50 @@ class StevePower_extended(object):
         # conversion factor to bplike normalisations, i.e., dl's to cl's:
         fac = self.ls*(self.ls+1.)/2./np.pi
         self.spec = self.spec/fac
-        print('shape spec : ', np.shape(self.spec))
-        print('shape fac : ', np.shape(fac))
+        # print('shape spec : ', np.shape(self.spec))
+        # print('shape fac : ', np.shape(fac))
         self.cov = self.cov/fac**2.
 
 
 
         if tt_lmin is not None:
-            n = 3
+            # n = 3
             ids = []
             ids = np.argwhere(self.ls<tt_lmin)[:,0]
-            ids = ids[ids<nbin*3]
+            # print('ls: ', self.ls)
+            # print(len(self.ls))
+            # print('nbins: ',nbin)
+            # print('ids ls<tt_lmin: ', ids)
+            # print('fband1 : ',self.fband1)
+            rfband1 = np.repeat(self.fband1,nbin)
+            rfband2 = np.repeat(self.fband2,nbin)
+            # print(len(rfband2))
+            # print(type(rfband2[0]))
+            # cd_act =
+            ids_act = np.argwhere((self.ls<tt_lmin) & ((rfband1 == '090') | (rfband1 == '150') | (rfband2 == '090') | (rfband2 == '150')))[:,0]
+            # print('idsact : ',ids_act)
+            # exit(0)
+            ids = ids_act
             self.cov[:,ids] = 0
             self.cov[ids,:] = 0
             self.cov[ids,ids] = infval
+            # print('cov')
+            # print(cov)
 
-        if tt_lmax is not None:
-            n = 3
-            ids = []
-            ids = np.argwhere(self.ls>tt_lmax)[:,0]
-            ids = ids[ids<nbin*3]
-            self.cov[:,ids] = 0
-            self.cov[ids,:] = 0
-            self.cov[ids,ids] = infval
+        # if tt_lmax is not None:
+        #     n = 3
+        #     ids = []
+        #     ids = np.argwhere(self.ls>tt_lmax)[:,0]
+        #     ids = ids[ids<nbin*3]
+        #     self.cov[:,ids] = 0
+        #     self.cov[ids,:] = 0
+        #     self.cov[ids,ids] = infval
 
         self.cinv = np.linalg.inv(self.cov)
 
-    # not used so far
     def bin(self,dls):
+        # print('bbl in bin, size : ',len(self.bbl[0,0,:]) )
+        # print(self.bbl[0,0,:])
         bdl = np.einsum('...k,...k',self.bbl,dls[:,None,:])
         return bdl.reshape(-1)
 
@@ -280,7 +318,7 @@ class act_pylike_extended(_InstallableLikelihood):
 
     def initialize(self):
 
-        self.l_max = 3826
+        # self.l_max = 3826
         # self.l_max = 6000
 
         self.log.info("Initialising.")
@@ -304,24 +342,12 @@ class act_pylike_extended(_InstallableLikelihood):
         # "cal_150",
         # "yp_95",
         # "yp_150"]
-        # Load path_params from yaml file
-        if self.use_act_planck == 'no':
-            self.fparams = config_from_yaml('params.yml')['fixed']
-            self.aparams = config_from_yaml('params.yml')['act_like']
-            self.bpmodes = config_from_yaml('params.yml')['bpass_modes']
-            # for the act only lkl:
-            cal_yp =[
+        self.cal_yp_act_only =[
             "cal_95",
             "cal_150",
             "yp_95",
             "yp_150"]
-
-        elif self.use_act_planck == 'yes':
-            self.fparams = config_from_yaml('params_extended.yml')['fixed']
-            self.aparams = config_from_yaml('params_extended.yml')['act_like']
-            self.bpmodes = config_from_yaml('params_extended.yml')['bpass_modes']
-            # for the act+planck lkl:
-            cal_yp =[
+        self.cal_yp_act_plus_planck =[
               "cal_090",
               "yp_090",
               "cal_100",
@@ -337,10 +363,52 @@ class act_pylike_extended(_InstallableLikelihood):
               "cal_545",
               "yp_545"
               ]
+        file = resource_filename("bplike","act_pylike_extended_full.yaml")
+        with open(file) as f:
+            act_pylike_extended_full = yaml.load(f, Loader=yaml.FullLoader)
+        # print('act_pylike_extended_full')
+        # print(act_pylike_extended_full)
+        # exit(0)
+        # Load path_params from yaml file
+        if self.use_act_planck == 'no':
+            self.l_max = 6000
+            self.fparams = config_from_yaml('params.yml')['fixed']
+            self.aparams = config_from_yaml('params.yml')['act_like']
+            self.bpmodes = config_from_yaml('params.yml')['bpass_modes']
+            # for the act only lkl:
+
+            cal_yp =  self.cal_yp_act_only
+            # for s in self.cal_yp_act_plus_planck:
+            #     if s not in self.cal_yp_act_only:
+            #         act_pylike_extended_full['params'].pop(s,None)
+            # print('act_pylike_extended_full act only')
+            # print(act_pylike_extended_full)
+
+        elif self.use_act_planck == 'yes':
+            self.l_max = 3826
+            self.fparams = config_from_yaml('params_extended.yml')['fixed']
+            self.aparams = config_from_yaml('params_extended.yml')['act_like']
+            self.bpmodes = config_from_yaml('params_extended.yml')['bpass_modes']
+            # for the act+planck lkl:
+
+            cal_yp = self.cal_yp_act_plus_planck
+            # for s in self.cal_yp_act_only:
+            #     if s not in self.cal_yp_act_plus_planck:
+            #         act_pylike_extended_full['params'].pop(s,None)
+            # print('act_pylike_extended_full act+planck')
+            # print(act_pylike_extended_full)
+        new_file = file.replace('_full', '')
+        # print('new_file')
+        # print(new_file)
+        with open(new_file, 'w') as f:
+            yaml.dump(act_pylike_extended_full, f)
+        # exit(0)
+
+
 
 
         self.expected_params = list(np.concatenate((self.expected_params,cal_yp)))
-        print('expected params: ',self.expected_params)
+        # print('expected params: ',self.expected_params)
         self.bands = self.aparams['bands']
 
 
@@ -357,7 +425,7 @@ class act_pylike_extended(_InstallableLikelihood):
 
         self.cal_params = []
         nbands = len(self.bands)
-        print('bands: ', self.bands)
+        # print('bands: ', self.bands)
         for i in range(nbands):
             self.cal_params.append(f"ct{i}") # Temperature Calibration
             self.cal_params.append(f"yp{i}") # Polarization gain
@@ -368,8 +436,23 @@ class act_pylike_extended(_InstallableLikelihood):
 
     def initialize_with_params(self):
         # Check that the parameters are the right ones
-        print('input params: ',self.input_params)
-        print('expected params: ',self.expected_params)
+        # print('params: ', self.use_act_planck)
+        # print('input params: ',self.input_params)
+        if self.use_act_planck == 'yes':
+            l = self.input_params
+            l_pop_cal_yp = [s for s in self.cal_yp_act_only  if s not in self.cal_yp_act_plus_planck]
+            new_l = [s for s in l if s not in l_pop_cal_yp ]
+            self.input_params = new_l
+        elif self.use_act_planck == 'no':
+            l = self.input_params
+            l_pop_cal_yp = [s for s in self.cal_yp_act_plus_planck  if s not in self.cal_yp_act_only]
+            new_l = [s for s in l if s not in l_pop_cal_yp ]
+            self.input_params = new_l
+
+
+            # self.input_params.remove('cal_95','yp_95')
+
+        # print('expected params: ',self.expected_params)
 
         differences = are_different_params_lists(
             self.input_params, self.expected_params,
@@ -385,17 +468,32 @@ class act_pylike_extended(_InstallableLikelihood):
 
     def logp(self, **params_values):
         # return 0
-        print('doing logp')
+        # print('doing logp')
         cl = self.theory.get_Cl(ell_factor=True)
-        print("cl's: ",cl)
+        # print("cl's: ",cl)
         return self.loglike(cl, **params_values)
 
     def loglike(self, cl, **params_values):
-        print('doing loglike')
+        # print('doing loglike')
+        # print('cls 0:10:', cl['tt'][:10] )
+
+
         ps_vec = self._get_power_spectra(cl, lkl_setup = self, **params_values)
-        print('ps_vec : ', np.shape(ps_vec))
-        print('self.sp.spec : ', np.shape(self.sp.spec))
-        delta = self.sp.spec - ps_vec
+
+        # print('shape ls: ',np.shape(self.sp.ls))
+        # print('shape ps_vec : ', np.shape(ps_vec))
+        # print('shape self.sp.spec : ', np.shape(self.sp.spec))
+        n_bins = self.sp.n_bins
+
+        if self.use_act_planck == 'yes':
+            fac = self.sp.ls*(self.sp.ls+1.)/2./np.pi
+            # print('ps_vec : ', ps_vec[:n_bins]/fac[:n_bins])
+            # print('self.sp.spec : ', self.sp.spec[:n_bins])
+            delta = self.sp.spec - ps_vec/fac
+        elif self.use_act_planck == 'no':
+            # print('ps_vec : ', ps_vec[:n_bins])
+            # print('self.sp.spec : ', self.sp.spec[:n_bins])
+            delta = self.sp.spec - ps_vec
         logp = -0.5 * np.dot(delta,np.dot(self.sp.cinv,delta))
         self.log.debug(
             f"ACT-like {self.flux} lnLike value = {logp} (chisquare = {-2 * logp})")
@@ -454,8 +552,8 @@ class act_pylike_extended(_InstallableLikelihood):
             beam_dict = None
             cfreq_dict = None
 
-        print(str_current+'frequencies: ')
-        print(cfreq_dict)
+        # print(str_current+'frequencies: ')
+        # print(cfreq_dict)
         self.fgpower = ForegroundPowers(self.fparams,self.sp.ells,
                                             sz_temp_file,
                                             ksz_temp_file,
@@ -468,10 +566,11 @@ class act_pylike_extended(_InstallableLikelihood):
                                             lkl_setup = self)
 
     def _get_power_spectra(self, cl, lkl_setup = None, **params_values):
-        print('getting power spectra')
+        # print('getting power spectra')
+        l_min = 2
 
         if self.theory_debug is not None:
-            print('theory debug')
+            # print('theory debug')
             ells,cltt,clee,clte = np.loadtxt(self.theory_debug,usecols=[0,1,2,4],unpack=True)
             assert ells[0] == 2
             assert ells[1] == 3
@@ -490,30 +589,43 @@ class act_pylike_extended(_InstallableLikelihood):
         fgdict =    {k: params_values[k] for k in self.expected_params}
         fgdict.update(self.fparams)
         nells_camb = cl['ell'].size
-        print('nells_camb: ', nells_camb)
+        # print('nells_camb: ', nells_camb)
         nells = self.sp.ells.size
-        print('self.sp.ells.size: ', nells)
+        # print('self.sp.ells.size: ', nells)
         # exit(0)
-        print('camb l0,l1: ',cl['ell'][0],cl['ell'][1])
-        print('sp.ells l0,l1: ',self.sp.ells[0],self.sp.ells[1])
+        # print('camb l0,l1: ',cl['ell'][0],cl['ell'][1])
+        # print('camb l-1,l-2: ',cl['ell'][-1],cl['ell'][-2])
+        # print('sp.ells l0,l1: ',self.sp.ells[0],self.sp.ells[1])
+        # print('sp.ells l-1,l-2: ',self.sp.ells[-1],self.sp.ells[-2])
         assert cl['ell'][0]==0
         assert cl['ell'][1]==1
-        assert self.sp.ells[0]==2
-        assert self.sp.ells[1]==3
-        ptt = np.zeros(nells+2)
-        pte = np.zeros(nells+2)
-        pee = np.zeros(nells+2)
-        ptt[2:nells_camb] = cl['tt'][2:]
-        pte[2:nells_camb] = cl['te'][2:]
-        pee[2:nells_camb] = cl['ee'][2:]
+        assert self.sp.ells[0]==l_min
+        assert self.sp.ells[1]==l_min + 1
+        ptt = np.zeros(nells+l_min)
+        pte = np.zeros(nells+l_min)
+        pee = np.zeros(nells+l_min)
+        ptt[l_min:nells_camb] = cl['tt'][l_min:]
+        pte[l_min:nells_camb] = cl['te'][l_min:]
+        pee[l_min:nells_camb] = cl['ee'][l_min:]
 
         if self.bandpass:
-            print('doing theory bandpass')
+            # print('doing theory bandpass')
             fpower = self.fgpower.get_theory_bandpassed(self.coadd_data,self.sp.ells,
                                                         self.sp.bbl,ptt[2:],pte[2:],pee[2:],fgdict,lmax=self.l_max)
         else:
-            print('doing theory no bandpass')
-            fpower = self.fgpower.get_theory(self.sp.ells,self.sp.bin,ptt[2:],pte[2:],pee[2:],fgdict,lmax=self.l_max,lkl_setup = lkl_setup)
+            # print('doing theory no bandpass')
+            # print('sp.ells: ',self.sp.ells)
+            fpower = self.fgpower.get_theory(self.sp.ells,
+                                             self.sp.bin,
+                                             ptt[l_min:],
+                                             pte[l_min:],
+                                             pee[l_min:],
+                                             fgdict,
+                                             lmax=self.l_max,
+                                             lkl_setup = lkl_setup)
+            # print('fpower : ', fpower[0:10])
+            # exit(0)
+
         return fpower
 
 
