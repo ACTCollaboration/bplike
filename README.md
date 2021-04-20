@@ -18,7 +18,13 @@ You can find the data files here on niagara:
 ```
 /scratch/r/rbond/msyriac/data/depot/bplike/data
 ```
-You should symlink that directory to the root repository directory.
+
+and on cori (NERSC):
+```
+/global/project/projectdirs/act/data/msyriac/bplike_data
+```
+
+You should symlink that directory to the root repository directory with the name `data`.
 
 
 ## Running chains with Cobaya
