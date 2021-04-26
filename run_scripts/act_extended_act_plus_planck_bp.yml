@@ -10,7 +10,7 @@ likelihood:
   bplike.act100:
     #path: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/
     stop_at_error: False
-    bandpass: False
+    bandpass: True
     # Optional line to do some debugging with an input theory curve
     #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
     use_act_planck: 'yes'
@@ -18,7 +18,7 @@ likelihood:
   # # The 15 mJy likelihood
   bplike.act15:
     stop_at_error: True
-    bandpass: False
+    bandpass: True
     # Optional line to do some debugging with an input theory curve
     #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
     use_act_planck: 'yes'

@@ -25,3 +25,6 @@ bplike/output
 bplike/data
 notebooks/.ipynb_checkpoints/bplike_wip-checkpoint.ipynb
 notebooks/bplike_wip.ipynb
+notebooks/*.pdf
+.ipynb_checkpoints
+notebooks/.ipynb_checkpoints

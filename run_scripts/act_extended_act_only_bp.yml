@@ -6,22 +6,22 @@ timing: True
 # Run with bandpass corrections
 likelihood:
   # The 100 mJy likelihood
-  #
+
   bplike.act100:
     #path: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/
-    stop_at_error: False
-    bandpass: False
+    stop_at_error: True
+    bandpass: True
     # Optional line to do some debugging with an input theory curve
     #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
-    use_act_planck: 'yes'
+    use_act_planck: 'no'
 
-  # # The 15 mJy likelihood
+  # # # The 15 mJy likelihood
   bplike.act15:
     stop_at_error: True
-    bandpass: False
+    bandpass: True
     # Optional line to do some debugging with an input theory curve
     #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
-    use_act_planck: 'yes'
+    use_act_planck: 'no'
 
 
 
@@ -136,16 +136,11 @@ sampler:
       a_p_ee:    0.0
       a_p_te:    0.1
       beta_CIB : 2.2
-      # galactic dust
-      a_g_tt:  1
-      # for the act+planck lkl:
-      yp_090: 1
-      yp_100: 1
-      yp_143: 1
+
+      # for the act only lkl
+      yp_95: 1
       yp_150: 1
-      yp_217: 1
-      yp_353: 1
-      yp_545: 1
+
   # Example MCMC run
   # mcmc:
   #   burn_in: 100
@@ -161,5 +156,5 @@ sampler:
   #   covmat: 'data/ACTPol_b5_new_cosmomc_theta2.covmat'
 
 
-output: chains/act_plus_planck_run_test
+output: chains/bandpass_run_test
 resume: True
