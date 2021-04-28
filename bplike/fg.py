@@ -411,6 +411,85 @@ class ForegroundPowers(ArraySED):
                 # print('dls 0-10',dls[i][0:10])
             return bin_func(dls/ells/(ells+1.)*2.*np.pi)
 
+
+    def get_comp(self,ells,bin_func,dltt,dlte,dlee,params,lmax=6000,lkl_setup = None, comp = None):
+        # print('getting theory')
+        if lmax is not None:
+            dltt[ells>lmax] = 0
+            dlte[ells>lmax] = 0
+            dlee[ells>lmax] = 0
+
+        if lkl_setup.use_act_planck == 'yes':
+            # print('use_act_planck :', lkl_setup.use_act_planck)
+            dls = np.zeros((28,3924))
+            for i in range(28):
+                # band1 = {0:'090',1:'100',2:'143',3:'150',4:'217',5:'353',6:'545'}[i]
+                # band2 = {0:'090',1:'100',2:'143',3:'150',4:'217',5:'353',6:'545'}[i]
+                band1 = lkl_setup.sp.fband1[i]
+                band2 = lkl_setup.sp.fband2[i]
+                c1 = params[f'cal_{band1}']
+                c2 = params[f'cal_{band2}']
+                # print('dltt 0-10',dltt[0:10])
+                # print('c1,c2:',c1,c2)
+                # print('b1,b2:',band1,band2)
+                # print('effs1,effs2:',self.effs[band1],self.effs[band2])
+                if comp == 'primary':
+                    dls[i] = (dltt ) * c1 * c2
+                else:
+                    dls[i] = (self.get_power('TT',[comp],params,
+                                                eff_freq_ghz1=self.effs[band1],array1=None,
+                                                eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2
+
+                # print('dls 0-10',dls[i][0:10])
+            # exit(0)
+            return bin_func(dls/ells/(ells+1.)*2.*np.pi)
+        else:
+            dls = np.zeros((10,7924))
+            for i in range(10):
+                if i<3:
+                    band1 = {0:'95',1:'95',2:'150'}[i]
+                    band2 = {0:'95',1:'150',2:'150'}[i]
+                    c1 = params[f'cal_{band1}']
+                    c2 = params[f'cal_{band2}']
+                    # print('dltt 0-10',dltt[0:10])
+                    if comp == 'primary':
+                        dls[i] = (dltt ) * c1 * c2
+                    else:
+                        dls[i] = (self.get_power('TT',[comp],params,
+                                                eff_freq_ghz1=self.effs[band1],array1=None,
+                                                eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2
+                    # print('dls 0-10',dls[0:10])
+                elif i>=3 and i<=6:
+                    band1 = {0:'95',1:'95',2:'150',3:'150'}[i-3]
+                    band2 = {0:'95',1:'150',2:'95',3:'150'}[i-3]
+                    c1 = params[f'cal_{band1}']
+                    c2 = params[f'cal_{band2}']
+                    y = params[f'yp_{band2}']
+                    if comp == 'primary':
+                        dls[i] = (dlte  ) * c1 * c2 * y
+                    else:
+                        dls[i] = (self.get_power('TE',[comp],params,
+                                                    eff_freq_ghz1=self.effs[band1],array1=None,
+                                                    eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2 * y
+                else:
+                    band1 = {0:'95',1:'95',2:'150'}[i-7]
+                    band2 = {0:'95',1:'150',2:'150'}[i-7]
+                    c1 = params[f'cal_{band1}']
+                    c2 = params[f'cal_{band2}']
+                    y1 = params[f'yp_{band1}']
+                    y2 = params[f'yp_{band2}']
+                    if comp == 'primary':
+                        dls[i] =  (dlee ) * c1 * c2 * y1 * y2
+                    else:
+                        dls[i] =  (self.get_power('EE',[comp],params,
+                                                    eff_freq_ghz1=self.effs[band1],array1=None,
+                                                    eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2 * y1 * y2
+                # print('dls 0-10',dls[i][0:10])
+            return bin_func(dls/ells/(ells+1.)*2.*np.pi)
+
+
+
+
     def get_coadd_power(self,cdata,ibbl,ells,dl,spec,fparams,lkl_setup = None):
 
         icov,icov_ibin,Pmat,arrays = cdata
@@ -445,6 +524,48 @@ class ForegroundPowers(ArraySED):
 
 
         return np.dot(icov_ibin,np.dot(Pmat,np.dot(icov,ps)))
+
+
+    def get_coadd_power_comp(self,cdata,ibbl,ells,dl,spec,fparams,lkl_setup = None,comp = None):
+
+        icov,icov_ibin,Pmat,arrays = cdata
+        # print('getting coadd power for spec:', spec)
+        # #print('fparams:', fparams)
+        # print('dls:', np.shape(dl),dl)
+        # print('ells:', np.shape(ells),ells)
+        # print('ibbl:', np.shape(ibbl),ibbl)
+        # print('icov:', np.shape(icov),icov)
+        # print('icov_ibin:', np.shape(icov_ibin),icov_ibin)
+        # print('arrays:', np.shape(arrays),arrays)
+
+        if lkl_setup.use_act_planck == 'yes':
+            l_max = 3924
+        else:
+            l_max = 7924
+
+
+        ps = []
+        for row in arrays:
+            ind,r,season1,season2,array1,array2 = row
+            a1 = '_'.join([season1,array1])
+            a2 = '_'.join([season2,array2])
+            # print('a1,a2:',a1,a2)
+            if comp == 'primary':
+                pow = dl
+            else:
+                pow = self.get_power(spec,[comp],fparams,
+                                          eff_freq_ghz1=None,array1=a1,
+                                          eff_freq_ghz2=None,array2=a2,
+                                          lmax=l_max) # 7924 for act alone, 3924 for act_planck
+
+            pow = pow/ells/(ells+1)*2.*np.pi
+            bpow = np.einsum('...k,...k',ibbl,pow)
+            ps = np.append(ps,bpow.copy())
+
+
+        return np.dot(icov_ibin,np.dot(Pmat,np.dot(icov,ps)))
+
+
 
 
     def get_theory_bandpassed(self,coadd_data,ells,bbl,dltt,dlte,dlee,params,lmax=6000,lkl_setup = None):
@@ -512,6 +633,77 @@ class ForegroundPowers(ArraySED):
                     y2 = params[f'yp_{band2}']
 
                     cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dlee,spec,params,lkl_setup) * c1 * c2 * y1 * y2
+
+
+
+        self.cache['CIB'] = {}
+        return cls
+
+    def get_theory_bandpassed_comp(self,coadd_data,ells,bbl,dltt,dlte,dlee,params,lmax=6000,lkl_setup = None,comp=None):
+
+        assert len(self.cache['CIB'])==0
+
+        if lmax is not None:
+            dltt[ells>lmax] = 0
+            dlte[ells>lmax] = 0
+            dlee[ells>lmax] = 0
+
+        if lkl_setup.use_act_planck == 'yes':
+            # print(lkl_setup.sp.n_bins)
+            # print(lkl_setup.sp.n_specs)
+            dim = lkl_setup.sp.n_bins*lkl_setup.sp.n_specs
+            # exit(0)
+            cls = np.zeros((dim,))
+            for i in range(lkl_setup.sp.n_specs):
+                sel = np.s_[i*lkl_setup.sp.n_bins:(i+1)*lkl_setup.sp.n_bins]
+                # print(sel)
+
+
+                spec = 'TT'
+                band1 = lkl_setup.sp.fband1[i]
+                band2 = lkl_setup.sp.fband2[i]
+                c1 = params[f'cal_{band1}']
+                c2 = params[f'cal_{band2}']
+                # print('  ')
+                # print('  ')
+                # print('getting theory bp at:')
+                # print(c1,c2,band1,band2)
+                cls[sel] = self.get_coadd_power_comp(coadd_data[spec][(band1,band2)],bbl[i],ells,dltt,spec,params,lkl_setup,comp) * c1 * c2
+            # exit(0)
+        else:
+            cls = np.zeros((520,))
+            for i in range(10):
+                sel = np.s_[i*52:(i+1)*52]
+
+                if i<3:
+                    spec = 'TT'
+                    band1 = {0:'95',1:'95',2:'150'}[i]
+                    band2 = {0:'95',1:'150',2:'150'}[i]
+                    c1 = params[f'cal_{band1}']
+                    c2 = params[f'cal_{band2}']
+
+                    cls[sel] = self.get_coadd_power_comp(coadd_data[spec][(band1,band2)],bbl[i],ells,dltt,spec,params,lkl_setup,comp) * c1 * c2
+
+                elif i>=3 and i<=6:
+                    spec = 'TE'
+                    band1 = {0:'95',1:'95',2:'150',3:'150'}[i-3]
+                    band2 = {0:'95',1:'150',2:'95',3:'150'}[i-3]
+                    c1 = params[f'cal_{band1}']
+                    c2 = params[f'cal_{band2}']
+                    y = params[f'yp_{band2}']
+
+                    cls[sel] = self.get_coadd_power_comp(coadd_data[spec][(band1,band2)],bbl[i],ells,dlte,spec,params,lkl_setup,comp) * c1 * c2 * y
+
+                else:
+                    spec = 'EE'
+                    band1 = {0:'95',1:'95',2:'150'}[i-7]
+                    band2 = {0:'95',1:'150',2:'150'}[i-7]
+                    c1 = params[f'cal_{band1}']
+                    c2 = params[f'cal_{band2}']
+                    y1 = params[f'yp_{band1}']
+                    y2 = params[f'yp_{band2}']
+
+                    cls[sel] = self.get_coadd_power_comp(coadd_data[spec][(band1,band2)],bbl[i],ells,dlee,spec,params,lkl_setup,comp) * c1 * c2 * y1 * y2
 
 
 

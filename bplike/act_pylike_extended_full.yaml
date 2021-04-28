@@ -222,7 +222,7 @@ params:
 
   a_g_tt:
     prior:
-      min: 0.9
+      min: -0.9 #was 0.9, set negative so it can be passed as = 0 in evaluate call
       max: 1.1
     ref:
       dist: norm
@@ -230,6 +230,28 @@ params:
       scale: 0.02
     proposal: 0.01
     latex: a_g_tt
+
+  a_g_te:
+    prior:
+      min: 0.9
+      max: 1.1
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: a_g_te
+
+  a_g_ee:
+    prior:
+      min: 0.9
+      max: 1.1
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: a_g_ee
 
 
   #
@@ -260,13 +282,13 @@ params:
   #   value: 1.
   #   latex: a_g_tt
 
-  a_g_te:
-    value: 0
-    latex: a_g_te
+  # a_g_te:
+  #   value: 0
+  #   latex: a_g_te
 
-  a_g_ee:
-    value: 0
-    latex: a_g_ee
+  # a_g_ee:
+  #   value: 0
+  #   latex: a_g_ee
 
   a_s_te:
     value: 0

@@ -22,15 +22,29 @@ params:
       scale: 1
   a_g_ee:
     latex: a_g_ee
-    value: 0
+    prior:
+      max: 1.1
+      min: 0.9
+    proposal: 0.01
+    ref:
+      dist: norm
+      loc: 1
+      scale: 0.02
   a_g_te:
     latex: a_g_te
-    value: 0
+    prior:
+      max: 1.1
+      min: 0.9
+    proposal: 0.01
+    ref:
+      dist: norm
+      loc: 1
+      scale: 0.02
   a_g_tt:
     latex: a_g_tt
     prior:
       max: 1.1
-      min: 0.9
+      min: -0.9
     proposal: 0.01
     ref:
       dist: norm

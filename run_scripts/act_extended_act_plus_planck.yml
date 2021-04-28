@@ -126,6 +126,12 @@ sampler:
   # Example for evaluating at a specific point
   evaluate:
     override:
+      theta_MC_100: 1.045
+      logA: 3.05
+      ns : 0.956159
+      ombh2 : 0.022219
+      omch2 : 0.119883
+      tau : 0.0754047
       a_c:    4.9
       a_d:    6.9
       a_tsz:    3.3

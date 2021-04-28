@@ -204,6 +204,20 @@ class StevePower(object):
             spec = 'TT'
 
             save_coadd_matrix(spec,band1,band2,flux,path_root)
+        fband1 = []
+        fband2 = []
+        for i in range(10):
+            if i<3:
+                fband1.append({0:'T095',1:'T095',2:'T150'}[i])
+                fband2.append({0:'T095',1:'T150',2:'T150'}[i])
+            elif i>=3 and i<=6:
+                fband1.append({0:'T095',1:'T095',2:'T150',3:'T150'}[i-3])
+                fband2.append({0:'E095',1:'E150',2:'E095',3:'E150'}[i-3])
+            else:
+                fband1.append({0:'E095',1:'E095',2:'E150'}[i-7])
+                fband2.append({0:'E095',1:'E150',2:'E150'}[i-7])
+        self.fband1 = fband1
+        self.fband2 = fband2
 
     def bin(self,dls):
         # print('bbl in bin, size : ',len(self.bbl[0,0,:]) )
@@ -281,6 +295,7 @@ class StevePower_extended(object):
         # print('n_specs: ',n_specs)
         n_bins = int(len(spec)/n_specs)
         # print('n_bins: ',n_bins)
+        # exit(0)
         n_ells = np.shape(bbl)[1]
         # print('n_ells: ',n_ells)
         n_ells = n_ells-l_min
@@ -647,34 +662,56 @@ class act_pylike_extended(_InstallableLikelihood):
     def loglike(self, cl, **params_values):
         # print('doing loglike')
         # print('cls 0:10:', cl['tt'][:10] )
+        comps = ['tot','primary','tsz','ksz','cibc','cibp','tsz_x_cib','radio','galdust','galsyn']
 
 
         ps = self._get_power_spectra(cl, lkl_setup = self, **params_values)
         ps_vec = ps['tot']
-        ps_vec_galdust = ps['galdust']
-        ps_vec_primary = ps['primary']
+
+        # ps_vec_galdust = ps['galdust']
+        # ps_vec_primary = ps['primary']
         # print('shape ls: ',np.shape(self.sp.ls))
         # print('shape ps_vec : ', np.shape(ps_vec))
         # print('shape self.sp.spec : ', np.shape(self.sp.spec))
         n_bins = self.sp.n_bins
+        if self.bandpass:
+            bps = '_bp_'
+        else:
+            bps = '_'
+
+        fac = self.sp.ls*(self.sp.ls+1.)/2./np.pi
 
         if self.use_act_planck == 'yes':
-            fac = self.sp.ls*(self.sp.ls+1.)/2./np.pi
+
             # print('ps_vec : ', ps_vec[:n_bins]/fac[:n_bins])
             # print('self.sp.spec : ', self.sp.spec[:n_bins])
             dls_theory = ps_vec
-            np.save(path_to_output+'/dls_theory.npy',dls_theory)
-            np.save(path_to_output+'/dls_theory_galdust.npy',ps_vec_galdust)
-            np.save(path_to_output+'/dls_theory_primary.npy',ps_vec_primary)
             ls_theory = self.sp.ls
-            np.save(path_to_output+'/ls_theory.npy',ls_theory)
             delta = self.sp.spec - dls_theory/fac
+            np.save(path_to_output+'/ls_theory_'+self.flux+bps+'act_planck.npy',ls_theory)
+
+            for comp in comps:
+                np.save(path_to_output+'/dls_theory_'+comp+'_'+self.flux+bps+'act_planck.npy',ps[comp])
+                # np.save(path_to_output+'/dls_theory_'+self.flux+bps+'act_planck.npy',ps_vec_galdust)
+                # np.save(path_to_output+'/dls_theory_'+self.flux+bps+'act_planck.npy',ps_vec_primary)
+
 
 
         elif self.use_act_planck == 'no':
             # print('ps_vec : ', ps_vec[:n_bins])
             # print('self.sp.spec : ', self.sp.spec[:n_bins])
+            dls_theory = ps_vec
+            ls_theory = self.sp.ls
             delta = self.sp.spec - ps_vec
+            np.save(path_to_output+'/ls_theory_'+self.flux+bps+'act_only.npy',ls_theory)
+            for comp in comps:
+                np.save(path_to_output+'/dls_theory_'+comp+'_'+self.flux+bps+'act_only.npy',ps[comp]*fac)
+            # np.save(path_to_output+'/dls_theory_galdust_'+self.flux+bps+'act_only.npy',ps_vec_galdust*fac)
+            # np.save(path_to_output+'/dls_theory_primary_'+self.flux+bps+'act_only.npy',ps_vec_primary*fac)
+
+
+
+
         logp = -0.5 * np.dot(delta,np.dot(self.sp.cinv,delta))
         self.log.debug(
             f"ACT-like {self.flux} lnLike value = {logp} (chisquare = {-2 * logp})")
@@ -867,7 +904,7 @@ class act_pylike_extended(_InstallableLikelihood):
 
         # print(str_current+'frequencies: ')
         # print('getting foreground power with cfrq: ', cfreq_dict)
-        # print('bp_dict: ', bp_dict)
+        print('bp_dict: ', bp_dict)
         # print('beam_dict: ', beam_dict)
         # print('flux:',self.flux)
         # print('pnammes:',pnames)
@@ -933,9 +970,12 @@ class act_pylike_extended(_InstallableLikelihood):
         pte[l_min:nells_camb] = cl['te'][l_min:]
         pee[l_min:nells_camb] = cl['ee'][l_min:]
 
+        comps = ['primary','tsz','ksz','cibc','cibp','tsz_x_cib','radio','galdust','galsyn']
+
         if self.bandpass:
             # print('doing theory bandpass')
-            fpower = self.fgpower.get_theory_bandpassed(self.coadd_data,
+            fpower = {}
+            fpower['tot'] = self.fgpower.get_theory_bandpassed(self.coadd_data,
                                                         self.sp.ells,
                                                         self.sp.bbl,
                                                         ptt[l_min:],
@@ -944,15 +984,49 @@ class act_pylike_extended(_InstallableLikelihood):
                                                         fgdict,
                                                         lmax=self.l_max,
                                                         lkl_setup = lkl_setup)
-            return {'tot': fpower,
-                    'primary': fpower,
-                    'galdust': fpower}
+            for comp in comps:
+                fpower[comp] = self.fgpower.get_theory_bandpassed_comp(self.coadd_data,
+                                                        self.sp.ells,
+                                                        self.sp.bbl,
+                                                        ptt[l_min:],
+                                                        pte[l_min:],
+                                                        pee[l_min:],
+                                                        fgdict,
+                                                        lmax=self.l_max,
+                                                        lkl_setup = lkl_setup,
+                                                        comp = comp)
+
+            #
+            # fpower_primary = self.fgpower.get_theory_bandpassed_comp(self.coadd_data,
+            #                                             self.sp.ells,
+            #                                             self.sp.bbl,
+            #                                             ptt[l_min:],
+            #                                             pte[l_min:],
+            #                                             pee[l_min:],
+            #                                             fgdict,
+            #                                             lmax=self.l_max,
+            #                                             lkl_setup = lkl_setup,
+            #                                             comp = 'primary')
+            #
+            # fpower_galdust = self.fgpower.get_theory_bandpassed_comp(self.coadd_data,
+            #                                             self.sp.ells,
+            #                                             self.sp.bbl,
+            #                                             ptt[l_min:],
+            #                                             pte[l_min:],
+            #                                             pee[l_min:],
+            #                                             fgdict,
+            #                                             lmax=self.l_max,
+            #                                             lkl_setup = lkl_setup,
+            #                                             comp = 'galdust')
+
+            return fpower
 
 
         else:
             # print('doing theory no bandpass')
             # print('sp.ells: ',self.sp.ells)
-            fpower = self.fgpower.get_theory(self.sp.ells,
+            fpower = {}
+            fpower['tot'] = self.fgpower.get_theory(self.sp.ells,
                                              self.sp.bin,
                                              ptt[l_min:],
                                              pte[l_min:],
@@ -962,29 +1036,39 @@ class act_pylike_extended(_InstallableLikelihood):
                                              lkl_setup = lkl_setup)
 
 
-            fpower_primary = self.fgpower.get_primary(self.sp.ells,
-                                             self.sp.bin,
-                                             ptt[l_min:],
-                                             pte[l_min:],
-                                             pee[l_min:],
-                                             fgdict,
-                                             lmax=self.l_max,
-                                             lkl_setup = lkl_setup)
+            # fpower_primary = self.fgpower.get_primary(self.sp.ells,
+            #                                  self.sp.bin,
+            #                                  ptt[l_min:],
+            #                                  pte[l_min:],
+            #                                  pee[l_min:],
+            #                                  fgdict,
+            #                                  lmax=self.l_max,
+            #                                  lkl_setup = lkl_setup)
+            #
+            # fpower_galdust = self.fgpower.get_galdust(self.sp.ells,
+            #                                  self.sp.bin,
+            #                                  ptt[l_min:],
+            #                                  pte[l_min:],
+            #                                  pee[l_min:],
+            #                                  fgdict,
+            #                                  lmax=self.l_max,
+            #                                  lkl_setup = lkl_setup)
 
-            fpower_galdust = self.fgpower.get_galdust(self.sp.ells,
-                                             self.sp.bin,
-                                             ptt[l_min:],
-                                             pte[l_min:],
-                                             pee[l_min:],
-                                             fgdict,
-                                             lmax=self.l_max,
-                                             lkl_setup = lkl_setup)
+            for comp in comps:
+                fpower[comp] = self.fgpower.get_comp(self.sp.ells,
+                                                 self.sp.bin,
+                                                 ptt[l_min:],
+                                                 pte[l_min:],
+                                                 pee[l_min:],
+                                                 fgdict,
+                                                 lmax=self.l_max,
+                                                 lkl_setup = lkl_setup,
+                                                 comp = comp)
+
             # print('fpower : ', fpower[0:10])
             # exit(0)
 
-            return {'tot': fpower,
-                    'primary': fpower_primary,
-                    'galdust': fpower_galdust}
+            return fpower
 
 
 
