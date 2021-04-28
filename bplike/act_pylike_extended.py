@@ -455,6 +455,7 @@ class StevePower_extended(object):
             # print(len(rfband2))
             # print(type(rfband2[0]))
             # cd_act =
+            # set cov to infal (ignore points) where l is smaller than tt_lmin=600 (default) for the ACT bands
             ids_act = np.argwhere((self.ls<tt_lmin) & ((rfband1 == '090') | (rfband1 == '150') | (rfband2 == '090') | (rfband2 == '150')))[:,0]
             # print('idsact : ',ids_act)
             # exit(0)
@@ -464,7 +465,61 @@ class StevePower_extended(object):
             self.cov[ids,ids] = infval
             # print('cov')
             # print(cov)
+        # print('setting inf in cov where beam too small')
 
+        beam_dict_f100 = np.loadtxt(data_root + 'HFI_BEAM_resave_210414_F100.txt')
+        beam_dict_f143 = np.loadtxt(data_root + 'HFI_BEAM_resave_210414_F143.txt')
+        beam_dict_f217 = np.loadtxt(data_root + 'HFI_BEAM_resave_210414_F217.txt')
+        beam_dict_f353 = np.loadtxt(data_root + 'HFI_BEAM_resave_210414_F353.txt')
+        beam_dict_f545 = np.loadtxt(data_root + 'HFI_BEAM_resave_210414_F545.txt')
+
+        beam_cut_off = 0.1
+        lmax_beam_cutoff = {}
+        lmax_100 = beam_dict_f100[:,0][beam_dict_f100[:,1]>beam_cut_off].max()
+        lmax_143 = beam_dict_f100[:,0][beam_dict_f143[:,1]>beam_cut_off].max()
+        lmax_217 = beam_dict_f100[:,0][beam_dict_f217[:,1]>beam_cut_off].max()
+        lmax_353 = beam_dict_f100[:,0][beam_dict_f353[:,1]>beam_cut_off].max()
+        lmax_545 = beam_dict_f100[:,0][beam_dict_f545[:,1]>beam_cut_off].max()
+
+        lmax_090 = infval
+        lmax_150 = infval
+        lmax_beam_cutoff['090'] = lmax_090
+        lmax_beam_cutoff['150'] = lmax_150
+        lmax_beam_cutoff['100'] = lmax_100
+        lmax_beam_cutoff['143'] = lmax_143
+        lmax_beam_cutoff['217'] = lmax_217
+        lmax_beam_cutoff['353'] = lmax_353
+        lmax_beam_cutoff['545'] = lmax_545
+
+        # print(lmax_090,lmax_150,lmax_100,lmax_143,lmax_217,lmax_353,lmax_545)
+        # cov has dimension 1344
+        # this is n_bin (48) times n_spec (28)
+        # print(np.shape(self.cov))
+        # print('fband1 : ',self.fband1)
+        # print('fband2 : ',self.fband2)
+        lmax_order_list = []
+
+        for (fb1,fb2) in zip(self.fband1,self.fband2):
+            lmax_order_list.append(min(lmax_beam_cutoff[fb1],lmax_beam_cutoff[fb2]))
+
+        # print('lmax_order_list:',lmax_order_list)
+
+
+
+        # rfband1 = np.repeat(self.fband1,nbin)
+        # print('repeated fband1:',rfband1)
+        # rfband2 = np.repeat(self.fband2,nbin)
+        rlmax_order_list = np.repeat(lmax_order_list,nbin)
+        # print(rlmax_order_list)
+
+        ids_cutoff = np.argwhere((self.ls>rlmax_order_list))[:,0]
+        # print(self.ls)
+        # print(ids_cutoff)
+        ids = ids_cutoff
+        self.cov[:,ids] = 0
+        self.cov[ids,:] = 0
+        self.cov[ids,ids] = infval
+        # exit(0)
         # if tt_lmax is not None:
         #     n = 3
         #     ids = []
@@ -877,11 +932,20 @@ class act_pylike_extended(_InstallableLikelihood):
                 bp_dict['s12_pa0_f545'] = data_root + 'HFI_BANDPASS_F545_reformat.txt'
                 pnames.append('s12_pa0_f545')
 
-                beam_dict['s12_pa0_f100'] = data_root + 'HFI_BEAM_F100.txt'
-                beam_dict['s12_pa0_f143'] = data_root + 'HFI_BEAM_F143.txt'
-                beam_dict['s12_pa0_f217'] = data_root + 'HFI_BEAM_F217.txt'
-                beam_dict['s12_pa0_f353'] = data_root + 'HFI_BEAM_F353.txt'
-                beam_dict['s12_pa0_f545'] = data_root + 'HFI_BEAM_F545.txt'
+                # beam_dict['s12_pa0_f100'] = data_root + 'HFI_BEAM_F100.txt'
+                # beam_dict['s12_pa0_f143'] = data_root + 'HFI_BEAM_F143.txt'
+                # beam_dict['s12_pa0_f217'] = data_root + 'HFI_BEAM_F217.txt'
+                # beam_dict['s12_pa0_f353'] = data_root + 'HFI_BEAM_F353.txt'
+                # beam_dict['s12_pa0_f545'] = data_root + 'HFI_BEAM_F545.txt'
+
+
+
+
+                beam_dict['s12_pa0_f100'] = data_root + 'HFI_BEAM_resave_210414_F100.txt'
+                beam_dict['s12_pa0_f143'] = data_root + 'HFI_BEAM_resave_210414_F143.txt'
+                beam_dict['s12_pa0_f217'] = data_root + 'HFI_BEAM_resave_210414_F217.txt'
+                beam_dict['s12_pa0_f353'] = data_root + 'HFI_BEAM_resave_210414_F353.txt'
+                beam_dict['s12_pa0_f545'] = data_root + 'HFI_BEAM_resave_210414_F545.txt'
 
                 cfreq_dict['s12_pa0_f100'] =cfreqs['pa0_f100']
                 cfreq_dict['s12_pa0_f143'] =cfreqs['pa0_f143']
@@ -905,7 +969,7 @@ class act_pylike_extended(_InstallableLikelihood):
         # print(str_current+'frequencies: ')
         # print('getting foreground power with cfrq: ', cfreq_dict)
         print('bp_dict: ', bp_dict)
-        # print('beam_dict: ', beam_dict)
+        print('beam_dict: ', beam_dict)
         # print('flux:',self.flux)
         # print('pnammes:',pnames)
         # exit(0)
