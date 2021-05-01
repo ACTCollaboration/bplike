@@ -2,7 +2,7 @@
 # and prior specifications for act_pylike.py
 # The params and priors can be overriden in
 # the yml file you submit to cobaya, e.g. act.yml
-theory_debug: null
+theory_debug: yes
 bandpass: False
 
 params:
@@ -61,7 +61,7 @@ params:
       scale: 0.5
     proposal: 0.4
     latex: a_\mathrm{p,TT,15}
-    
+
   a_p_tt_100:
     prior:
       min: 10
@@ -128,7 +128,7 @@ params:
       scale: 0.02
     proposal: 0.01
     latex: yp_95
-    
+
   yp_150:
     prior:
       min: 0.9
@@ -147,7 +147,7 @@ params:
   cal_150:
     value: 1
     latex: cal_150
-    
+  
   a_g_tt:
     value: 0
     latex: a_g_tt
@@ -159,7 +159,7 @@ params:
   a_g_ee:
     value: 0
     latex: a_g_ee
-    
+
   a_s_te:
     value: 0
     latex: a_s_te
@@ -167,4 +167,3 @@ params:
   a_s_ee:
     value: 0
     latex: a_s_ee
-    

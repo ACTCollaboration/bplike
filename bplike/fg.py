@@ -21,6 +21,12 @@ from tilec.fg import ArraySED
 
 def get_template(ells,template_file,ell_pivot=3000):
     ls,pow = np.loadtxt(template_file,unpack=True)
+    if '_tsz_150' in template_file:
+        print('tsz template rescaling')
+        pow = pow/5.59550
+    if '_ksz_bat' in template_file:
+        print('ksz template rescaling')
+        pow = pow/1.51013
     powfunc = interp1d(ls,pow)
     if ell_pivot is not None:
         pow_pivot = powfunc(ell_pivot)
@@ -133,10 +139,20 @@ class ForegroundPowers(ArraySED):
         if 'radio' in ocomps:
             e1syn = eff_freq_ghz1['syn'] if eff_freq_ghz1 is not None else None
             e2syn = eff_freq_ghz2['syn'] if eff_freq_ghz2 is not None else None
-            f1 = self.get_response("radio",array=array1,norm_freq_ghz=params['nu0'],
-                                         eff_freq_ghz=e1syn,params=params,lmax=lmax)
-            f2 = self.get_response("radio",array=array2,norm_freq_ghz=params['nu0'],
-                                         eff_freq_ghz=e2syn,params=params,lmax=lmax)
+            # print('e1,e2:',e1syn,e2syn)
+            # print('params radio:',params)
+            f1 = self.get_response("radio",
+                                    array=array1,
+                                    norm_freq_ghz=params['nu0'],
+                                    eff_freq_ghz=e1syn,
+                                    params=params,
+                                    lmax=lmax)
+            f2 = self.get_response("radio",
+                                    array=array2,
+                                    norm_freq_ghz=params['nu0'],
+                                    eff_freq_ghz=e2syn,
+                                    params=params,
+                                    lmax=lmax)
 
             if spec=='tt':
                 if self.fcut == '15mJy':
@@ -150,20 +166,85 @@ class ForegroundPowers(ArraySED):
                 rparam = f'a_p_{spec}'
             tpow = tpow + f1*f2*params[rparam]*self.get_component_scale_dependence('poisson',params)
 
+
+        # if 'galdust' in ocomps:
+        #     e1syn = eff_freq_ghz1['syn'] if eff_freq_ghz1 is not None else None
+        #     e2syn = eff_freq_ghz2['syn'] if eff_freq_ghz2 is not None else None
+        #     # print('e1,e2:',e1syn,e2syn)
+        #     # print('params radio:',params)
+        #     f1 = self.get_response("radio",
+        #                             array=array1,
+        #                             norm_freq_ghz=params['nu0'],
+        #                             eff_freq_ghz=e1syn,
+        #                             params=params,
+        #                             lmax=lmax)
+        #     f2 = self.get_response("radio",
+        #                             array=array2,
+        #                             norm_freq_ghz=params['nu0'],
+        #                             eff_freq_ghz=e2syn,
+        #                             params=params,
+        #                             lmax=lmax)
+        #
+        #     if spec=='tt':
+        #         if self.fcut == '15mJy':
+        #             fnum = 15
+        #         elif self.fcut == '100mJy':
+        #             fnum = 100
+        #         else:
+        #             raise ValueError
+        #         rparam = f'a_p_{spec}_{fnum}'
+        #     else:
+        #         rparam = f'a_p_{spec}'
+        #     tpow = tpow + f1*f2*params[rparam]*self.get_component_scale_dependence('poisson',params)
+        #
+
+
         if 'galdust' in ocomps:
             # print('doing galdust')
+            # print('params galdust:',params)
             e1dusty = eff_freq_ghz1['dust'] if eff_freq_ghz1 is not None else None
             e2dusty = eff_freq_ghz2['dust'] if eff_freq_ghz2 is not None else None
             # print('e1,e2:',e1dusty,e2dusty)
-            f1 = self.get_response("radio",array=array1,norm_freq_ghz=params['nu0'],
-                                   eff_freq_ghz=e1dusty,params=params,radio_beta_param_name='beta_galdust',lmax=lmax)
-            f2 = self.get_response("radio",array=array2,norm_freq_ghz=params['nu0'],
-                                   eff_freq_ghz=e2dusty,params=params,radio_beta_param_name='beta_galdust',lmax=lmax)
+            f1 = self.get_response("galdust",array=array1,
+                                   norm_freq_ghz=params['nu0'],
+                                   eff_freq_ghz=e1dusty,
+                                   params=params,
+                                   radio_beta_param_name='beta_galdust',
+                                   # dust_beta_param_name='beta_galdust',
+                                   lmax=lmax)
+            f2 = self.get_response("galdust",array=array2,
+                                    norm_freq_ghz=params['nu0'],
+                                   eff_freq_ghz=e2dusty,
+                                   params=params,
+                                   radio_beta_param_name='beta_galdust',
+                                   # dust_beta_param_name='beta_galdust',
+                                   lmax=lmax)
             # print('f1,f2:',f1,f2)
             scale_str = 'galdust_t' if spec=='tt' else 'galdust_p'
             # print('spec,scale_str:',spec,scale_str)
             # print("params[f'a_g_{spec}']:",params[f'a_g_{spec}'])
-            tpow = tpow + f1*f2*params[f'a_g_{spec}']*self.get_component_scale_dependence(scale_str,params)
+            if self.fcut == '15mJy':
+                fnum = 15
+            elif self.fcut == '100mJy':
+                fnum = 100
+            else:
+                raise ValueError
+            rparam = f'a_g_{spec}_{fnum}'
+            tpow = tpow + f1*f2*params[rparam]*self.get_component_scale_dependence(scale_str,params) # correct one
+            # tpow = tpow + f1*f2*params[f'a_g_{spec}']*self.get_component_scale_dependence(scale_str,params) # correct one
+
+            #
+            # if spec=='tt':
+            #     if self.fcut == '15mJy':
+            #         fnum = 15
+            #     elif self.fcut == '100mJy':
+            #         fnum = 100
+            #     else:
+            #         raise ValueError
+            #     rparam = f'a_p_{spec}_{fnum}'
+            # else:
+            #     rparam = f'a_p_{spec}'
+            # tpow = tpow + f1*f2*params[rparam]*self.get_component_scale_dependence('poisson',params) # incorrect
 
         if spec!='tt':
             if 'galsyn' in ocomps:
@@ -503,9 +584,9 @@ class ForegroundPowers(ArraySED):
         # print('arrays:', np.shape(arrays),arrays)
 
         if lkl_setup.use_act_planck == 'yes':
-            l_max = 3924
+            l_max = 3924 #!ell max of the full window functions
         else:
-            l_max = 7924
+            l_max = 7924 #!ell max of the full window functions
 
 
         ps = []
@@ -517,7 +598,7 @@ class ForegroundPowers(ArraySED):
             pow = dl + self.get_power(spec,self.comps,fparams,
                                       eff_freq_ghz1=None,array1=a1,
                                       eff_freq_ghz2=None,array2=a2,
-                                      lmax=l_max) # 7924 for act alone, 3924 for act_planck
+                                      lmax=l_max) # 7924 for act alone, 3924 for act_planck !ell max of the full window functions
             pow = pow/ells/(ells+1)*2.*np.pi
             bpow = np.einsum('...k,...k',ibbl,pow)
             ps = np.append(ps,bpow.copy())
@@ -539,9 +620,9 @@ class ForegroundPowers(ArraySED):
         # print('arrays:', np.shape(arrays),arrays)
 
         if lkl_setup.use_act_planck == 'yes':
-            l_max = 3924
+            l_max = 3924  #!ell max of the full window functions
         else:
-            l_max = 7924
+            l_max = 7924  #!ell max of the full window functions
 
 
         ps = []

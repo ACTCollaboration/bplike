@@ -204,6 +204,8 @@ class StevePower(object):
             spec = 'TT'
 
             save_coadd_matrix(spec,band1,band2,flux,path_root)
+
+
         fband1 = []
         fband2 = []
         for i in range(10):
@@ -218,6 +220,10 @@ class StevePower(object):
                 fband2.append({0:'E095',1:'E150',2:'E150'}[i-7])
         self.fband1 = fband1
         self.fband2 = fband2
+
+        self.rfband1 =  np.repeat(self.fband1,nbin)
+        self.rfband2 =  np.repeat(self.fband2,nbin)
+
 
     def bin(self,dls):
         # print('bbl in bin, size : ',len(self.bbl[0,0,:]) )
@@ -452,6 +458,8 @@ class StevePower_extended(object):
             # print('fband1 : ',self.fband1)
             rfband1 = np.repeat(self.fband1,nbin)
             rfband2 = np.repeat(self.fband2,nbin)
+            self.rfband1 =  rfband1
+            self.rfband2 =  rfband2
             # print(len(rfband2))
             # print(type(rfband2[0]))
             # cd_act =
@@ -573,9 +581,12 @@ class act_pylike_extended(_InstallableLikelihood):
             "a_p_tt_100", # TT radio Poisson with given flux cut
             "a_p_te", # TE Poisson sources
             "a_p_ee", # EE Poisson sources
-            "a_g_tt", # TT Galactic dust at ell=500
-            "a_g_te", # TE Galactic dust at ell=500
-            "a_g_ee", # EE Galactic dust at ell=500
+            "a_g_tt_15", # TT Galactic dust at ell=500
+            "a_g_tt_100", # TT Galactic dust at ell=500
+            "a_g_te_15", # TE Galactic dust at ell=500
+            "a_g_te_100", # TE Galactic dust at ell=500
+            "a_g_ee_15", # EE Galactic dust at ell=500
+            "a_g_ee_100", # EE Galactic dust at ell=500
             "a_s_te", # TE Synchrotron at ell=500
             "a_s_ee"] # EE Synchrotron at ell=500
         # "cal_95",
@@ -611,7 +622,8 @@ class act_pylike_extended(_InstallableLikelihood):
         # exit(0)
         # Load path_params from yaml file
         if self.use_act_planck == 'no':
-            self.l_max = 6000
+            # self.l_max = 6000
+            self.l_max = 6051
             self.fparams = config_from_yaml('params.yml')['fixed']
             self.aparams = config_from_yaml('params.yml')['act_like']
             self.bpmodes = config_from_yaml('params.yml')['bpass_modes']
@@ -649,6 +661,7 @@ class act_pylike_extended(_InstallableLikelihood):
 
         self.expected_params = list(np.concatenate((self.expected_params,cal_yp)))
         # print('expected params: ',self.expected_params)
+        # exit(0)
         self.bands = self.aparams['bands']
 
 
@@ -710,11 +723,13 @@ class act_pylike_extended(_InstallableLikelihood):
     def logp(self, **params_values):
         # return 0
         # print('doing logp')
+
         cl = self.theory.get_Cl(ell_factor=True)
         # print("cl's: ",cl)
         return self.loglike(cl, **params_values)
 
     def loglike(self, cl, **params_values):
+
         # print('doing loglike')
         # print('cls 0:10:', cl['tt'][:10] )
         comps = ['tot','primary','tsz','ksz','cibc','cibp','tsz_x_cib','radio','galdust','galsyn']
@@ -722,6 +737,14 @@ class act_pylike_extended(_InstallableLikelihood):
 
         ps = self._get_power_spectra(cl, lkl_setup = self, **params_values)
         ps_vec = ps['tot']
+        # ps_vec = ps['primary']
+        print('model')
+        for idb in range(52):
+            print(idb,ps_vec[:52][idb])
+        print('data')
+        for idb in range(52):
+            print(idb,self.sp.spec[:52][idb])
+        # exit(0)
 
         # ps_vec_galdust = ps['galdust']
         # ps_vec_primary = ps['primary']
@@ -740,7 +763,8 @@ class act_pylike_extended(_InstallableLikelihood):
 
             # print('ps_vec : ', ps_vec[:n_bins]/fac[:n_bins])
             # print('self.sp.spec : ', self.sp.spec[:n_bins])
-            dls_theory = ps_vec
+            dls_theory = ps_vec # Primary + FG
+
             ls_theory = self.sp.ls
             delta = self.sp.spec - dls_theory/fac
             np.save(path_to_output+'/ls_theory_'+self.flux+bps+'act_planck.npy',ls_theory)
@@ -766,8 +790,13 @@ class act_pylike_extended(_InstallableLikelihood):
 
 
 
+        for idb in range(520):
+            print("%s %s %d\t%.10e\t%.10e\t%.10e\t%.10e"%(self.sp.rfband1[idb],self.sp.rfband2[idb],idb+1,self.sp.cinv[idb,idb],delta[idb],self.sp.spec[idb],dls_theory[idb]))
+        # exit(0)
+
 
         logp = -0.5 * np.dot(delta,np.dot(self.sp.cinv,delta))
+        print('logp: ',logp)
         self.log.debug(
             f"ACT-like {self.flux} lnLike value = {logp} (chisquare = {-2 * logp})")
         return logp
@@ -992,25 +1021,41 @@ class act_pylike_extended(_InstallableLikelihood):
         # exit(0)
 
     def _get_power_spectra(self, cl, lkl_setup = None, **params_values):
-        # print('getting power spectra')
+        print('getting power spectra')
         l_min = 2
 
         if self.theory_debug is not None:
-            # print('theory debug')
-            ells,cltt,clee,clte = np.loadtxt(self.theory_debug,usecols=[0,1,2,4],unpack=True)
+            print('theory debug:',self.theory_debug)
+            # ells,cltt,clee,clte = np.loadtxt(self.theory_debug,usecols=[0,1,2,4],unpack=True) # mat's debig
+            ells,cltt,clte,clee = np.loadtxt(self.theory_debug,usecols=[0,1,2,3],unpack=True) # boris's debug
+            # print('ell0,ell1:',ells[0],ells[1])
+
             assert ells[0] == 2
             assert ells[1] == 3
             cl = {}
-            cl['ell'] = np.zeros(2+self.l_max+50)
-            cl['tt'] = np.zeros(2+self.l_max+50)
-            cl['te'] = np.zeros(2+self.l_max+50)
-            cl['ee'] = np.zeros(2+self.l_max+50)
+            # cl['ell'] = np.zeros(2+self.l_max+50)
+            # cl['tt'] = np.zeros(2+self.l_max+50)
+            # cl['te'] = np.zeros(2+self.l_max+50)
+            # cl['ee'] = np.zeros(2+self.l_max+50)
+            # cl['ell'][1] = 1
+            # cl['ell'][2:] = ells[:self.l_max+50]
+            # cl['tt'][2:] = cltt[:self.l_max+50]
+            # cl['te'][2:] = clte[:self.l_max+50]
+            # cl['ee'][2:] = clee[:self.l_max+50]
+            cl['ell'] = np.zeros(self.l_max)
+            cl['tt'] = np.zeros(self.l_max)
+            cl['te'] = np.zeros(self.l_max)
+            cl['ee'] = np.zeros(self.l_max)
             cl['ell'][1] = 1
-            cl['ell'][2:] = ells[:self.l_max+50]
-            cl['tt'][2:] = cltt[:self.l_max+50]
-            cl['te'][2:] = clte[:self.l_max+50]
-            cl['ee'][2:] = clee[:self.l_max+50]
-
+            cl['ell'][2:] = ells[:self.l_max]
+            cl['tt'][2:] = cltt[:self.l_max]
+            cl['te'][2:] = clte[:self.l_max]
+            cl['ee'][2:] = clee[:self.l_max]
+        # print('cl:',cl)
+        # save some cls to do debugging fun
+        # np.savetxt(path_to_output+'/cls_model.txt',np.c_[cl['ell'],cl['tt'],cl['te'],cl['ee']])
+        # exit(0)
+        # exit(0)
 
         fgdict =    {k: params_values[k] for k in self.expected_params}
         fgdict.update(self.fparams)

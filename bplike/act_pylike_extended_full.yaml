@@ -64,7 +64,7 @@ params:
 
   a_p_tt_100:
     prior:
-      min: 10
+      min: 0.
       max: 40
     ref:
       dist: norm
@@ -120,7 +120,7 @@ params:
 
   yp_95:
     prior:
-      min: 0.9
+      min: 0.
       max: 1.1
     ref:
       dist: norm
@@ -131,22 +131,38 @@ params:
 
   yp_150:
     prior:
-      min: 0.9
+      min: 0.
       max: 1.1
     ref:
       dist: norm
       loc:   1
       scale: 0.02
     proposal: 0.01
-    latex: yp_95
+    latex: yp_150
 
-  cal_95:
-    value: 1
-    latex: cal_95
+
 
   cal_150:
-    value: 1
+    prior:
+      min: 0.
+      max: 11
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
     latex: cal_150
+
+  cal_95:
+    prior:
+      min: 0.
+      max: 11
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: cal_95
 
 
   yp_090:
@@ -181,7 +197,7 @@ params:
     latex: yp_143
   yp_150:
     prior:
-      min: 0.9
+      min: 0.
       max: 1.1
     ref:
       dist: norm
@@ -220,38 +236,94 @@ params:
     proposal: 0.01
     latex: yp_545
 
-  a_g_tt:
+  a_g_tt_15:
     prior:
-      min: -0.9 #was 0.9, set negative so it can be passed as = 0 in evaluate call
-      max: 1.1
+      min: 0. #was 0.9, set negative so it can be passed as = 0 in evaluate call
+      max: 11
     ref:
       dist: norm
       loc:   1
       scale: 0.02
     proposal: 0.01
-    latex: a_g_tt
+    latex: a_g_tt_15
 
-  a_g_te:
+  a_g_tt_100:
     prior:
-      min: 0.9
-      max: 1.1
+      min: 0. #was 0.9, set negative so it can be passed as = 0 in evaluate call
+      max: 11
     ref:
       dist: norm
       loc:   1
       scale: 0.02
     proposal: 0.01
-    latex: a_g_te
+    latex: a_g_tt_100
 
-  a_g_ee:
+  a_g_te_15:
     prior:
-      min: 0.9
+      min: 0.
+      max: 11
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: a_g_te_15
+
+  a_g_te_100:
+    prior:
+      min: 0.
+      max: 11
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: a_g_te_100
+
+  a_g_ee_15:
+    prior:
+      min: 0.
+      max: 11
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: a_g_ee_15
+
+
+  a_g_ee_100:
+    prior:
+      min: 0.
+      max: 11
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: a_g_ee_100
+
+  a_s_ee:
+    prior:
+      min: 0.
       max: 1.1
     ref:
       dist: norm
       loc:   1
       scale: 0.02
     proposal: 0.01
-    latex: a_g_ee
+    latex: a_s_ee
+
+  a_s_te:
+    prior:
+      min: 0.
+      max: 1.1
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: a_s_te
 
 
   #
@@ -264,9 +336,9 @@ params:
   cal_143:
     value: 1
     latex: cal_143
-  cal_150:
-    value: 1
-    latex: cal_150
+  # cal_150:
+  #   value: 1
+  #   latex: cal_150
   cal_217:
     value: 1
     latex: cal_217
@@ -277,23 +349,23 @@ params:
     value: 1
     latex: cal_545
 
-
+  #
   # a_g_tt:
   #   value: 1.
   #   latex: a_g_tt
-
+  #
   # a_g_te:
   #   value: 0
   #   latex: a_g_te
-
+  #
   # a_g_ee:
   #   value: 0
   #   latex: a_g_ee
-
-  a_s_te:
-    value: 0
-    latex: a_s_te
-
-  a_s_ee:
-    value: 0
-    latex: a_s_ee
+  #
+  # a_s_te:
+  #   value: 0
+  #   latex: a_s_te
+  #
+  # a_s_ee:
+  #   value: 0
+  #   latex: a_s_ee

@@ -71,7 +71,7 @@ fixed:
 
 
 
-  beta_galdust : 3.8
+  beta_galdust : 3.8 # default 3.8
   beta_radio : -0.5
   beta_galsyn : -1.
   high_ell0 : 3000

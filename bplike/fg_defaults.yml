@@ -4,6 +4,8 @@
 #for how to get foreground spectra in Erminia's model.
 #The available parameters and their defaults are here:
 #https://github.com/ACTCollaboration/bplike/blob/master/fg_defaults.yml
+# Colin:
+# we should at least make a note in https://github.com/ACTCollaboration/bplike/blob/master/fg_defaults.yml saying that beta_dust is a power-law-type index, not an MBB index (as beta_CIB is).  this is super subtle and non-standard
 # Amplitude of clustered CIB
 a_c:    4.9
 # Amplitude of Poisson CIB
@@ -39,6 +41,7 @@ fdust_95_15mJy : 98.77
 fdust_150_15mJy : 151.16
 fsyn_95_15mJy  : 95.76
 fsyn_150_15mJy  : 147.24
+
 ftsz_95_100mJy   : 98.38
 ftsz_150_100mJy   : 149.94
 fdust_95_100mJy : 98.77
@@ -55,6 +58,7 @@ beta_radio : -0.5
 beta_galsyn : -1.
 # CIB dust temperature
 Tdust_CIB : 9.7
+Tdust_galdust : 19.6 # same as f90
 
 Tdust_CIB: 24.0       #CIB effective dust temperature [K] (Table 9 of http://www.aanda.org/articles/aa/pdf/2014/11/aa22093-13.pdf)
 beta_CIB: 1.2         #CIB modified blackbody spectral index (Table 9 of http://www.aanda.org/articles/aa/pdf/2014/11/aa22093-13.pdf ; Table 10 of that paper contains CIB monopoles)

@@ -20,31 +20,61 @@ params:
       dist: norm
       loc: 6.9
       scale: 1
-  a_g_ee:
-    latex: a_g_ee
+  a_g_ee_100:
+    latex: a_g_ee_100
     prior:
-      max: 1.1
-      min: 0.9
+      max: 11
+      min: 0.0
     proposal: 0.01
     ref:
       dist: norm
       loc: 1
       scale: 0.02
-  a_g_te:
-    latex: a_g_te
+  a_g_ee_15:
+    latex: a_g_ee_15
     prior:
-      max: 1.1
-      min: 0.9
+      max: 11
+      min: 0.0
     proposal: 0.01
     ref:
       dist: norm
       loc: 1
       scale: 0.02
-  a_g_tt:
-    latex: a_g_tt
+  a_g_te_100:
+    latex: a_g_te_100
     prior:
-      max: 1.1
-      min: -0.9
+      max: 11
+      min: 0.0
+    proposal: 0.01
+    ref:
+      dist: norm
+      loc: 1
+      scale: 0.02
+  a_g_te_15:
+    latex: a_g_te_15
+    prior:
+      max: 11
+      min: 0.0
+    proposal: 0.01
+    ref:
+      dist: norm
+      loc: 1
+      scale: 0.02
+  a_g_tt_100:
+    latex: a_g_tt_100
+    prior:
+      max: 11
+      min: 0.0
+    proposal: 0.01
+    ref:
+      dist: norm
+      loc: 1
+      scale: 0.02
+  a_g_tt_15:
+    latex: a_g_tt_15
+    prior:
+      max: 11
+      min: 0.0
     proposal: 0.01
     ref:
       dist: norm
@@ -84,7 +114,7 @@ params:
     latex: a_\mathrm{p,TT,100}
     prior:
       max: 40
-      min: 10
+      min: 0.0
     proposal: 3
     ref:
       dist: norm
@@ -102,10 +132,24 @@ params:
       scale: 0.5
   a_s_ee:
     latex: a_s_ee
-    value: 0
+    prior:
+      max: 1.1
+      min: 0.0
+    proposal: 0.01
+    ref:
+      dist: norm
+      loc: 1
+      scale: 0.02
   a_s_te:
     latex: a_s_te
-    value: 0
+    prior:
+      max: 1.1
+      min: 0.0
+    proposal: 0.01
+    ref:
+      dist: norm
+      loc: 1
+      scale: 0.02
   a_tsz:
     latex: a_\mathrm{tSZ}
     prior:
@@ -137,7 +181,14 @@ params:
     value: 1
   cal_150:
     latex: cal_150
-    value: 1
+    prior:
+      max: 11
+      min: 0.0
+    proposal: 0.01
+    ref:
+      dist: norm
+      loc: 1
+      scale: 0.02
   cal_217:
     latex: cal_217
     value: 1
@@ -149,7 +200,14 @@ params:
     value: 1
   cal_95:
     latex: cal_95
-    value: 1
+    prior:
+      max: 11
+      min: 0.0
+    proposal: 0.01
+    ref:
+      dist: norm
+      loc: 1
+      scale: 0.02
   xi:
     latex: \xi^{tSZ-CIB}
     prior:
@@ -194,7 +252,7 @@ params:
     latex: yp_150
     prior:
       max: 1.1
-      min: 0.9
+      min: 0.0
     proposal: 0.01
     ref:
       dist: norm
@@ -234,7 +292,7 @@ params:
     latex: yp_95
     prior:
       max: 1.1
-      min: 0.9
+      min: 0.0
     proposal: 0.01
     ref:
       dist: norm
