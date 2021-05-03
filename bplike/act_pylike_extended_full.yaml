@@ -1,0 +1,371 @@
+# This file contains the default parameters
+# and prior specifications for act_pylike_extended.py
+# The params and priors can be overriden in
+# the yml file you submit to cobaya, e.g. act.yml
+theory_debug: null
+bandpass: False
+
+params:
+  # Foregrounds
+  a_tsz:
+    prior:
+      min: 0
+      max: 10
+    ref:
+      dist: norm
+      loc:   3.3
+      scale: 0.5
+    proposal: 0.2
+    latex: a_\mathrm{tSZ}
+
+  a_ksz:
+    prior:
+      min: 0
+      max: 10
+    ref:
+      dist: norm
+      loc:   4.95
+      scale: 0.5
+    proposal: 0.5
+    latex: a_\mathrm{kSZ}
+
+  xi:
+    prior:
+      min: 0
+      max: 0.2
+    ref:
+      dist: norm
+      loc:   0.0165
+      scale: 0.05
+    proposal: 0.05
+    latex: \xi^{tSZ-CIB}
+
+  a_d:
+    prior:
+      min: 0
+      max: 11
+    ref:
+      dist: norm
+      loc:   6.9
+      scale: 1
+    proposal: 1
+    latex: a_\mathrm{d}
+
+  a_p_tt_15:
+    prior:
+      min: 0
+      max: 6
+    ref:
+      dist: norm
+      loc:   3.1
+      scale: 0.5
+    proposal: 0.4
+    latex: a_\mathrm{p,TT,15}
+
+  a_p_tt_100:
+    prior:
+      min: 0.
+      max: 40
+    ref:
+      dist: norm
+      loc:   22.5
+      scale: 6
+    proposal: 3
+    latex: a_\mathrm{p,TT,100}
+
+  a_c:
+    prior:
+      min: 0
+      max: 15
+    ref:
+      dist: norm
+      loc:   4.9
+      scale: 1
+    proposal: 1
+    latex: a_\mathrm{c}
+
+  a_p_te:
+    prior:
+      min: -1
+      max: 1
+    ref:
+      dist: norm
+      loc:   0
+      scale: 0.1
+    proposal: 0.1
+    latex: a_\mathrm{p,TE}
+
+  a_p_ee:
+    prior:
+      min: 0
+      max: 1
+    ref:
+      dist: norm
+      loc:   0
+      scale: 0.1
+    proposal: 0.1
+    latex: a_\mathrm{p,EE}
+
+
+  beta_CIB:
+    prior:
+      min: 0
+      max: 5
+    ref:
+      dist: norm
+      loc:   2.2
+      scale: 0.5
+    proposal: 0.2
+    latex: \beta_c
+
+  yp_95:
+    prior:
+      min: 0.
+      max: 1.1
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: yp_95
+
+  yp_150:
+    prior:
+      min: 0.
+      max: 1.1
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: yp_150
+
+
+
+  cal_150:
+    prior:
+      min: 0.
+      max: 11
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: cal_150
+
+  cal_95:
+    prior:
+      min: 0.
+      max: 11
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: cal_95
+
+
+  yp_090:
+    prior:
+      min: 0.9
+      max: 1.1
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: yp_90
+  yp_100:
+    prior:
+      min: 0.9
+      max: 1.1
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: yp_100
+  yp_143:
+    prior:
+      min: 0.9
+      max: 1.1
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: yp_143
+  yp_150:
+    prior:
+      min: 0.
+      max: 1.1
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: yp_150
+  yp_217:
+    prior:
+      min: 0.9
+      max: 1.1
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: yp_217
+  yp_353:
+    prior:
+      min: 0.9
+      max: 1.1
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: yp_353
+  yp_545:
+    prior:
+      min: 0.9
+      max: 1.1
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: yp_545
+
+  a_g_tt_15:
+    prior:
+      min: 0. #was 0.9, set negative so it can be passed as = 0 in evaluate call
+      max: 11
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: a_g_tt_15
+
+  a_g_tt_100:
+    prior:
+      min: 0. #was 0.9, set negative so it can be passed as = 0 in evaluate call
+      max: 11
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: a_g_tt_100
+
+  a_g_te_15:
+    prior:
+      min: 0.
+      max: 11
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: a_g_te_15
+
+  a_g_te_100:
+    prior:
+      min: 0.
+      max: 11
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: a_g_te_100
+
+  a_g_ee_15:
+    prior:
+      min: 0.
+      max: 11
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: a_g_ee_15
+
+
+  a_g_ee_100:
+    prior:
+      min: 0.
+      max: 11
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: a_g_ee_100
+
+  a_s_ee:
+    prior:
+      min: 0.
+      max: 1.1
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: a_s_ee
+
+  a_s_te:
+    prior:
+      min: 0.
+      max: 1.1
+    ref:
+      dist: norm
+      loc:   1
+      scale: 0.02
+    proposal: 0.01
+    latex: a_s_te
+
+
+  #
+  cal_090:
+    value: 1
+    latex: cal_90
+  cal_100:
+    value: 1
+    latex: cal_100
+  cal_143:
+    value: 1
+    latex: cal_143
+  # cal_150:
+  #   value: 1
+  #   latex: cal_150
+  cal_217:
+    value: 1
+    latex: cal_217
+  cal_353:
+    value: 1
+    latex: cal_353
+  cal_545:
+    value: 1
+    latex: cal_545
+
+  #
+  # a_g_tt:
+  #   value: 1.
+  #   latex: a_g_tt
+  #
+  # a_g_te:
+  #   value: 0
+  #   latex: a_g_te
+  #
+  # a_g_ee:
+  #   value: 0
+  #   latex: a_g_ee
+  #
+  # a_s_te:
+  #   value: 0
+  #   latex: a_s_te
+  #
+  # a_s_ee:
+  #   value: 0
+  #   latex: a_s_ee

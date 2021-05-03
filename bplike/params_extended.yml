@@ -1,0 +1,113 @@
+act_like:
+  bands: ['090', '100', '143', '150', '217', '353', '545']
+  use_deep: True
+  use_wide: True
+  nnu: 7   # number of frequencies
+  nspectot: 28 # nspecf*nspec+2 TE for 90x150 and 150x90
+  nspecf  : 7 # 95, 95x150, 150
+  nspectt : 28   # TT
+  nspecte : 0   # TE
+  nspecee : 0   # EE
+  nbintt: 48  # max nbins in ACT TT data
+  nbinte: 48  # max nbins in ACT TE data
+  nbinee: 48  # max nbins in ACT EE data
+  nbint : 1344  # total bins 48*28 = 1344
+  lmax_win: 3926 # ell max of the full window functions
+  bmax0 : 548   # number of bins in full window function
+  b0: 5
+  b1: 0
+  b2: 0
+  bpass_mode: 'eff_freq_coadd'
+
+fixed:
+  ftsz_090_15mJy   : 98.38
+  ftsz_100_15mJy   : 100.14
+  ftsz_143_15mJy   : 143.14
+  ftsz_150_15mJy   : 150.14
+  ftsz_217_15mJy   : 217.14
+  ftsz_353_15mJy   : 353.14
+  ftsz_545_15mJy   : 545.14
+
+  fdust_090_15mJy   : 98.38
+  fdust_100_15mJy   : 100.14
+  fdust_143_15mJy   : 143.14
+  fdust_150_15mJy   : 150.14
+  fdust_217_15mJy   : 217.14
+  fdust_353_15mJy   : 353.14
+  fdust_545_15mJy   : 545.14
+
+  fsyn_090_15mJy   : 98.38
+  fsyn_100_15mJy   : 100.14
+  fsyn_143_15mJy   : 143.14
+  fsyn_150_15mJy   : 150.14
+  fsyn_217_15mJy   : 217.14
+  fsyn_353_15mJy   : 353.14
+  fsyn_545_15mJy   : 545.14
+
+
+  ftsz_090_100mJy   : 98.38
+  ftsz_100_100mJy   : 100.14
+  ftsz_143_100mJy   : 143.14
+  ftsz_150_100mJy   : 150.14
+  ftsz_217_100mJy   : 217.14
+  ftsz_353_100mJy   : 353.14
+  ftsz_545_100mJy   : 545.14
+
+  fdust_090_100mJy   : 98.38
+  fdust_100_100mJy   : 100.14
+  fdust_143_100mJy   : 143.14
+  fdust_150_100mJy   : 150.14
+  fdust_217_100mJy   : 217.14
+  fdust_353_100mJy   : 353.14
+  fdust_545_100mJy   : 545.14
+
+  fsyn_090_100mJy   : 98.38
+  fsyn_100_100mJy   : 100.14
+  fsyn_143_100mJy   : 143.14
+  fsyn_150_100mJy   : 150.14
+  fsyn_217_100mJy   : 217.14
+  fsyn_353_100mJy   : 353.14
+  fsyn_545_100mJy   : 545.14
+
+
+
+  beta_galdust : 3.8 # default 3.8
+  beta_radio : -0.5
+  beta_galsyn : -1.
+  high_ell0 : 3000
+  low_ell0 : 500
+  nu0 : 150
+  nu0_radio_ghz : 150
+  Tdust_CIB : 9.7
+  nu0_CIB_ghz : 150.
+  cibc_n : -1.2
+  galdust_t_n : -0.7
+  galdust_p_n : -0.4
+  galsync_p_n : -0.7
+
+bpass_modes:
+  color_corr:
+    mode: 'color_corr'
+    ccor_exp: -1
+    pa1_bpass_file: 'data/bpass/PA1_avg_passband_wErr_trunc.txt'
+    pa2_bpass_file: 'data/bpass/PA2_avg_passband_wErr_trunc.txt'
+    pa3_150_bpass_file: 'data/bpass/PA3_avg_passband_150_wErr_trunc.txt'
+    pa3_90_bpass_file: 'data/bpass/PA3_avg_passband_90_wErr_trunc.txt'
+
+  color_corr_BL:
+    mode: 'color_corr'
+    ccor_exp: -1
+    pa1_bpass_file: 'data/bpass/PA1_avg_passband_wErr_trunc.txt'
+    pa2_bpass_file: 'data/bpass/PA2_avg_passband_wErr_trunc.txt'
+    pa3_150_bpass_file: 'data/bpass/PA3_avg_passband_150_wErr_trunc.txt'
+    pa3_90_bpass_file: 'data/bpass/PA3_avg_passband_90_wErr_trunc.txt'
+
+  eff_freq_coadd:
+    mode: 'eff_freq'
+    file_100mJy: 'data/effreqs/PA123_efffreq_noBL_100mJy_20200222.txt'
+    file_15mJy: 'data/effreqs/PA123_efffreq_noBL_15mJy_20200222.txt'
+
+  eff_freq_coadd_BL:
+    mode: 'eff_freq'
+    file_100mJy: 'data/effreqs/PA123_efffreq_BL_100mJy_20200222.txt'
+    file_15mJy: 'data/effreqs/PA123_efffreq_BL_15mJy_20200222.txt'

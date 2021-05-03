@@ -1,2 +1,14 @@
 *.png
 chains/
+data/
+notebooks/.ipynb_checkpoints
+.DS_Store
+power_atsz_analysis.py
+act_baseline.yml
+act.yml
+test_like.py
+test_like_extended.py
+__pycache__
+build/
+bplike.egg-info/
+dist/
