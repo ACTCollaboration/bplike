@@ -14,7 +14,7 @@ from pkg_resources import resource_filename
 
 save_coadd_data = False
 save_coadd_data_extended = False
-save_theory_data_spectra = True
+save_theory_data_spectra = False
 # run with:
 # $ cobaya-run run_scripts/act_extended_act_plus_planck.yml -f
 
@@ -1260,23 +1260,25 @@ class act_pylike_extended(_InstallableLikelihood):
                                              lmax=self.l_max,
                                              lkl_setup = lkl_setup)
 
+
             if self.theory_debug is not None:
                 print('[debug] time for tot: ', time.time() - start)
-            for comp in comps:
-                if self.theory_debug is not None:
-                    print('[debug] comp = ', comp)
-                    start = time.time()
-                fpower[comp] = self.fgpower.get_comp(self.sp.ells,
-                                                 self.sp.bin,
-                                                 ptt[l_min:],
-                                                 pte[l_min:],
-                                                 pee[l_min:],
-                                                 fgdict,
-                                                 lmax=self.l_max,
-                                                 lkl_setup = lkl_setup,
-                                                 comp = comp)
-                if self.theory_debug is not None:
-                    print('[debug] time for comp: ', time.time() - start)
+            if save_theory_data_spectra:
+                for comp in comps:
+                    if self.theory_debug is not None:
+                        print('[debug] comp = ', comp)
+                        start = time.time()
+                    fpower[comp] = self.fgpower.get_comp(self.sp.ells,
+                                                     self.sp.bin,
+                                                     ptt[l_min:],
+                                                     pte[l_min:],
+                                                     pee[l_min:],
+                                                     fgdict,
+                                                     lmax=self.l_max,
+                                                     lkl_setup = lkl_setup,
+                                                     comp = comp)
+                    if self.theory_debug is not None:
+                        print('[debug] time for comp: ', time.time() - start)
 
             return fpower
 
