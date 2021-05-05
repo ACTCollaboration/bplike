@@ -13,3 +13,4 @@ build/
 bplike.egg-info/
 dist/
 output/
+bplike/config_stampede.py
