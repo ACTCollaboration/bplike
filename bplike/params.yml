@@ -54,6 +54,7 @@ fixed:
   nu0_CIB_ghz : 150. # same as f90
 
   Tdust_galdust : 19.6 # same as f90
+  nu0_galdust_ghz : 150  # same as f90
   nu0_radio_ghz : 150  # same as f90
 
   cibc_n : -1.2

@@ -14,6 +14,7 @@ from pkg_resources import resource_filename
 
 save_coadd_data = False
 save_coadd_data_extended = False
+save_theory_data_spectra = True
 # run with:
 # $ cobaya-run run_scripts/act_extended_act_plus_planck.yml -f
 
@@ -161,6 +162,12 @@ class StevePower(object):
         spec=np.loadtxt(f"{froot}coadd_cl_{flux}_data_200124.txt")
         cov =np.loadtxt(f'{froot}coadd_cov_{flux}_200519.txt')
         bbl = np.loadtxt(f'{froot}coadd_bpwf_{flux}_191127_lmin2.txt')
+
+        if flux=='15mJy':
+            lregion = 'deep'
+        elif flux=='100mJy':
+            lregion = 'wide'
+        self.leak_95,self.leak_150 = np.loadtxt(f'{froot}leak_TE_{lregion}_200519.txt',usecols=[1,2],unpack=True)
         # print('bbl shape:',np.shape(bbl))
         # exit(0)
         self.bbl =bbl.reshape((10,52,7924))
@@ -168,7 +175,7 @@ class StevePower(object):
         self.cov = cov[:520,:520]
         nbin = 52
         self.n_bins = nbin
-        self.ells = np.arange(2,7924+2)
+        self.ells = np.arange(2,7924+2)  # ell max of the full window functions = 7924
         rells = np.repeat(self.ells[None],10,axis=0)
         self.ls = self.bin(rells)
 
@@ -223,6 +230,9 @@ class StevePower(object):
 
         self.rfband1 =  np.repeat(self.fband1,nbin)
         self.rfband2 =  np.repeat(self.fband2,nbin)
+        # print('rfband1 act:')
+        # print(self.rfband1)
+        # exit(0)
 
 
     def bin(self,dls):
@@ -302,7 +312,7 @@ class StevePower_extended(object):
         n_bins = int(len(spec)/n_specs)
         # print('n_bins: ',n_bins)
         # exit(0)
-        n_ells = np.shape(bbl)[1]
+        n_ells = np.shape(bbl)[1]  # ell max of the full window functions = 3926
         # print('n_ells: ',n_ells)
         n_ells = n_ells-l_min
         bbl_2 = np.zeros((n_bins*n_specs,n_ells))
@@ -596,6 +606,8 @@ class act_pylike_extended(_InstallableLikelihood):
         self.cal_yp_act_only =[
             "cal_95",
             "cal_150",
+            "leak_150",
+            "leak_95",
             "yp_95",
             "yp_150"]
         self.cal_yp_act_plus_planck =[
@@ -614,9 +626,9 @@ class act_pylike_extended(_InstallableLikelihood):
               "cal_545",
               "yp_545"
               ]
-        file = resource_filename("bplike","act_pylike_extended_full.yaml")
-        with open(file) as f:
-            act_pylike_extended_full = yaml.load(f, Loader=yaml.FullLoader)
+        # file = resource_filename("bplike","act_pylike_extended_full.yaml")
+        # with open(file) as f:
+        #     act_pylike_extended_full = yaml.load(f, Loader=yaml.FullLoader)
         # print('act_pylike_extended_full')
         # print(act_pylike_extended_full)
         # exit(0)
@@ -637,7 +649,8 @@ class act_pylike_extended(_InstallableLikelihood):
             # print(act_pylike_extended_full)
 
         elif self.use_act_planck == 'yes':
-            self.l_max = 3899
+            self.l_max = 3924
+            # self.l_max = 6051
             self.fparams = config_from_yaml('params_extended.yml')['fixed']
             self.aparams = config_from_yaml('params_extended.yml')['act_like']
             self.bpmodes = config_from_yaml('params_extended.yml')['bpass_modes']
@@ -649,12 +662,12 @@ class act_pylike_extended(_InstallableLikelihood):
             #         act_pylike_extended_full['params'].pop(s,None)
             # print('act_pylike_extended_full act+planck')
             # print(act_pylike_extended_full)
-        new_file = file.replace('_full', '')
+        # new_file = file.replace('_full', '')
         # print('new_file')
         # print(new_file)
-        with open(new_file, 'w') as f:
-            yaml.dump(act_pylike_extended_full, f)
-        # exit(0)
+        # with open(new_file, 'w') as f:
+        #     yaml.dump(act_pylike_extended_full, f)
+        # # exit(0)
 
 
 
@@ -707,6 +720,7 @@ class act_pylike_extended(_InstallableLikelihood):
             # self.input_params.remove('cal_95','yp_95')
 
         # print('expected params: ',self.expected_params)
+        # print('input params: ',self.input_params)
 
         differences = are_different_params_lists(
             self.input_params, self.expected_params,
@@ -735,16 +749,16 @@ class act_pylike_extended(_InstallableLikelihood):
         comps = ['tot','primary','tsz','ksz','cibc','cibp','tsz_x_cib','radio','galdust','galsyn']
 
 
+        # print('loglike getting power spectra')
         ps = self._get_power_spectra(cl, lkl_setup = self, **params_values)
+        # print('loglike done getting power spectra')
         ps_vec = ps['tot']
         # ps_vec = ps['primary']
-        print('model')
-        for idb in range(52):
-            print(idb,ps_vec[:52][idb])
-        print('data')
-        for idb in range(52):
-            print(idb,self.sp.spec[:52][idb])
-        # exit(0)
+        # print('model')
+        # for idb in range(52):
+        #     print(idb,ps_vec[:52][idb])
+        # print('data')
+
 
         # ps_vec_galdust = ps['galdust']
         # ps_vec_primary = ps['primary']
@@ -767,12 +781,11 @@ class act_pylike_extended(_InstallableLikelihood):
 
             ls_theory = self.sp.ls
             delta = self.sp.spec - dls_theory/fac
-            np.save(path_to_output+'/ls_theory_'+self.flux+bps+'act_planck.npy',ls_theory)
+            if save_theory_data_spectra:
+                np.save(path_to_output+'/ls_theory_'+self.flux+bps+'act_planck.npy',ls_theory)
 
-            for comp in comps:
-                np.save(path_to_output+'/dls_theory_'+comp+'_'+self.flux+bps+'act_planck.npy',ps[comp])
-                # np.save(path_to_output+'/dls_theory_'+self.flux+bps+'act_planck.npy',ps_vec_galdust)
-                # np.save(path_to_output+'/dls_theory_'+self.flux+bps+'act_planck.npy',ps_vec_primary)
+                for comp in comps:
+                    np.save(path_to_output+'/dls_theory_'+comp+'_'+self.flux+bps+'act_planck.npy',ps[comp])
 
 
 
@@ -781,22 +794,89 @@ class act_pylike_extended(_InstallableLikelihood):
             # print('self.sp.spec : ', self.sp.spec[:n_bins])
             dls_theory = ps_vec
             ls_theory = self.sp.ls
+
+            # print('len ls ps:',len(ls_theory),len(dls_theory))
+
+            # add T to P leakage Eq. 26-27 of choi et al https://arxiv.org/pdf/2007.07289.pdf
+            # T95E95
+            ids_leak_TE = np.argwhere((self.sp.rfband1 == 'T095') & (self.sp.rfband2 == 'E095'))[:,0]
+            ids_leak_TT = np.argwhere((self.sp.rfband1 == 'T095') & (self.sp.rfband2 == 'T095'))[:,0]
+            dls_theory[ids_leak_TE] = dls_theory[ids_leak_TE] + dls_theory[ids_leak_TT]*params_values['leak_95']*self.sp.leak_95[:]
+
+            # T95E150
+            ids_leak_TE = np.argwhere((self.sp.rfband1 == 'T095') & (self.sp.rfband2 == 'E150'))[:,0]
+            ids_leak_TT = np.argwhere((self.sp.rfband1 == 'T095') & (self.sp.rfband2 == 'T150'))[:,0]
+            dls_theory[ids_leak_TE] = dls_theory[ids_leak_TE] + dls_theory[ids_leak_TT]*params_values['leak_150']*self.sp.leak_150[:]
+
+            # T150E95
+            ids_leak_TE = np.argwhere((self.sp.rfband1 == 'T150') & (self.sp.rfband2 == 'E095'))[:,0]
+            ids_leak_TT = np.argwhere((self.sp.rfband1 == 'T095') & (self.sp.rfband2 == 'T150'))[:,0]
+            dls_theory[ids_leak_TE] = dls_theory[ids_leak_TE] + dls_theory[ids_leak_TT]*params_values['leak_95']*self.sp.leak_95[:]
+
+            # T150E150
+            ids_leak_TE = np.argwhere((self.sp.rfband1 == 'T150') & (self.sp.rfband2 == 'E150'))[:,0]
+            ids_leak_TT = np.argwhere((self.sp.rfband1 == 'T150') & (self.sp.rfband2 == 'T150'))[:,0]
+            dls_theory[ids_leak_TE] = dls_theory[ids_leak_TE] + dls_theory[ids_leak_TT]*params_values['leak_150']*self.sp.leak_150[:]
+
+            # E095E095
+            ids_leak_EE = np.argwhere((self.sp.rfband1 == 'E095') & (self.sp.rfband2 == 'E095'))[:,0]
+            ids_leak_TE = np.argwhere((self.sp.rfband1 == 'T095') & (self.sp.rfband2 == 'E095'))[:,0]
+            ids_leak_ET = np.argwhere((self.sp.rfband1 == 'T095') & (self.sp.rfband2 == 'E095'))[:,0]
+            ids_leak_TT = np.argwhere((self.sp.rfband1 == 'T095') & (self.sp.rfband2 == 'T095'))[:,0]
+            dls_theory[ids_leak_EE] = dls_theory[ids_leak_EE] \
+                                    + dls_theory[ids_leak_TE]*params_values['leak_95']*self.sp.leak_95[:]\
+                                    + dls_theory[ids_leak_ET]*params_values['leak_95']*self.sp.leak_95[:]\
+                                    + dls_theory[ids_leak_TT]*params_values['leak_95']*self.sp.leak_95[:]*params_values['leak_95']*self.sp.leak_95[:]
+
+            # E150E150
+            ids_leak_EE = np.argwhere((self.sp.rfband1 == 'E150') & (self.sp.rfband2 == 'E150'))[:,0]
+            ids_leak_TE = np.argwhere((self.sp.rfband1 == 'T150') & (self.sp.rfband2 == 'E150'))[:,0]
+            ids_leak_ET = np.argwhere((self.sp.rfband1 == 'T150') & (self.sp.rfband2 == 'E150'))[:,0]
+            ids_leak_TT = np.argwhere((self.sp.rfband1 == 'T150') & (self.sp.rfband2 == 'T150'))[:,0]
+            dls_theory[ids_leak_EE] = dls_theory[ids_leak_EE] \
+                                    + dls_theory[ids_leak_TE]*params_values['leak_150']*self.sp.leak_150[:]\
+                                    + dls_theory[ids_leak_ET]*params_values['leak_150']*self.sp.leak_150[:]\
+                                    + dls_theory[ids_leak_TT]*params_values['leak_150']*self.sp.leak_150[:]*params_values['leak_150']*self.sp.leak_150[:]
+
+
+            # E095E150
+            ids_leak_EE = np.argwhere((self.sp.rfband1 == 'E095') & (self.sp.rfband2 == 'E150'))[:,0]
+            ids_leak_TE = np.argwhere((self.sp.rfband1 == 'T095') & (self.sp.rfband2 == 'E150'))[:,0]
+            ids_leak_ET = np.argwhere((self.sp.rfband1 == 'T150') & (self.sp.rfband2 == 'E095'))[:,0]
+            ids_leak_TT = np.argwhere((self.sp.rfband1 == 'T095') & (self.sp.rfband2 == 'T150'))[:,0]
+            dls_theory[ids_leak_EE] = dls_theory[ids_leak_EE]\
+                                    + dls_theory[ids_leak_TE]*params_values['leak_95']*self.sp.leak_95[:]\
+                                    + dls_theory[ids_leak_ET]*params_values['leak_150']*self.sp.leak_150[:]\
+                                    + dls_theory[ids_leak_TT]*params_values['leak_95']*self.sp.leak_95[:]*params_values['leak_150']*self.sp.leak_150[:]
+
+
+
+
+            # print(ids_leak)
+            #
+            # exit(0)
+
+
             delta = self.sp.spec - ps_vec
-            np.save(path_to_output+'/ls_theory_'+self.flux+bps+'act_only.npy',ls_theory)
-            for comp in comps:
-                np.save(path_to_output+'/dls_theory_'+comp+'_'+self.flux+bps+'act_only.npy',ps[comp]*fac)
+            if save_theory_data_spectra:
+                np.save(path_to_output+'/ls_theory_'+self.flux+bps+'act_only.npy',ls_theory)
+                for comp in comps:
+                    np.save(path_to_output+'/dls_theory_'+comp+'_'+self.flux+bps+'act_only.npy',ps[comp]*fac)
+
+
             # np.save(path_to_output+'/dls_theory_galdust_'+self.flux+bps+'act_only.npy',ps_vec_galdust*fac)
             # np.save(path_to_output+'/dls_theory_primary_'+self.flux+bps+'act_only.npy',ps_vec_primary*fac)
 
 
-
-        for idb in range(520):
-            print("%s %s %d\t%.10e\t%.10e\t%.10e\t%.10e"%(self.sp.rfband1[idb],self.sp.rfband2[idb],idb+1,self.sp.cinv[idb,idb],delta[idb],self.sp.spec[idb],dls_theory[idb]))
-        # exit(0)
+        #
+        # for idb in range(520):
+        #     print("%s %s %d\t%.10e\t%.10e\t%.10e\t%.10e"%(self.sp.rfband1[idb],self.sp.rfband2[idb],idb+1,self.sp.cinv[idb,idb],delta[idb],self.sp.spec[idb],dls_theory[idb]))
+        # # exit(0)
 
 
         logp = -0.5 * np.dot(delta,np.dot(self.sp.cinv,delta))
-        print('logp: ',logp)
+        if self.theory_debug is not None:
+            print('[debug] logp: ',logp)
         self.log.debug(
             f"ACT-like {self.flux} lnLike value = {logp} (chisquare = {-2 * logp})")
         return logp
@@ -997,8 +1077,8 @@ class act_pylike_extended(_InstallableLikelihood):
 
         # print(str_current+'frequencies: ')
         # print('getting foreground power with cfrq: ', cfreq_dict)
-        print('bp_dict: ', bp_dict)
-        print('beam_dict: ', beam_dict)
+        # print('bp_dict: ', bp_dict)
+        # print('beam_dict: ', beam_dict)
         # print('flux:',self.flux)
         # print('pnammes:',pnames)
         # exit(0)
@@ -1021,14 +1101,14 @@ class act_pylike_extended(_InstallableLikelihood):
         # exit(0)
 
     def _get_power_spectra(self, cl, lkl_setup = None, **params_values):
-        print('getting power spectra')
+        # print('getting power spectra')
         l_min = 2
 
         if self.theory_debug is not None:
-            print('theory debug:',self.theory_debug)
+            print('[debug] theory debug:',self.theory_debug)
             # ells,cltt,clee,clte = np.loadtxt(self.theory_debug,usecols=[0,1,2,4],unpack=True) # mat's debig
             ells,cltt,clte,clee = np.loadtxt(self.theory_debug,usecols=[0,1,2,3],unpack=True) # boris's debug
-            # print('ell0,ell1:',ells[0],ells[1])
+            # print('ell0,ell1:',ells[0],ells[1],ells[:self.l_max])
 
             assert ells[0] == 2
             assert ells[1] == 3
@@ -1042,15 +1122,39 @@ class act_pylike_extended(_InstallableLikelihood):
             # cl['tt'][2:] = cltt[:self.l_max+50]
             # cl['te'][2:] = clte[:self.l_max+50]
             # cl['ee'][2:] = clee[:self.l_max+50]
-            cl['ell'] = np.zeros(self.l_max)
-            cl['tt'] = np.zeros(self.l_max)
-            cl['te'] = np.zeros(self.l_max)
-            cl['ee'] = np.zeros(self.l_max)
+            # 6051
+            l_max = len(ells) + 2
+
+            cl['ell'] = np.zeros(l_max)
+            cl['tt'] = np.zeros(l_max)
+            cl['te'] = np.zeros(l_max)
+            cl['ee'] = np.zeros(l_max)
+
             cl['ell'][1] = 1
-            cl['ell'][2:] = ells[:self.l_max]
-            cl['tt'][2:] = cltt[:self.l_max]
-            cl['te'][2:] = clte[:self.l_max]
-            cl['ee'][2:] = clee[:self.l_max]
+            cl['ell'][l_min:] = ells[:l_max]
+            cl['tt'][l_min:] = cltt[:l_max]
+            cl['te'][l_min:] = clte[:l_max]
+            cl['ee'][l_min:] = clee[:l_max]
+
+            # cl['ell'] = np.zeros(self.l_max)
+            # cl['tt'] = np.zeros(self.l_max)
+            # cl['te'] = np.zeros(self.l_max)
+            # cl['ee'] = np.zeros(self.l_max)
+            #
+            # cl['ell'][1] = 1
+            # cl['ell'][2:] = ells[2:self.l_max]
+            # cl['tt'][2:] = cltt[2:self.l_max]
+            # cl['te'][2:] = clte[2:self.l_max]
+            # cl['ee'][2:] = clee[2:self.l_max]
+            # cl['ell'] = np.zeros(6051)
+            # cl['tt'] = np.zeros(6051)
+            # cl['te'] = np.zeros(6051)
+            # cl['ee'] = np.zeros(6051)
+            # cl['ell'][1] = 1
+            # cl['ell'][2:] = ells[:6051]
+            # cl['tt'][2:] = cltt[:6051]
+            # cl['te'][2:] = clte[:6051]
+            # cl['ee'][2:] = clee[:6051]
         # print('cl:',cl)
         # save some cls to do debugging fun
         # np.savetxt(path_to_output+'/cls_model.txt',np.c_[cl['ell'],cl['tt'],cl['te'],cl['ee']])
@@ -1060,8 +1164,10 @@ class act_pylike_extended(_InstallableLikelihood):
         fgdict =    {k: params_values[k] for k in self.expected_params}
         fgdict.update(self.fparams)
         nells_camb = cl['ell'].size
-        # print('nells_camb: ', nells_camb)
+
         nells = self.sp.ells.size
+        # print('nells_camb (dim of cl["ell"]): ', nells_camb)
+        # print('nells (dim of cl["ell"]): ', nells_camb)
         # print('self.sp.ells.size: ', nells)
         # exit(0)
         # print('camb l0,l1: ',cl['ell'][0],cl['ell'][1])
@@ -1075,15 +1181,37 @@ class act_pylike_extended(_InstallableLikelihood):
         ptt = np.zeros(nells+l_min)
         pte = np.zeros(nells+l_min)
         pee = np.zeros(nells+l_min)
-        ptt[l_min:nells_camb] = cl['tt'][l_min:]
-        pte[l_min:nells_camb] = cl['te'][l_min:]
-        pee[l_min:nells_camb] = cl['ee'][l_min:]
+
+
+        # ptt[l_min:nells_camb] = cl['tt'][l_min:]
+        # pte[l_min:nells_camb] = cl['te'][l_min:]
+        # pee[l_min:nells_camb] = cl['ee'][l_min:]
+
+        # ptt[l_min:nells_camb] = cl['tt'][l_min:nells_camb]
+        # pte[l_min:nells_camb] = cl['te'][l_min:nells_camb]
+        # pee[l_min:nells_camb] = cl['ee'][l_min:nells_camb]
+
+
+        # print('lencl["tt"][l_min:] :', len(cl['tt'][l_min:]))
+        # print('lenptt[l_min:nells_camb] :', len(ptt[l_min:nells_camb]))
+
+        # exit(0)
+
+        ptt[l_min:nells_camb] = cl['tt'][l_min:len(ptt[l_min:nells_camb])+l_min]
+        pte[l_min:nells_camb] = cl['te'][l_min:len(ptt[l_min:nells_camb])+l_min]
+        pee[l_min:nells_camb] = cl['ee'][l_min:len(ptt[l_min:nells_camb])+l_min]
+
+        # print('starting get theory')
 
         comps = ['primary','tsz','ksz','cibc','cibp','tsz_x_cib','radio','galdust','galsyn']
 
         if self.bandpass:
             # print('doing theory bandpass')
             fpower = {}
+            if self.theory_debug is not None:
+                import time
+                start = time.time()
+                print('[debug] comp = ', 'tot')
             fpower['tot'] = self.fgpower.get_theory_bandpassed(self.coadd_data,
                                                         self.sp.ells,
                                                         self.sp.bbl,
@@ -1093,7 +1221,12 @@ class act_pylike_extended(_InstallableLikelihood):
                                                         fgdict,
                                                         lmax=self.l_max,
                                                         lkl_setup = lkl_setup)
+            if self.theory_debug is not None:
+                print('[debug] time for tot: ', time.time() - start)
             for comp in comps:
+                if self.theory_debug is not None:
+                    print('[debug] comp = ', comp)
+                    start = time.time()
                 fpower[comp] = self.fgpower.get_theory_bandpassed_comp(self.coadd_data,
                                                         self.sp.ells,
                                                         self.sp.bbl,
@@ -1104,29 +1237,8 @@ class act_pylike_extended(_InstallableLikelihood):
                                                         lmax=self.l_max,
                                                         lkl_setup = lkl_setup,
                                                         comp = comp)
-
-            #
-            # fpower_primary = self.fgpower.get_theory_bandpassed_comp(self.coadd_data,
-            #                                             self.sp.ells,
-            #                                             self.sp.bbl,
-            #                                             ptt[l_min:],
-            #                                             pte[l_min:],
-            #                                             pee[l_min:],
-            #                                             fgdict,
-            #                                             lmax=self.l_max,
-            #                                             lkl_setup = lkl_setup,
-            #                                             comp = 'primary')
-            #
-            # fpower_galdust = self.fgpower.get_theory_bandpassed_comp(self.coadd_data,
-            #                                             self.sp.ells,
-            #                                             self.sp.bbl,
-            #                                             ptt[l_min:],
-            #                                             pte[l_min:],
-            #                                             pee[l_min:],
-            #                                             fgdict,
-            #                                             lmax=self.l_max,
-            #                                             lkl_setup = lkl_setup,
-            #                                             comp = 'galdust')
+                if self.theory_debug is not None:
+                    print('[debug] time for comp: ', time.time() - start)
 
             return fpower
 
@@ -1135,6 +1247,10 @@ class act_pylike_extended(_InstallableLikelihood):
             # print('doing theory no bandpass')
             # print('sp.ells: ',self.sp.ells)
             fpower = {}
+            if self.theory_debug is not None:
+                import time
+                start = time.time()
+                print('[debug] comp = ', 'tot')
             fpower['tot'] = self.fgpower.get_theory(self.sp.ells,
                                              self.sp.bin,
                                              ptt[l_min:],
@@ -1144,26 +1260,12 @@ class act_pylike_extended(_InstallableLikelihood):
                                              lmax=self.l_max,
                                              lkl_setup = lkl_setup)
 
-
-            # fpower_primary = self.fgpower.get_primary(self.sp.ells,
-            #                                  self.sp.bin,
-            #                                  ptt[l_min:],
-            #                                  pte[l_min:],
-            #                                  pee[l_min:],
-            #                                  fgdict,
-            #                                  lmax=self.l_max,
-            #                                  lkl_setup = lkl_setup)
-            #
-            # fpower_galdust = self.fgpower.get_galdust(self.sp.ells,
-            #                                  self.sp.bin,
-            #                                  ptt[l_min:],
-            #                                  pte[l_min:],
-            #                                  pee[l_min:],
-            #                                  fgdict,
-            #                                  lmax=self.l_max,
-            #                                  lkl_setup = lkl_setup)
-
+            if self.theory_debug is not None:
+                print('[debug] time for tot: ', time.time() - start)
             for comp in comps:
+                if self.theory_debug is not None:
+                    print('[debug] comp = ', comp)
+                    start = time.time()
                 fpower[comp] = self.fgpower.get_comp(self.sp.ells,
                                                  self.sp.bin,
                                                  ptt[l_min:],
@@ -1173,9 +1275,8 @@ class act_pylike_extended(_InstallableLikelihood):
                                                  lmax=self.l_max,
                                                  lkl_setup = lkl_setup,
                                                  comp = comp)
-
-            # print('fpower : ', fpower[0:10])
-            # exit(0)
+                if self.theory_debug is not None:
+                    print('[debug] time for comp: ', time.time() - start)
 
             return fpower
 

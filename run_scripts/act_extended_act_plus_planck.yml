@@ -7,13 +7,14 @@ timing: True
 likelihood:
   # The 100 mJy likelihood
   #
-  # bplike.act100:
-  #   #path: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/
-  #   stop_at_error: False
-  #   bandpass: False
-  #   # Optional line to do some debugging with an input theory curve
-  #   #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
-  #   use_act_planck: 'yes'
+  bplike.act100:
+    #path: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/
+    stop_at_error: False
+    bandpass: False
+    # Optional line to do some debugging with an input theory curve
+    #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
+    theory_debug: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/data/bplike_data/cls_model.txt # boris's debug
+    use_act_planck: 'yes'
 
   # # The 15 mJy likelihood
   bplike.act15:
@@ -21,6 +22,7 @@ likelihood:
     bandpass: False
     # Optional line to do some debugging with an input theory curve
     #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
+    theory_debug: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/data/bplike_data/cls_model.txt # boris's debug
     use_act_planck: 'yes'
 
 
@@ -132,26 +134,30 @@ sampler:
       ombh2 : 0.022219
       omch2 : 0.119883
       tau : 0.0754047
-      a_c:    4.9
-      a_d:    6.9
-      a_tsz:    3.3
-      a_ksz:    4.950210
-      xi:   1.654936e-2
-      a_p_tt_15:    3.1
-      a_p_tt_100:    24.6
-      a_p_ee:    0.0
-      a_p_te:    0.1
-      beta_CIB : 2.2
-      # galactic dust
-      a_g_tt:  1
-      # for the act+planck lkl:
-      yp_090: 1
-      yp_100: 1
-      yp_143: 1
-      yp_150: 1
-      yp_217: 1
-      yp_353: 1
-      yp_545: 1
+
+      a_c:    0.3648102E+01 #4.9
+      a_d:    0.6872966E+01 #6.9
+      a_tsz:    0.5806115E+01 ##3.3
+      a_ksz:   0.1024734E-03 #4.950210
+      xi:   0.1998220E+00 #1.654936e-2
+      a_p_tt_15:   0.3682240E+01 #3.1
+      a_p_tt_100:   0.2249012E+02 #24.6
+      a_p_ee:    0.5342375E-04 # 0.0
+      a_p_te:   0.4443353E-01 # 0.1
+
+      beta_CIB : 0.2447908E+01 #2.2
+
+      a_g_tt_15:  0.2811710E+01  #0.3436806E-01 #0
+      a_g_tt_100:   0.8717251E+01 #0.2811710E+01  #0.3436806E-01 #0
+
+      # yp_090: 1
+      # yp_100: 1
+      # yp_143: 1
+      # yp_150: 1
+      # yp_217: 1
+      # yp_353: 1
+      # yp_545: 1
+
   # Example MCMC run
   # mcmc:
   #   burn_in: 100

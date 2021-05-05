@@ -71,19 +71,29 @@ fixed:
 
 
 
-  beta_galdust : 3.8 # default 3.8
-  beta_radio : -0.5
+  beta_galdust : 1.5 #was 3.8
+  beta_radio : -0.5 # beta_p in erminia's code = to beta_cib
   beta_galsyn : -1.
+
   high_ell0 : 3000
+
   low_ell0 : 500
   nu0 : 150
-  nu0_radio_ghz : 150
-  Tdust_CIB : 9.7
-  nu0_CIB_ghz : 150.
+
+
+  Tdust_CIB : 9.7 # same as f90
+  nu0_CIB_ghz : 150. # same as f90
+
+  Tdust_galdust : 19.6 # same as f90
+  nu0_galdust_ghz : 150  # same as f90
+  nu0_radio_ghz : 150  # same as f90
+
   cibc_n : -1.2
-  galdust_t_n : -0.7
-  galdust_p_n : -0.4
-  galsync_p_n : -0.7
+  galdust_t_n : -0.6 # was 0.7, set to -0.6 to match f90
+
+  galdust_p_n : -0.4 # same as f90
+
+  galsync_p_n : -0.7 # same as f90
 
 bpass_modes:
   color_corr:

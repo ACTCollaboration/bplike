@@ -1,175 +1,175 @@
 bandpass: false
 params:
-  a_c:
-    latex: a_\mathrm{c}
-    prior:
-      max: 15
-      min: 0
-    proposal: 1
-    ref:
-      dist: norm
-      loc: 4.9
-      scale: 1
-  a_d:
-    latex: a_\mathrm{d}
-    prior:
-      max: 11
-      min: 0
-    proposal: 1
-    ref:
-      dist: norm
-      loc: 6.9
-      scale: 1
-  a_g_ee_100:
-    latex: a_g_ee_100
-    prior:
-      max: 11
-      min: 0.0
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  a_g_ee_15:
-    latex: a_g_ee_15
-    prior:
-      max: 11
-      min: 0.0
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  a_g_te_100:
-    latex: a_g_te_100
-    prior:
-      max: 11
-      min: 0.0
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  a_g_te_15:
-    latex: a_g_te_15
-    prior:
-      max: 11
-      min: 0.0
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  a_g_tt_100:
-    latex: a_g_tt_100
-    prior:
-      max: 11
-      min: 0.0
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  a_g_tt_15:
-    latex: a_g_tt_15
-    prior:
-      max: 11
-      min: 0.0
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  a_ksz:
-    latex: a_\mathrm{kSZ}
-    prior:
-      max: 10
-      min: 0
-    proposal: 0.5
-    ref:
-      dist: norm
-      loc: 4.95
-      scale: 0.5
-  a_p_ee:
-    latex: a_\mathrm{p,EE}
-    prior:
-      max: 1
-      min: 0
-    proposal: 0.1
-    ref:
-      dist: norm
-      loc: 0
-      scale: 0.1
-  a_p_te:
-    latex: a_\mathrm{p,TE}
-    prior:
-      max: 1
-      min: -1
-    proposal: 0.1
-    ref:
-      dist: norm
-      loc: 0
-      scale: 0.1
-  a_p_tt_100:
-    latex: a_\mathrm{p,TT,100}
-    prior:
-      max: 40
-      min: 0.0
-    proposal: 3
-    ref:
-      dist: norm
-      loc: 22.5
-      scale: 6
-  a_p_tt_15:
-    latex: a_\mathrm{p,TT,15}
-    prior:
-      max: 6
-      min: 0
-    proposal: 0.4
-    ref:
-      dist: norm
-      loc: 3.1
-      scale: 0.5
-  a_s_ee:
-    latex: a_s_ee
-    prior:
-      max: 1.1
-      min: 0.0
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  a_s_te:
-    latex: a_s_te
-    prior:
-      max: 1.1
-      min: 0.0
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  a_tsz:
-    latex: a_\mathrm{tSZ}
-    prior:
-      max: 10
-      min: 0
-    proposal: 0.2
-    ref:
-      dist: norm
-      loc: 3.3
-      scale: 0.5
-  beta_CIB:
-    latex: \beta_c
-    prior:
-      max: 5
-      min: 0
-    proposal: 0.2
-    ref:
-      dist: norm
-      loc: 2.2
-      scale: 0.5
+  a_c: 0.3648102E+01
+    # latex: a_\mathrm{c}
+    # prior:
+    #   max: 15
+    #   min: 0
+    # proposal: 1
+    # ref:
+    #   dist: norm
+    #   loc: 4.9
+    #   scale: 1
+  a_d: 0.6872966E+01
+    # latex: a_\mathrm{d}
+    # prior:
+    #   max: 11
+    #   min: 0
+    # proposal: 1
+    # ref:
+    #   dist: norm
+    #   loc: 6.9
+    #   scale: 1
+  a_g_ee_100: 0.1293905E+00
+    # latex: a_g_ee_100
+    # prior:
+    #   max: 11
+    #   min: 0.0
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  a_g_ee_15: 0.3436806E-01
+    # latex: a_g_ee_15
+    # prior:
+    #   max: 11
+    #   min: 0.0
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  a_g_te_100: 0.3559930E+00
+    # latex: a_g_te_100
+    # prior:
+    #   max: 11
+    #   min: 0.0
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  a_g_te_15: 0.1049940E+00
+    # latex: a_g_te_15
+    # prior:
+    #   max: 11
+    #   min: 0.0
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  a_g_tt_100: 0.8717251E+01
+    # latex: a_g_tt_100
+    # prior:
+    #   max: 11
+    #   min: 0.0
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  a_g_tt_15: 0.2811710E+01
+    # latex: a_g_tt_15
+    # prior:
+    #   max: 11
+    #   min: 0.0
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  a_ksz: 0.1024734E-03
+    # latex: a_\mathrm{kSZ}
+    # prior:
+    #   max: 10
+    #   min: 0
+    # proposal: 0.5
+    # ref:
+    #   dist: norm
+    #   loc: 4.95
+    #   scale: 0.5
+  a_p_ee: 0.5342375E-04
+    # latex: a_\mathrm{p,EE}
+    # prior:
+    #   max: 1
+    #   min: 0
+    # proposal: 0.1
+    # ref:
+    #   dist: norm
+    #   loc: 0
+    #   scale: 0.1
+  a_p_te: 0.4443353E-01
+    # latex: a_\mathrm{p,TE}
+    # prior:
+    #   max: 1
+    #   min: -1
+    # proposal: 0.1
+    # ref:
+    #   dist: norm
+    #   loc: 0
+    #   scale: 0.1
+  a_p_tt_100: 0.2249012E+02
+    # latex: a_\mathrm{p,TT,100}
+    # prior:
+    #   max: 40
+    #   min: 0.0
+    # proposal: 3
+    # ref:
+    #   dist: norm
+    #   loc: 22.5
+    #   scale: 6
+  a_p_tt_15:  0.3682240E+01
+    # latex: a_\mathrm{p,TT,15}
+    # prior:
+    #   max: 6
+    #   min: 0
+    # proposal: 0.4
+    # ref:
+    #   dist: norm
+    #   loc: 3.1
+    #   scale: 0.5
+  a_s_ee: 0.
+    # latex: a_s_ee
+    # prior:
+    #   max: 1.1
+    #   min: 0.0
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  a_s_te: 0.
+    # latex: a_s_te
+    # prior:
+    #   max: 1.1
+    #   min: 0.0
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  a_tsz: 0.5806115E+01
+    # latex: a_\mathrm{tSZ}
+    # prior:
+    #   max: 10
+    #   min: 0
+    # proposal: 0.2
+    # ref:
+    #   dist: norm
+    #   loc: 3.3
+    #   scale: 0.5
+  beta_CIB: 0.2447908E+01
+    # latex: \beta_c
+    # prior:
+    #   max: 5
+    #   min: 0
+    # proposal: 0.2
+    # ref:
+    #   dist: norm
+    #   loc: 2.2
+    #   scale: 0.5
   cal_090:
     latex: cal_90
     value: 1
@@ -179,16 +179,16 @@ params:
   cal_143:
     latex: cal_143
     value: 1
-  cal_150:
-    latex: cal_150
-    prior:
-      max: 11
-      min: 0.0
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
+  cal_150: 1.
+    # latex: cal_150
+    # prior:
+    #   max: 11
+    #   min: 0.0
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
   cal_217:
     latex: cal_217
     value: 1
@@ -198,104 +198,108 @@ params:
   cal_545:
     latex: cal_545
     value: 1
-  cal_95:
-    latex: cal_95
-    prior:
-      max: 11
-      min: 0.0
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  xi:
-    latex: \xi^{tSZ-CIB}
-    prior:
-      max: 0.2
-      min: 0
-    proposal: 0.05
-    ref:
-      dist: norm
-      loc: 0.0165
-      scale: 0.05
-  yp_090:
-    latex: yp_90
-    prior:
-      max: 1.1
-      min: 0.9
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  yp_100:
-    latex: yp_100
-    prior:
-      max: 1.1
-      min: 0.9
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  yp_143:
-    latex: yp_143
-    prior:
-      max: 1.1
-      min: 0.9
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  yp_150:
-    latex: yp_150
-    prior:
-      max: 1.1
-      min: 0.0
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  yp_217:
-    latex: yp_217
-    prior:
-      max: 1.1
-      min: 0.9
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  yp_353:
-    latex: yp_353
-    prior:
-      max: 1.1
-      min: 0.9
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  yp_545:
-    latex: yp_545
-    prior:
-      max: 1.1
-      min: 0.9
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  yp_95:
-    latex: yp_95
-    prior:
-      max: 1.1
-      min: 0.0
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
+  cal_95: 1.
+
+  leak_95: 1.
+  leak_150: 1.
+
+    # latex: cal_95
+    # prior:
+    #   max: 11
+    #   min: 0.0
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  xi: 0.1998220E+00
+    # latex: \xi^{tSZ-CIB}
+    # prior:
+    #   max: 0.2
+    #   min: 0
+    # proposal: 0.05
+    # ref:
+    #   dist: norm
+    #   loc: 0.0165
+    #   scale: 0.05
+  yp_090: 0.
+    # latex: yp_90
+    # prior:
+    #   max: 1.1
+    #   min: 0.9
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  yp_100: 0.
+    # latex: yp_100
+    # prior:
+    #   max: 1.1
+    #   min: 0.9
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  yp_143: 0.
+    # latex: yp_143
+    # prior:
+    #   max: 1.1
+    #   min: 0.9
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  yp_150: 0.9714017E+00
+    # latex: yp_150
+    # prior:
+    #   max: 1.1
+    #   min: 0.0
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  yp_217: 0.
+    # latex: yp_217
+    # prior:
+    #   max: 1.1
+    #   min: 0.9
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  yp_353: 0.
+    # latex: yp_353
+    # prior:
+    #   max: 1.1
+    #   min: 0.9
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  yp_545: 0.
+    # latex: yp_545
+    # prior:
+    #   max: 1.1
+    #   min: 0.9
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  yp_95: 0.9860632E+00
+    # latex: yp_95
+    # prior:
+    #   max: 1.1
+    #   min: 0.0
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
 theory_debug: null
