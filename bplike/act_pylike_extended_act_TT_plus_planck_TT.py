@@ -1403,8 +1403,8 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
             # print('fpower:',fpower)
             # # exit(0)
             #
-            # if self.theory_debug is not None:
-            #     print('[debug] time for tot: ', time.time() - start)
+            if self.theory_debug is not None:
+                print('[debug] time for tot: ', time.time() - start)
             # for comp in comps:
             #     if self.theory_debug is not None:
             #         print('[debug] comp = ', comp)
