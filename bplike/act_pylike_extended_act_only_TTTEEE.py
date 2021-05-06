@@ -2,574 +2,545 @@ import numpy as np
 #from cobaya.conventions import _path_install
 from cobaya.log import LoggedError
 from cobaya.tools import are_different_params_lists
-from cobaya.likelihoods._base_classes import _InstallableLikelihood
+from cobaya.likelihoods.base_classes import InstallableLikelihood
 import os,sys
 from .config import *
 from .utils import *
 from .fg import *
+from .stevepower import *
 # import utils
 # import fg
 from soapack import interfaces as sints
 from pkg_resources import resource_filename
 
-save_coadd_data = False
-save_coadd_data_extended = False
-save_theory_data_spectra = False
-# run with:
-# $ cobaya-run run_scripts/act_extended_act_plus_planck.yml -f
-
-
-dfroot = resource_filename("bplike","data/actpolfull_dr4.01/data/data_act/")
-
-# dfroot_coadd_w = resource_filename("bplike","data")+"/bplike_data/big_coadd_weights/200226/"
-# dfroot_coadd_d = resource_filename("bplike","data")+"/bplike_data/coadd_data/"
-# dfroot_fg = resource_filename("bplike","data")+"/actpolfull_dr4.01/data/Fg/"
-# dfroot_bpass = resource_filename("bplike","data")+"/bplike_data/bpass/"
-
-
-dfroot = path_to_data+"/actpolfull_dr4.01/data/data_act/"
-
-dfroot_coadd_w = path_to_data+"/bplike_data/big_coadd_weights/200226/"
-dfroot_coadd_d = path_to_data+"/bplike_data/coadd_data/"
-dfroot_fg = path_to_data+"/actpolfull_dr4.01/data/Fg/"
-dfroot_bpass = path_to_data+"/bplike_data/bpass/"
-
-sz_temp_file = dfroot_fg+"cl_tsz_150_bat.dat"
-sz_x_cib_temp_file = dfroot_fg+"sz_x_cib_template.dat"
-ksz_temp_file = dfroot_fg+"cl_ksz_bat.dat"
-
-def get_band(array):
-    a = array.split("_")[1]
-    assert a[0]=='f'
-    if a[1:]=='150':
-        return '150'
-    elif a[1:]=='090':
-        return '95'
-    else:
-        raise ValueError
-
-def get_band_extended(array):
-    a = array.split("_")[1]
-    assert a[0]=='f'
-    if a[1:]=='150':
-        return '150'
-    elif a[1:]=='090':
-        return '090'
-    elif a[1:]=='100':
-        return '100'
-    elif a[1:]=='143':
-        return '143'
-    elif a[1:]=='217':
-        return '217'
-    elif a[1:]=='353':
-        return '353'
-    elif a[1:]=='545':
-        return '545'
-    else:
-        raise ValueError
-
-def save_coadd_matrix(spec,band1,band2,flux,path_root):
-    import pandas as pd
-
-    from scipy.linalg import block_diag
-    if flux=='15mJy':
-        regions = ['deep56']
-    elif flux=='100mJy':
-        regions = ['boss'] + [f'advact_window{x}' for x in range(6)]
-    else:
-        raise ValueError
-
-    nbin = 59
-    rbin = 7 # remove first 7 bins
-    def rmap(r):
-        if r[:6]=='advact': return 'advact'
-        else: return r
-
-    barrays = []
-    icovs = []
-    # print('regions:',regions)
-    for region in regions:
-        order = np.load(f"{dfroot_coadd_w}{region}_all_C_ell_data_order_190918.npy")
-        df = pd.DataFrame(order,columns=['t1','t2','region','s1','s2','a1','a2']).stack().str.decode('utf-8').unstack()
-        df = df[(df.t1==spec[0]) & (df.t2==spec[1]) & (df.region==rmap(region)+"_")]
-        # print('region:',region)
-        # print('df:',df)
-        arrays = []
-        for index, row in df.iterrows():
-            b1 = get_band(row.a1)
-            b2 = get_band(row.a2)
-            # print('b1,b2:',b1,b2)
-            if (b1==band1 and b2==band2) or (b1==band2 and b2==band1):
-                # print('rmap(region):',rmap(region))
-                # print('rmap b1,b2:',b1,b2)
-                # print('row.s1:',row.s1)
-                arrays.append((index,rmap(region),row.s1,row.s2,row.a1,row.a2))
-                barrays.append((index,rmap(region),row.s1,row.s2,row.a1,row.a2))
-
-        adf = pd.DataFrame(arrays,columns = ['i','r','s1','s2','a1','a2'])
-        ids = adf.i.to_numpy()
-        oids = []
-        for ind in ids:
-            oids = oids + list(range(ind*nbin+rbin,(ind+1)*nbin))
-        # print('oids:',oids)
-        # print('soids:',np.shape(oids))
-
-        """
-        Covmat selection
-        """
-        # print('loading cov:',dfroot_coadd_w+f"{region}_all_covmat_190918.npy")
-        cov = np.load(dfroot_coadd_w+f"{region}_all_covmat_190918.npy")
-        # print('cov loaded')
-        # print('scov:',np.shape(cov))
-        ocov = cov[oids,:][:,oids]
-        # print('socov:',np.shape(ocov))
-        icovs.append(np.linalg.inv(ocov))
-    # print('sicovs:',np.shape(icovs))
-    icov = block_diag(*icovs)
-    # print('sicov:',np.shape(icov))
-    nspec = 1
-    nbins = 52
-    norig = len(barrays)
-    # print('norig:',norig)
-    # print('barrays:',barrays)
-    N_spec = nbins*nspec
-    # print('N_spec:',N_spec)
-    # building projection matrix with shape nbins*nspec x nbins*norig
-    pmat = np.identity(N_spec)
-    Pmat = np.identity(N_spec)
-    for i in range(1,norig):
-        Pmat = np.append(Pmat,pmat,axis=1)
-    # print('sPmat:',np.shape(Pmat))
-    icov_ibin = np.linalg.inv(np.dot(Pmat,np.dot(icov,Pmat.T)))
-    # np.savetxt(f'{path_root}_{spec}_{band1}_{band2}_{flux}_icov.txt',icov)
-    # np.savetxt(f'{path_root}_{spec}_{band1}_{band2}_{flux}_icov_ibin.txt',icov_ibin)
-    # np.savetxt(f'{path_root}_{spec}_{band1}_{band2}_{flux}_pmat.txt',Pmat)
-    barrays = np.array(barrays,dtype=[('i','i8'),('r','U32'),('s1','U32'),('s2','U32'),('a1','U32'),('a2','U32')])
-    # np.savetxt(f'{path_root}_{spec}_{band1}_{band2}_{flux}_arrays.txt', barrays,fmt=['%d','%s','%s','%s','%s','%s'])
-
-
-def load_coadd_matrix(spec,band1,band2,flux,path_root):
-    icov = np.loadtxt(f'{path_root}_{spec}_{band1}_{band2}_{flux}_icov.txt',)
-    icov_ibin = np.loadtxt(f'{path_root}_{spec}_{band1}_{band2}_{flux}_icov_ibin.txt',)
-    pmat = np.loadtxt(f'{path_root}_{spec}_{band1}_{band2}_{flux}_pmat.txt',)
-    arrays = np.loadtxt(f'{path_root}_{spec}_{band1}_{band2}_{flux}_arrays.txt',dtype=[('i','i8'),('r','U32'),('s1','U32'),('s2','U32'),('a1','U32'),('a2','U32')],ndmin=1)
-    return icov,icov_ibin,pmat,arrays
-
-
-class StevePower(object):
-    def __init__(self,froot,flux,infval=1e10,tt_lmin=600,tt_lmax=None):
-        # print('doing stevepower')
-        spec=np.loadtxt(f"{froot}coadd_cl_{flux}_data_200124.txt")
-        cov =np.loadtxt(f'{froot}coadd_cov_{flux}_200519.txt')
-        bbl = np.loadtxt(f'{froot}coadd_bpwf_{flux}_191127_lmin2.txt')
-
-        if flux=='15mJy':
-            lregion = 'deep'
-        elif flux=='100mJy':
-            lregion = 'wide'
-        self.leak_95,self.leak_150 = np.loadtxt(f'{froot}leak_TE_{lregion}_200519.txt',usecols=[1,2],unpack=True)
-        # print('bbl shape:',np.shape(bbl))
-        # exit(0)
-        self.bbl =bbl.reshape((10,52,7924))
-        self.spec = spec[:520]
-        self.cov = cov[:520,:520]
-        nbin = 52
-        self.n_bins = nbin
-        self.ells = np.arange(2,7924+2)  # ell max of the full window functions = 7924
-        rells = np.repeat(self.ells[None],10,axis=0)
-        self.ls = self.bin(rells)
-
-        if tt_lmin is not None:
-            n = 3
-            ids = []
-            ids = np.argwhere(self.ls<tt_lmin)[:,0]
-            ids = ids[ids<nbin*3]
-            self.cov[:,ids] = 0
-            self.cov[ids,:] = 0
-            self.cov[ids,ids] = infval
-            # print('cov')
-            # print(cov)
-
-        if tt_lmax is not None:
-            n = 3
-            ids = []
-            ids = np.argwhere(self.ls>tt_lmax)[:,0]
-            ids = ids[ids<nbin*3]
-            self.cov[:,ids] = 0
-            self.cov[ids,:] = 0
-            self.cov[ids,ids] = infval
-            # print('cov')
-            # print(cov)
-
-        self.cinv = np.linalg.inv(self.cov)
-
-        if save_coadd_data == True:
-            band1 = '95'
-            band2 = '95'
-            flux = '100mJy'
-            path_root = None
-            spec = 'TT'
-
-            save_coadd_matrix(spec,band1,band2,flux,path_root)
-
-
-        fband1 = []
-        fband2 = []
-        for i in range(10):
-            if i<3:
-                fband1.append({0:'T095',1:'T095',2:'T150'}[i])
-                fband2.append({0:'T095',1:'T150',2:'T150'}[i])
-            elif i>=3 and i<=6:
-                fband1.append({0:'T095',1:'T095',2:'T150',3:'T150'}[i-3])
-                fband2.append({0:'E095',1:'E150',2:'E095',3:'E150'}[i-3])
-            else:
-                fband1.append({0:'E095',1:'E095',2:'E150'}[i-7])
-                fband2.append({0:'E095',1:'E150',2:'E150'}[i-7])
-        self.fband1 = fband1
-        self.fband2 = fband2
-
-        self.rfband1 =  np.repeat(self.fband1,nbin)
-        self.rfband2 =  np.repeat(self.fband2,nbin)
-        # print('rfband1 act:')
-        # print(self.rfband1)
-        # exit(0)
-
-
-    def bin(self,dls):
-        # print('bbl in bin, size : ',len(self.bbl[0,0,:]) )
-        # print(self.bbl[0,0,:])
-        bdl = np.einsum('...k,...k',self.bbl,dls[:,None,:])
-        return bdl.reshape(-1)
-
-    def select(self,bls,spec,band1,band2,shift=52):
-        I = {'tt':0,'te':3,'ee':7}
-        i = { 'tt':{('95','95'): 0,('95','150'): 1,('150','95'): 1,('150','150'): 2},
-              'te':{('95','95'): 0,('95','150'): 1,('150','95'): 2,('150','150'): 3},
-              'ee':{('95','95'): 0,('95','150'): 1,('150','95'): 1,('150','150'): 2} }
-        mind = i[spec][(band1,band2)]
-        sel = np.s_[(I[spec]+mind)*shift:(I[spec]+mind+1)*shift]
-        if bls.ndim==1: return bls[sel]
-        elif bls.ndim==2: return bls[sel,sel]
-        else: raise ValueError
-
-
-    # exit()
-
-
-
-class StevePower_extended(object):
-    def __init__(self,data_root,flux,infval=1e10,tt_lmin=600,tt_lmax=None):
-        # data_root = path_to_data + '/act_planck_data_210328/'
-        specs = ['f090xf090','f090xf100','f090xf143','f090xf150',
-         'f090xf217','f090xf353','f090xf545','f100xf100',
-         'f100xf143','f143xf143','f100xf150','f143xf150',
-         'f150xf150','f150xf217','f150xf353','f150xf545',
-         'f100xf217','f143xf217','f217xf217','f100xf353',
-         'f143xf353','f217xf353','f353xf353','f100xf545',
-         'f143xf545','f217xf545','f353xf545','f545xf545']
-        specx_l = ['TT']
-
-        freqs_asked = []
-        fband1 = []
-        fband2 = []
-        for spec in specs:
-            comp1 = spec.split('x')[0]
-            comp2 = spec.split('x')[1]
-            comp1 = comp1.replace('f', '')
-            comp2 = comp2.replace('f', '')
-            fband1.append(comp1)
-            fband2.append(comp2)
-            # print(comp1,comp2)
-            if comp1 not in freqs_asked:
-                freqs_asked.append(comp1)
-            if comp2 not in freqs_asked:
-                freqs_asked.append(comp2)
-        freqs_asked.sort()
-        # print('fband1: ')
-        # print(fband1)
-        # print('fband2: ')
-        # print(fband2)
-        self.fband1 = fband1
-        self.fband2 = fband2
-        # print('frequency list used in the analysis: ')
-        # print(freqs_asked)
-        self.cfreqs_list = freqs_asked
-
-        if flux == '15mJy':
-            rfroot = 'deep56'
-        if flux == '100mJy':
-            rfroot = 'boss'
-
-        spec = np.load(data_root+f'{rfroot}_all_ps_mean_C_ell_data_210327.npy')
-        cov = np.load(data_root+f'{rfroot}_all_ps_Cov_from_coadd_ps_210327.npy')
-        covx = np.load(data_root+f'{rfroot}_all_covmat_anal_210327.npy')
-        bbl = np.load(data_root+f'{rfroot}_bpwf_210327.npy')
-
-        l_min = 2
-        # print('bbl shape:',np.shape(bbl))
-        n_specs = len(specs)
-        # print('n_specs: ',n_specs)
-        n_bins = int(len(spec)/n_specs)
-        # print('n_bins: ',n_bins)
-        # exit(0)
-        n_ells = np.shape(bbl)[1]  # ell max of the full window functions = 3926
-        # print('n_ells: ',n_ells)
-        n_ells = n_ells-l_min
-        bbl_2 = np.zeros((n_bins*n_specs,n_ells))
-        for i in range(n_bins*n_specs):
-            bbl_2[i,:] = np.delete(bbl[i,:],[0,1])
-        # print(len(bbl_2[0,:]))
-
-
-        self.n_specs = n_specs
-
-
-        self.n_bins = n_bins
-
-        # doing coadd_data
-        #if self.bandpass:
-        if save_coadd_data_extended:
-            from scipy.linalg import block_diag
-            import pandas as pd
-            if flux=='15mJy':
-                regions = ['deep56']
-            elif flux=='100mJy':
-                regions = ['boss'] + [f'advact_window{x}' for x in range(6)]
-            else:
-                raise ValueError
-            # order = spec
-            # print('starting df for region:',regions)
-            region = regions[0]
-            specx = specx_l[0]
-            order = np.load(data_root+f'{rfroot}_all_C_ell_data_order_190918.npy')
-            df = pd.DataFrame(order,columns=['t1','t2','region','s1','s2','a1','a2'])#.stack().str.decode('utf-8').unstack()
-            # print(df)
-            def rmap(r):
-                if r[:6]=='advact': return 'advact'
-                else: return r
-            # print('restricting df')
-            df = df[(df.t1==specx[0]) & (df.t2==specx[1]) & (df.region==rmap(region)+"_")]
-            # df = df[(df.t1==spec[0]) & (df.t2==spec[1]) & (df.region==rmap(region)+"_")]
-            # print(df)
-            # print('  ')
-            # print('  ')
-            for ib in range(28):
-                # print('  ')
-                # print('  ')
-
-                band1 = fband1[ib]
-                band2 = fband2[ib]
-
-                arrays = []
-                barrays = []
-                icovs = []
-                nbin = self.n_bins+3
-                # print('ib b1, b2, nbin:',ib,band1,band2,nbin)
-                rbin = 3
-                # normallly here there is loop over region
-                ibx = 0
-                for index, row in df.iterrows():
-                    # print('id,row:',index,row)
-                    b1 = get_band_extended(row.a1)
-                    b2 = get_band_extended(row.a2)
-                    # print('b1,b2:',b1,b2)
-
-                    if (b1==band1 and b2==band2) or (b1==band2 and b2==band1):
-                        #print('row:',row)
-                        # print('rmap(region):',index,ibx,rmap(region))
-                        # print('rmap b1,b2:',b1,b2)
-                        # print('row.s1:',row.s1)
-                        # print('row.s2:',row.s2)
-                        # print('row.a1:',row.a1)
-                        # print('row.a2:',row.a2)
-                        # print(' ')
-                        # print('#####')
-                        arrays.append((index,rmap(region),row.s1,row.s2,row.a1,row.a2))
-                        barrays.append((index,rmap(region),row.s1,row.s2,row.a1,row.a2))
-                        ibx += 1
-                adf = pd.DataFrame(arrays,columns = ['i','r','s1','s2','a1','a2'])
-                ids = adf.i.to_numpy()
-                oids = []
-                for ind in ids:
-                    oids = oids + list(range(ind*nbin+rbin,(ind+1)*nbin))
-                # print('oids:',oids)
-                # print('scov:',np.shape(cov))
-                # print('soids:',np.shape(oids))
-                # try:
-                ocov = covx[oids,:][:,oids]
-
-                #exit(0)
-                # print('socov:',np.shape(ocov))
-                icovs.append(np.linalg.inv(ocov))
-                # print('sicovs:',np.shape(icovs))
-                icov = block_diag(*icovs)
-                # print('sicov:',np.shape(icov))
-                # print('barrays:',barrays)
-                nspec = 1
-                nbins = self.n_bins
-                norig = len(barrays)
-                # print('norig:',norig)
-                # print('barrays:',barrays)
-                N_spec = nbins*nspec
-                # print('N_spec:',N_spec)
-                pmat = np.identity(N_spec)
-                Pmat = np.identity(N_spec)
-                for i in range(1,norig):
-                    Pmat = np.append(Pmat,pmat,axis=1)
-                # print('sPmat:',np.shape(Pmat))
-                icov_ibin = np.linalg.inv(np.dot(Pmat,np.dot(icov,Pmat.T)))
-                barrays = np.array(barrays,dtype=[('i','i8'),('r','U32'),('s1','U32'),('s2','U32'),('a1','U32'),('a2','U32')])
-                # print('barrays:',barrays)
-                np.savetxt(data_root+f'{rfroot}_{specx}_{band1}_{band2}_{flux}_icov.txt',icov)
-                np.savetxt(data_root+f'{rfroot}_{specx}_{band1}_{band2}_{flux}_icov_ibin.txt',icov_ibin)
-                np.savetxt(data_root+f'{rfroot}_{specx}_{band1}_{band2}_{flux}_pmat.txt',Pmat)
-                np.savetxt(data_root+f'{rfroot}_{specx}_{band1}_{band2}_{flux}_arrays.txt', barrays,fmt=['%d','%s','%s','%s','%s','%s'])
-
-                # print('ib2:',ib,band1,band2)
-            #
-        #exit(0)
-
-
-
-
-
-
-        self.bbl = bbl_2.reshape((n_specs,n_bins,n_ells))
-        self.spec = spec[:,1]
-        self.cov = cov
-        # print('shape cov : ', np.shape(self.cov))
-        nbin = n_bins
-        #self.ells = np.arange(2,n_ells+2)
-        self.ells = np.arange(l_min,n_ells+2)
-        # self.ells = np.arange(2,7924+2)
-        # self.ells = spec[:,0]
-        #rells = np.repeat(self.ells[None],n_specs,axis=0)
-        #print(np.shape(rells))
-        #self.ls = self.bin(rells)
-        self.ls = spec[:,0]
-
-        # conversion factor to bplike normalisations, i.e., dl's to cl's:
-        fac = self.ls*(self.ls+1.)/2./np.pi
-        self.spec = self.spec/fac
-        # print('shape spec : ', np.shape(self.spec))
-        # print('shape fac : ', np.shape(fac))
-        self.cov = self.cov/fac**2.
-
-
-
-        if tt_lmin is not None:
-            # n = 3
-            ids = []
-            ids = np.argwhere(self.ls<tt_lmin)[:,0]
-            # print('ls: ', self.ls)
-            # print(len(self.ls))
-            # print('nbins: ',nbin)
-            # print('ids ls<tt_lmin: ', ids)
-            # print('fband1 : ',self.fband1)
-            rfband1 = np.repeat(self.fband1,nbin)
-            rfband2 = np.repeat(self.fband2,nbin)
-            self.rfband1 =  rfband1
-            self.rfband2 =  rfband2
-            # print(len(rfband2))
-            # print(type(rfband2[0]))
-            # cd_act =
-            # set cov to infal (ignore points) where l is smaller than tt_lmin=600 (default) for the ACT bands
-            ids_act = np.argwhere((self.ls<tt_lmin) & ((rfband1 == '090') | (rfband1 == '150') | (rfband2 == '090') | (rfband2 == '150')))[:,0]
-            # print('idsact : ',ids_act)
-            # exit(0)
-            ids = ids_act
-            self.cov[:,ids] = 0
-            self.cov[ids,:] = 0
-            self.cov[ids,ids] = infval
-            # print('cov')
-            # print(cov)
-        # print('setting inf in cov where beam too small')
-
-        beam_dict_f100 = np.loadtxt(data_root + 'HFI_BEAM_resave_210414_F100.txt')
-        beam_dict_f143 = np.loadtxt(data_root + 'HFI_BEAM_resave_210414_F143.txt')
-        beam_dict_f217 = np.loadtxt(data_root + 'HFI_BEAM_resave_210414_F217.txt')
-        beam_dict_f353 = np.loadtxt(data_root + 'HFI_BEAM_resave_210414_F353.txt')
-        beam_dict_f545 = np.loadtxt(data_root + 'HFI_BEAM_resave_210414_F545.txt')
-
-        beam_cut_off = 0.1
-        lmax_beam_cutoff = {}
-        lmax_100 = beam_dict_f100[:,0][beam_dict_f100[:,1]>beam_cut_off].max()
-        lmax_143 = beam_dict_f100[:,0][beam_dict_f143[:,1]>beam_cut_off].max()
-        lmax_217 = beam_dict_f100[:,0][beam_dict_f217[:,1]>beam_cut_off].max()
-        lmax_353 = beam_dict_f100[:,0][beam_dict_f353[:,1]>beam_cut_off].max()
-        lmax_545 = beam_dict_f100[:,0][beam_dict_f545[:,1]>beam_cut_off].max()
-
-        lmax_090 = infval
-        lmax_150 = infval
-        lmax_beam_cutoff['090'] = lmax_090
-        lmax_beam_cutoff['150'] = lmax_150
-        lmax_beam_cutoff['100'] = lmax_100
-        lmax_beam_cutoff['143'] = lmax_143
-        lmax_beam_cutoff['217'] = lmax_217
-        lmax_beam_cutoff['353'] = lmax_353
-        lmax_beam_cutoff['545'] = lmax_545
-
-        # print(lmax_090,lmax_150,lmax_100,lmax_143,lmax_217,lmax_353,lmax_545)
-        # cov has dimension 1344
-        # this is n_bin (48) times n_spec (28)
-        # print(np.shape(self.cov))
-        # print('fband1 : ',self.fband1)
-        # print('fband2 : ',self.fband2)
-        lmax_order_list = []
-
-        for (fb1,fb2) in zip(self.fband1,self.fband2):
-            lmax_order_list.append(min(lmax_beam_cutoff[fb1],lmax_beam_cutoff[fb2]))
-
-        # print('lmax_order_list:',lmax_order_list)
-
-
-
-        # rfband1 = np.repeat(self.fband1,nbin)
-        # print('repeated fband1:',rfband1)
-        # rfband2 = np.repeat(self.fband2,nbin)
-        rlmax_order_list = np.repeat(lmax_order_list,nbin)
-        # print(rlmax_order_list)
-
-        ids_cutoff = np.argwhere((self.ls>rlmax_order_list))[:,0]
-        # print(self.ls)
-        # print(ids_cutoff)
-        ids = ids_cutoff
-        self.cov[:,ids] = 0
-        self.cov[ids,:] = 0
-        self.cov[ids,ids] = infval
-        # exit(0)
-        # if tt_lmax is not None:
-        #     n = 3
-        #     ids = []
-        #     ids = np.argwhere(self.ls>tt_lmax)[:,0]
-        #     ids = ids[ids<nbin*3]
-        #     self.cov[:,ids] = 0
-        #     self.cov[ids,:] = 0
-        #     self.cov[ids,ids] = infval
-
-        self.cinv = np.linalg.inv(self.cov)
-
-    def bin(self,dls):
-        # print('bbl in bin, size : ',len(self.bbl[0,0,:]) )
-        # print(self.bbl[0,0,:])
-        bdl = np.einsum('...k,...k',self.bbl,dls[:,None,:])
-        return bdl.reshape(-1)
-
-    #
-    # def select(self,bls,spec,band1,band2,shift=52):
-    #     I = {'tt':0,'te':3,'ee':7}
-    #     i = { 'tt':{('95','95'): 0,('95','150'): 1,('150','95'): 1,('150','150'): 2},
-    #           'te':{('95','95'): 0,('95','150'): 1,('150','95'): 2,('150','150'): 3},
-    #           'ee':{('95','95'): 0,('95','150'): 1,('150','95'): 1,('150','150'): 2} }
-    #     mind = i[spec][(band1,band2)]
-    #     sel = np.s_[(I[spec]+mind)*shift:(I[spec]+mind+1)*shift]
-    #     if bls.ndim==1: return bls[sel]
-    #     elif bls.ndim==2: return bls[sel,sel]
-    #     else: raise ValueError
-
-
-
-class act_pylike_extended(_InstallableLikelihood):
+import multiprocessing
+import functools
+
+
+#
+#
+#
+# def get_theory_bandpassed_parallel_2(i,coadd_data):
+#     return 0
+#
+# def get_theory_bandpassed_parallel(i,fgpower,coadd_data,ells,bbl,dltt,dlte,dlee,params,lmax=6000,lkl_setup = None):
+#     dim = lkl_setup.sp.n_bins*lkl_setup.sp.n_specs
+#     sel = np.s_[i*lkl_setup.sp.n_bins:(i+1)*lkl_setup.sp.n_bins]
+#     assert len(fgpower.cache['CIB'])==0
+#
+#     if lmax is not None:
+#         dltt[ells>lmax] = 0
+#         dlte[ells>lmax] = 0
+#         dlee[ells>lmax] = 0
+#     cls = np.zeros((dim,))
+#     if lkl_setup.use_act_planck == 'yes':
+#         # print(lkl_setup.sp.n_bins)
+#         # print(lkl_setup.sp.n_specs)
+#
+#         # exit(0)
+#
+#         # for i in range(lkl_setup.sp.n_specs):
+#         # sel = np.s_[i*lkl_setup.sp.n_bins:(i+1)*lkl_setup.sp.n_bins]
+#         # print(sel)
+#
+#
+#         spec = 'TT'
+#         band1 = lkl_setup.sp.fband1[i]
+#         band2 = lkl_setup.sp.fband2[i]
+#         c1 = params[f'cal_{band1}']
+#         c2 = params[f'cal_{band2}']
+#         # print('  ')
+#         # print('  ')
+#         # print('getting theory bp at:')
+#         # print(c1,c2,band1,band2)
+#         cls[sel] = fgpower.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dltt,spec,params,lkl_setup) * c1 * c2
+#         # exit(0)
+#     else:
+#         # cls = np.zeros((520,))
+#
+#         # parallel compoutation:
+#
+#
+#         # a_pool = multiprocessing.Pool()
+#         # print('starting pool')
+#         #
+#         # p1 = 0
+#         # pool = multiprocessing.Pool()
+#         # fn = functools.partial(get_coadd_power_act_only_parallel,p1=p1)
+#         # print('pool.map')
+#         # r = pool.map(fn,range(10))
+#         #                             # self=self,
+#         #                             # cls=cls,
+#         #                             # coadd_data=coadd_data,
+#         #                             # bbl=bbl,
+#         #                             # ells=ells,
+#         #                             # dltt=dltt,
+#         #                             # dlte=dlte,
+#         #                             # dlee=dlee,
+#         #                             # params=params,
+#         #                             # lkl_setup=lkl_setup),
+#         #                             # range(10))
+#         # pool.close()
+#         # print('r:',r)
+#         # exit(0)
+#         # print('dim:',dim)
+#         # for i in range(lkl_setup.sp.n_specs):
+#
+#
+#         if i<3:
+#             spec = 'TT'
+#             band1 = {0:'95',1:'95',2:'150'}[i]
+#             band2 = {0:'95',1:'150',2:'150'}[i]
+#             c1 = params[f'cal_{band1}']
+#             c2 = params[f'cal_{band2}']
+#
+#             cls[sel] = fgpower.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dltt,spec,params,lkl_setup) * c1 * c2
+#
+#         elif i>=3 and i<=6:
+#             spec = 'TE'
+#             band1 = {0:'95',1:'95',2:'150',3:'150'}[i-3]
+#             band2 = {0:'95',1:'150',2:'95',3:'150'}[i-3]
+#             c1 = params[f'cal_{band1}']
+#             c2 = params[f'cal_{band2}']
+#             y = params[f'yp_{band2}']
+#
+#             cls[sel] = fgpower.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dlte,spec,params,lkl_setup) * c1 * c2 * y
+#
+#         else:
+#             spec = 'EE'
+#             band1 = {0:'95',1:'95',2:'150'}[i-7]
+#             band2 = {0:'95',1:'150',2:'150'}[i-7]
+#             c1 = params[f'cal_{band1}']
+#             c2 = params[f'cal_{band2}']
+#             y1 = params[f'yp_{band1}']
+#             y2 = params[f'yp_{band2}']
+#
+#             cls[sel] = fgpower.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dlee,spec,params,lkl_setup) * c1 * c2 * y1 * y2
+#
+#
+#
+#     fgpower.cache['CIB'] = {}
+#     return cls
+#
+#
+#
+#
+#
+# class StevePower(object):
+#     def __init__(self,froot,flux,infval=1e10,tt_lmin=600,tt_lmax=None):
+#         # print('doing stevepower')
+#         spec=np.loadtxt(f"{froot}coadd_cl_{flux}_data_200124.txt")
+#         cov =np.loadtxt(f'{froot}coadd_cov_{flux}_200519.txt')
+#         bbl = np.loadtxt(f'{froot}coadd_bpwf_{flux}_191127_lmin2.txt')
+#
+#         if flux=='15mJy':
+#             lregion = 'deep'
+#         elif flux=='100mJy':
+#             lregion = 'wide'
+#         self.leak_95,self.leak_150 = np.loadtxt(f'{froot}leak_TE_{lregion}_200519.txt',usecols=[1,2],unpack=True)
+#         # print('bbl shape:',np.shape(bbl))
+#         # exit(0)
+#         self.n_specs = 10
+#         self.bbl =bbl.reshape((10,52,7924))
+#         self.spec = spec[:520]
+#         self.cov = cov[:520,:520]
+#         nbin = 52
+#         self.n_bins = nbin
+#         self.ells = np.arange(2,7924+2)  # ell max of the full window functions = 7924
+#         rells = np.repeat(self.ells[None],10,axis=0)
+#         self.ls = self.bin(rells)
+#
+#         if tt_lmin is not None:
+#             n = 3
+#             ids = []
+#             ids = np.argwhere(self.ls<tt_lmin)[:,0]
+#             ids = ids[ids<nbin*3]
+#             self.cov[:,ids] = 0
+#             self.cov[ids,:] = 0
+#             self.cov[ids,ids] = infval
+#             # print('cov')
+#             # print(cov)
+#
+#         if tt_lmax is not None:
+#             n = 3
+#             ids = []
+#             ids = np.argwhere(self.ls>tt_lmax)[:,0]
+#             ids = ids[ids<nbin*3]
+#             self.cov[:,ids] = 0
+#             self.cov[ids,:] = 0
+#             self.cov[ids,ids] = infval
+#             # print('cov')
+#             # print(cov)
+#
+#         self.cinv = np.linalg.inv(self.cov)
+#
+#         if save_coadd_data == True:
+#             band1 = '95'
+#             band2 = '95'
+#             flux = '100mJy'
+#             path_root = None
+#             spec = 'TT'
+#
+#             save_coadd_matrix(spec,band1,band2,flux,path_root)
+#
+#
+#         fband1 = []
+#         fband2 = []
+#         for i in range(10):
+#             if i<3:
+#                 fband1.append({0:'T095',1:'T095',2:'T150'}[i])
+#                 fband2.append({0:'T095',1:'T150',2:'T150'}[i])
+#             elif i>=3 and i<=6:
+#                 fband1.append({0:'T095',1:'T095',2:'T150',3:'T150'}[i-3])
+#                 fband2.append({0:'E095',1:'E150',2:'E095',3:'E150'}[i-3])
+#             else:
+#                 fband1.append({0:'E095',1:'E095',2:'E150'}[i-7])
+#                 fband2.append({0:'E095',1:'E150',2:'E150'}[i-7])
+#         self.fband1 = fband1
+#         self.fband2 = fband2
+#
+#         self.rfband1 =  np.repeat(self.fband1,nbin)
+#         self.rfband2 =  np.repeat(self.fband2,nbin)
+#         # print('rfband1 act:')
+#         # print(self.rfband1)
+#         # exit(0)
+#
+#
+#     def bin(self,dls):
+#         # print('bbl in bin, size : ',len(self.bbl[0,0,:]) )
+#         # print(self.bbl[0,0,:])
+#         bdl = np.einsum('...k,...k',self.bbl,dls[:,None,:])
+#         return bdl.reshape(-1)
+#
+#     def select(self,bls,spec,band1,band2,shift=52):
+#         I = {'tt':0,'te':3,'ee':7}
+#         i = { 'tt':{('95','95'): 0,('95','150'): 1,('150','95'): 1,('150','150'): 2},
+#               'te':{('95','95'): 0,('95','150'): 1,('150','95'): 2,('150','150'): 3},
+#               'ee':{('95','95'): 0,('95','150'): 1,('150','95'): 1,('150','150'): 2} }
+#         mind = i[spec][(band1,band2)]
+#         sel = np.s_[(I[spec]+mind)*shift:(I[spec]+mind+1)*shift]
+#         if bls.ndim==1: return bls[sel]
+#         elif bls.ndim==2: return bls[sel,sel]
+#         else: raise ValueError
+#
+#
+#     # exit()
+#
+#
+#
+# class StevePower_extended(object):
+#     def __init__(self,data_root,flux,infval=1e10,tt_lmin=600,tt_lmax=None):
+#         # data_root = path_to_data + '/act_planck_data_210328/'
+#         specs = ['f090xf090','f090xf100','f090xf143','f090xf150',
+#          'f090xf217','f090xf353','f090xf545','f100xf100',
+#          'f100xf143','f143xf143','f100xf150','f143xf150',
+#          'f150xf150','f150xf217','f150xf353','f150xf545',
+#          'f100xf217','f143xf217','f217xf217','f100xf353',
+#          'f143xf353','f217xf353','f353xf353','f100xf545',
+#          'f143xf545','f217xf545','f353xf545','f545xf545']
+#         specx_l = ['TT']
+#
+#         freqs_asked = []
+#         fband1 = []
+#         fband2 = []
+#         for spec in specs:
+#             comp1 = spec.split('x')[0]
+#             comp2 = spec.split('x')[1]
+#             comp1 = comp1.replace('f', '')
+#             comp2 = comp2.replace('f', '')
+#             fband1.append(comp1)
+#             fband2.append(comp2)
+#             # print(comp1,comp2)
+#             if comp1 not in freqs_asked:
+#                 freqs_asked.append(comp1)
+#             if comp2 not in freqs_asked:
+#                 freqs_asked.append(comp2)
+#         freqs_asked.sort()
+#         # print('fband1: ')
+#         # print(fband1)
+#         # print('fband2: ')
+#         # print(fband2)
+#         self.fband1 = fband1
+#         self.fband2 = fband2
+#         # print('frequency list used in the analysis: ')
+#         # print(freqs_asked)
+#         self.cfreqs_list = freqs_asked
+#
+#         if flux == '15mJy':
+#             rfroot = 'deep56'
+#         if flux == '100mJy':
+#             rfroot = 'boss'
+#
+#         spec = np.load(data_root+f'{rfroot}_all_ps_mean_C_ell_data_210327.npy')
+#         cov = np.load(data_root+f'{rfroot}_all_ps_Cov_from_coadd_ps_210327.npy')
+#         covx = np.load(data_root+f'{rfroot}_all_covmat_anal_210327.npy')
+#         bbl = np.load(data_root+f'{rfroot}_bpwf_210327.npy')
+#
+#         l_min = 2
+#         # print('bbl shape:',np.shape(bbl))
+#         n_specs = len(specs)
+#         # print('n_specs: ',n_specs)
+#         n_bins = int(len(spec)/n_specs)
+#         # print('n_bins: ',n_bins)
+#         # exit(0)
+#         n_ells = np.shape(bbl)[1]  # ell max of the full window functions = 3926
+#         # print('n_ells: ',n_ells)
+#         n_ells = n_ells-l_min
+#         bbl_2 = np.zeros((n_bins*n_specs,n_ells))
+#         for i in range(n_bins*n_specs):
+#             bbl_2[i,:] = np.delete(bbl[i,:],[0,1])
+#         # print(len(bbl_2[0,:]))
+#
+#
+#         self.n_specs = n_specs
+#
+#
+#         self.n_bins = n_bins
+#
+#         # doing coadd_data
+#         #if self.bandpass:
+#         if save_coadd_data_extended:
+#             from scipy.linalg import block_diag
+#             import pandas as pd
+#             if flux=='15mJy':
+#                 regions = ['deep56']
+#             elif flux=='100mJy':
+#                 regions = ['boss'] + [f'advact_window{x}' for x in range(6)]
+#             else:
+#                 raise ValueError
+#             # order = spec
+#             # print('starting df for region:',regions)
+#             region = regions[0]
+#             specx = specx_l[0]
+#             order = np.load(data_root+f'{rfroot}_all_C_ell_data_order_190918.npy')
+#             df = pd.DataFrame(order,columns=['t1','t2','region','s1','s2','a1','a2'])#.stack().str.decode('utf-8').unstack()
+#             # print(df)
+#             def rmap(r):
+#                 if r[:6]=='advact': return 'advact'
+#                 else: return r
+#             # print('restricting df')
+#             df = df[(df.t1==specx[0]) & (df.t2==specx[1]) & (df.region==rmap(region)+"_")]
+#             # df = df[(df.t1==spec[0]) & (df.t2==spec[1]) & (df.region==rmap(region)+"_")]
+#             # print(df)
+#             # print('  ')
+#             # print('  ')
+#             for ib in range(28):
+#                 # print('  ')
+#                 # print('  ')
+#
+#                 band1 = fband1[ib]
+#                 band2 = fband2[ib]
+#
+#                 arrays = []
+#                 barrays = []
+#                 icovs = []
+#                 nbin = self.n_bins+3
+#                 # print('ib b1, b2, nbin:',ib,band1,band2,nbin)
+#                 rbin = 3
+#                 # normallly here there is loop over region
+#                 ibx = 0
+#                 for index, row in df.iterrows():
+#                     # print('id,row:',index,row)
+#                     b1 = get_band_extended(row.a1)
+#                     b2 = get_band_extended(row.a2)
+#                     # print('b1,b2:',b1,b2)
+#
+#                     if (b1==band1 and b2==band2) or (b1==band2 and b2==band1):
+#                         #print('row:',row)
+#                         # print('rmap(region):',index,ibx,rmap(region))
+#                         # print('rmap b1,b2:',b1,b2)
+#                         # print('row.s1:',row.s1)
+#                         # print('row.s2:',row.s2)
+#                         # print('row.a1:',row.a1)
+#                         # print('row.a2:',row.a2)
+#                         # print(' ')
+#                         # print('#####')
+#                         arrays.append((index,rmap(region),row.s1,row.s2,row.a1,row.a2))
+#                         barrays.append((index,rmap(region),row.s1,row.s2,row.a1,row.a2))
+#                         ibx += 1
+#                 adf = pd.DataFrame(arrays,columns = ['i','r','s1','s2','a1','a2'])
+#                 ids = adf.i.to_numpy()
+#                 oids = []
+#                 for ind in ids:
+#                     oids = oids + list(range(ind*nbin+rbin,(ind+1)*nbin))
+#                 # print('oids:',oids)
+#                 # print('scov:',np.shape(cov))
+#                 # print('soids:',np.shape(oids))
+#                 # try:
+#                 ocov = covx[oids,:][:,oids]
+#
+#                 #exit(0)
+#                 # print('socov:',np.shape(ocov))
+#                 icovs.append(np.linalg.inv(ocov))
+#                 # print('sicovs:',np.shape(icovs))
+#                 icov = block_diag(*icovs)
+#                 # print('sicov:',np.shape(icov))
+#                 # print('barrays:',barrays)
+#                 nspec = 1
+#                 nbins = self.n_bins
+#                 norig = len(barrays)
+#                 # print('norig:',norig)
+#                 # print('barrays:',barrays)
+#                 N_spec = nbins*nspec
+#                 # print('N_spec:',N_spec)
+#                 pmat = np.identity(N_spec)
+#                 Pmat = np.identity(N_spec)
+#                 for i in range(1,norig):
+#                     Pmat = np.append(Pmat,pmat,axis=1)
+#                 # print('sPmat:',np.shape(Pmat))
+#                 icov_ibin = np.linalg.inv(np.dot(Pmat,np.dot(icov,Pmat.T)))
+#                 barrays = np.array(barrays,dtype=[('i','i8'),('r','U32'),('s1','U32'),('s2','U32'),('a1','U32'),('a2','U32')])
+#                 # print('barrays:',barrays)
+#                 np.savetxt(data_root+f'{rfroot}_{specx}_{band1}_{band2}_{flux}_icov.txt',icov)
+#                 np.savetxt(data_root+f'{rfroot}_{specx}_{band1}_{band2}_{flux}_icov_ibin.txt',icov_ibin)
+#                 np.savetxt(data_root+f'{rfroot}_{specx}_{band1}_{band2}_{flux}_pmat.txt',Pmat)
+#                 np.savetxt(data_root+f'{rfroot}_{specx}_{band1}_{band2}_{flux}_arrays.txt', barrays,fmt=['%d','%s','%s','%s','%s','%s'])
+#
+#                 # print('ib2:',ib,band1,band2)
+#             #
+#         #exit(0)
+#
+#
+#
+#
+#
+#
+#         self.bbl = bbl_2.reshape((n_specs,n_bins,n_ells))
+#         self.spec = spec[:,1]
+#         self.cov = cov
+#         # print('shape cov : ', np.shape(self.cov))
+#         nbin = n_bins
+#         #self.ells = np.arange(2,n_ells+2)
+#         self.ells = np.arange(l_min,n_ells+2)
+#         # self.ells = np.arange(2,7924+2)
+#         # self.ells = spec[:,0]
+#         #rells = np.repeat(self.ells[None],n_specs,axis=0)
+#         #print(np.shape(rells))
+#         #self.ls = self.bin(rells)
+#         self.ls = spec[:,0]
+#
+#         # conversion factor to bplike normalisations, i.e., dl's to cl's:
+#         fac = self.ls*(self.ls+1.)/2./np.pi
+#         self.spec = self.spec/fac
+#         # print('shape spec : ', np.shape(self.spec))
+#         # print('shape fac : ', np.shape(fac))
+#         self.cov = self.cov/fac**2.
+#
+#
+#
+#         if tt_lmin is not None:
+#             # n = 3
+#             ids = []
+#             ids = np.argwhere(self.ls<tt_lmin)[:,0]
+#             # print('ls: ', self.ls)
+#             # print(len(self.ls))
+#             # print('nbins: ',nbin)
+#             # print('ids ls<tt_lmin: ', ids)
+#             # print('fband1 : ',self.fband1)
+#             rfband1 = np.repeat(self.fband1,nbin)
+#             rfband2 = np.repeat(self.fband2,nbin)
+#             self.rfband1 =  rfband1
+#             self.rfband2 =  rfband2
+#             # print(len(rfband2))
+#             # print(type(rfband2[0]))
+#             # cd_act =
+#             # set cov to infal (ignore points) where l is smaller than tt_lmin=600 (default) for the ACT bands
+#             ids_act = np.argwhere((self.ls<tt_lmin) & ((rfband1 == '090') | (rfband1 == '150') | (rfband2 == '090') | (rfband2 == '150')))[:,0]
+#             # print('idsact : ',ids_act)
+#             # exit(0)
+#             ids = ids_act
+#             self.cov[:,ids] = 0
+#             self.cov[ids,:] = 0
+#             self.cov[ids,ids] = infval
+#             # print('cov')
+#             # print(cov)
+#         # print('setting inf in cov where beam too small')
+#
+#         beam_dict_f100 = np.loadtxt(data_root + 'HFI_BEAM_resave_210414_F100.txt')
+#         beam_dict_f143 = np.loadtxt(data_root + 'HFI_BEAM_resave_210414_F143.txt')
+#         beam_dict_f217 = np.loadtxt(data_root + 'HFI_BEAM_resave_210414_F217.txt')
+#         beam_dict_f353 = np.loadtxt(data_root + 'HFI_BEAM_resave_210414_F353.txt')
+#         beam_dict_f545 = np.loadtxt(data_root + 'HFI_BEAM_resave_210414_F545.txt')
+#
+#         beam_cut_off = 0.1
+#         lmax_beam_cutoff = {}
+#         lmax_100 = beam_dict_f100[:,0][beam_dict_f100[:,1]>beam_cut_off].max()
+#         lmax_143 = beam_dict_f100[:,0][beam_dict_f143[:,1]>beam_cut_off].max()
+#         lmax_217 = beam_dict_f100[:,0][beam_dict_f217[:,1]>beam_cut_off].max()
+#         lmax_353 = beam_dict_f100[:,0][beam_dict_f353[:,1]>beam_cut_off].max()
+#         lmax_545 = beam_dict_f100[:,0][beam_dict_f545[:,1]>beam_cut_off].max()
+#
+#         lmax_090 = infval
+#         lmax_150 = infval
+#         lmax_beam_cutoff['090'] = lmax_090
+#         lmax_beam_cutoff['150'] = lmax_150
+#         lmax_beam_cutoff['100'] = lmax_100
+#         lmax_beam_cutoff['143'] = lmax_143
+#         lmax_beam_cutoff['217'] = lmax_217
+#         lmax_beam_cutoff['353'] = lmax_353
+#         lmax_beam_cutoff['545'] = lmax_545
+#
+#         # print(lmax_090,lmax_150,lmax_100,lmax_143,lmax_217,lmax_353,lmax_545)
+#         # cov has dimension 1344
+#         # this is n_bin (48) times n_spec (28)
+#         # print(np.shape(self.cov))
+#         # print('fband1 : ',self.fband1)
+#         # print('fband2 : ',self.fband2)
+#         lmax_order_list = []
+#
+#         for (fb1,fb2) in zip(self.fband1,self.fband2):
+#             lmax_order_list.append(min(lmax_beam_cutoff[fb1],lmax_beam_cutoff[fb2]))
+#
+#         # print('lmax_order_list:',lmax_order_list)
+#
+#
+#
+#         # rfband1 = np.repeat(self.fband1,nbin)
+#         # print('repeated fband1:',rfband1)
+#         # rfband2 = np.repeat(self.fband2,nbin)
+#         rlmax_order_list = np.repeat(lmax_order_list,nbin)
+#         # print(rlmax_order_list)
+#
+#         ids_cutoff = np.argwhere((self.ls>rlmax_order_list))[:,0]
+#         # print(self.ls)
+#         # print(ids_cutoff)
+#         ids = ids_cutoff
+#         self.cov[:,ids] = 0
+#         self.cov[ids,:] = 0
+#         self.cov[ids,ids] = infval
+#         # exit(0)
+#         # if tt_lmax is not None:
+#         #     n = 3
+#         #     ids = []
+#         #     ids = np.argwhere(self.ls>tt_lmax)[:,0]
+#         #     ids = ids[ids<nbin*3]
+#         #     self.cov[:,ids] = 0
+#         #     self.cov[ids,:] = 0
+#         #     self.cov[ids,ids] = infval
+#
+#         self.cinv = np.linalg.inv(self.cov)
+#
+#     def bin(self,dls):
+#         # print('bbl in bin, size : ',len(self.bbl[0,0,:]) )
+#         # print(self.bbl[0,0,:])
+#         bdl = np.einsum('...k,...k',self.bbl,dls[:,None,:])
+#         return bdl.reshape(-1)
+#
+#     #
+#     # def select(self,bls,spec,band1,band2,shift=52):
+#     #     I = {'tt':0,'te':3,'ee':7}
+#     #     i = { 'tt':{('95','95'): 0,('95','150'): 1,('150','95'): 1,('150','150'): 2},
+#     #           'te':{('95','95'): 0,('95','150'): 1,('150','95'): 2,('150','150'): 3},
+#     #           'ee':{('95','95'): 0,('95','150'): 1,('150','95'): 1,('150','150'): 2} }
+#     #     mind = i[spec][(band1,band2)]
+#     #     sel = np.s_[(I[spec]+mind)*shift:(I[spec]+mind+1)*shift]
+#     #     if bls.ndim==1: return bls[sel]
+#     #     elif bls.ndim==2: return bls[sel,sel]
+#     #     else: raise ValueError
+#
+
+
+class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
 
 
     def initialize(self):
@@ -612,19 +583,19 @@ class act_pylike_extended(_InstallableLikelihood):
             "yp_150"]
         self.cal_yp_act_plus_planck =[
               "cal_090",
-              "yp_090",
+              # "yp_090",
               "cal_100",
-              "yp_100",
+              # "yp_100",
               "cal_143",
-              "yp_143",
+              # "yp_143",
               "cal_150",
-              "yp_150",
+              # "yp_150",
               "cal_217",
-              "yp_217",
+              # "yp_217",
               "cal_353",
-              "yp_353",
-              "cal_545",
-              "yp_545"
+              # "yp_353",
+              "cal_545"#,
+              # "yp_545"
               ]
         # file = resource_filename("bplike","act_pylike_extended_full.yaml")
         # with open(file) as f:
@@ -683,7 +654,10 @@ class act_pylike_extended(_InstallableLikelihood):
         self.prepare_data()
 
         # State requisites to the theory code
-        self.requested_cls = ["tt", "te", "ee"]
+        # if self.use_act_planck == 'yes':
+        #     self.requested_cls = ["tt"]
+        # else:
+        #     self.requested_cls = ["tt", "te", "ee"]
 
 
 
@@ -722,17 +696,24 @@ class act_pylike_extended(_InstallableLikelihood):
         # print('expected params: ',self.expected_params)
         # print('input params: ',self.input_params)
 
-        differences = are_different_params_lists(
-            self.input_params, self.expected_params,
-            name_A="given", name_B="expected")
-        if differences:
-            # self.input_params = self.expected_params
-            raise LoggedError(
-                self.log, "Configuration error in parameters: %r.",
-                differences)
+        # differences = are_different_params_lists(
+        #     self.input_params, self.expected_params,
+        #     name_A="given", name_B="expected")
+        # if differences:
+        #     # self.input_params = self.expected_params
+        #     raise LoggedError(
+        #         self.log, "Configuration error in parameters: %r.",
+        #         differences)
 
     def get_requirements(self):
-        return {'Cl': {'tt': self.l_max,'te': self.l_max,'ee': self.l_max}}
+        l_max = 5000
+        # l_max = self.l_max
+        if self.use_act_planck == 'no':
+            # reqs = {'Cl': {'tt': self.l_max}}
+            reqs = {'Cl': {'tt': l_max,'te': l_max,'ee': l_max}}
+        elif self.use_act_planck == 'yes':
+            reqs = {'Cl': {'tt': l_max}}
+        return reqs
 
     def logp(self, **params_values):
         # return 0
@@ -743,6 +724,9 @@ class act_pylike_extended(_InstallableLikelihood):
         return self.loglike(cl, **params_values)
 
     def loglike(self, cl, **params_values):
+        # print('params:',params_values)
+        # print('##############')
+        # print(' ')
 
         # print('doing loglike')
         # print('cls 0:10:', cl['tt'][:10] )
@@ -1103,6 +1087,7 @@ class act_pylike_extended(_InstallableLikelihood):
     def _get_power_spectra(self, cl, lkl_setup = None, **params_values):
         # print('getting power spectra')
         l_min = 2
+        # print('cls:',cl)
 
         if self.theory_debug is not None:
             print('[debug] theory debug:',self.theory_debug)
@@ -1196,11 +1181,14 @@ class act_pylike_extended(_InstallableLikelihood):
         # print('lenptt[l_min:nells_camb] :', len(ptt[l_min:nells_camb]))
 
         # exit(0)
-
-        ptt[l_min:nells_camb] = cl['tt'][l_min:len(ptt[l_min:nells_camb])+l_min]
-        pte[l_min:nells_camb] = cl['te'][l_min:len(ptt[l_min:nells_camb])+l_min]
-        pee[l_min:nells_camb] = cl['ee'][l_min:len(ptt[l_min:nells_camb])+l_min]
-
+        if lkl_setup.use_act_planck == 'no':
+            ptt[l_min:nells_camb] = cl['tt'][l_min:len(ptt[l_min:nells_camb])+l_min]
+            pte[l_min:nells_camb] = cl['te'][l_min:len(ptt[l_min:nells_camb])+l_min]
+            pee[l_min:nells_camb] = cl['ee'][l_min:len(ptt[l_min:nells_camb])+l_min]
+        elif lkl_setup.use_act_planck == 'yes':
+            ptt[l_min:nells_camb] = cl['tt'][l_min:len(ptt[l_min:nells_camb])+l_min]
+            pte[l_min:nells_camb] = cl['tt'][l_min:len(ptt[l_min:nells_camb])+l_min]
+            pee[l_min:nells_camb] = cl['tt'][l_min:len(ptt[l_min:nells_camb])+l_min]
         # print('starting get theory')
 
         comps = ['primary','tsz','ksz','cibc','cibp','tsz_x_cib','radio','galdust','galsyn']
@@ -1221,24 +1209,75 @@ class act_pylike_extended(_InstallableLikelihood):
                                                         fgdict,
                                                         lmax=self.l_max,
                                                         lkl_setup = lkl_setup)
-            if self.theory_debug is not None:
-                print('[debug] time for tot: ', time.time() - start)
-            for comp in comps:
-                if self.theory_debug is not None:
-                    print('[debug] comp = ', comp)
-                    start = time.time()
-                fpower[comp] = self.fgpower.get_theory_bandpassed_comp(self.coadd_data,
-                                                        self.sp.ells,
-                                                        self.sp.bbl,
-                                                        ptt[l_min:],
-                                                        pte[l_min:],
-                                                        pee[l_min:],
-                                                        fgdict,
-                                                        lmax=self.l_max,
-                                                        lkl_setup = lkl_setup,
-                                                        comp = comp)
-                if self.theory_debug is not None:
-                    print('[debug] time for comp: ', time.time() - start)
+            # dim = lkl_setup.sp.n_bins*lkl_setup.sp.n_specs
+            # clsp = np.zeros((dim,))
+            # fgpow = []
+            # for i in range(lkl_setup.sp.n_specs):
+            #     fgpowp = get_theory_bandpassed_parallel(i,self.fgpower,
+            #                                                 self.coadd_data,
+            #                                                 self.sp.ells,
+            #                                                 self.sp.bbl,
+            #                                                 ptt[l_min:],
+            #                                                 pte[l_min:],
+            #                                                 pee[l_min:],
+            #                                                 fgdict,
+            #                                                 lmax=self.l_max,
+            #                                                 lkl_setup = lkl_setup)
+            #     fgpow.append(fgpowp)
+            #     print('fgpow:',np.shape(fgpowp),fgpowp)
+            #
+            #
+            # pool = multiprocessing.Pool()
+            # fgstructure = self.fgpower
+            # fn = functools.partial(get_theory_bandpassed_parallel_2,
+            #                        coadd_data = fgstructure)
+            #
+            # r = pool.map(fn,range(lkl_setup.sp.n_specs))
+            # pool.close()
+            # print('r:',r)
+            # exit(0)
+            # pool = multiprocessing.Pool()
+            # fn = functools.partial(get_theory_bandpassed_parallel,
+            #                        fgpower = self.fgpower,
+            #                        coadd_data = self.coadd_data,
+            #                        ells = self.sp.ells,
+            #                        bbl = self.sp.bbl,
+            #                        ptt = ptt[l_min:],
+            #                        pte = pte[l_min:],
+            #                        pee = pee[l_min:],
+            #                        fgdict = fgdict,
+            #                        lmax=self.l_max,
+            #                        lkl_setup = lkl_setup)
+            # r = pool.map(fn,range(lkl_setup.sp.n_specs))
+            # pool.close()
+            # print('r:',r)
+            # exit(0)
+            #
+            # for i in range(lkl_setup.sp.n_specs):
+            #     sel = np.s_[i*lkl_setup.sp.n_bins:(i+1)*lkl_setup.sp.n_bins]
+            #     clsp[sel] = fgpow[i][sel]
+            # fpower['tot'] = clsp
+            # print('fpower:',fpower)
+            # # exit(0)
+            #
+            # if self.theory_debug is not None:
+            #     print('[debug] time for tot: ', time.time() - start)
+            # for comp in comps:
+            #     if self.theory_debug is not None:
+            #         print('[debug] comp = ', comp)
+            #         start = time.time()
+            #     fpower[comp] = self.fgpower.get_theory_bandpassed_comp(self.coadd_data,
+            #                                             self.sp.ells,
+            #                                             self.sp.bbl,
+            #                                             ptt[l_min:],
+            #                                             pte[l_min:],
+            #                                             pee[l_min:],
+            #                                             fgdict,
+            #                                             lmax=self.l_max,
+            #                                             lkl_setup = lkl_setup,
+            #                                             comp = comp)
+            #     if self.theory_debug is not None:
+            #         print('[debug] time for comp: ', time.time() - start)
 
             return fpower
 
@@ -1284,10 +1323,18 @@ class act_pylike_extended(_InstallableLikelihood):
 
 
 
-class act15(act_pylike_extended):
+class act15_act_only_TTTEEE(act_pylike_extended_act_only_TTTEEE):
     flux = '15mJy'
-    use_act_planck = 'None'
+    use_act_planck = 'no'
 
-class act100(act_pylike_extended):
+class act100_act_only_TTTEEE(act_pylike_extended_act_only_TTTEEE):
     flux = '100mJy'
-    use_act_planck = 'None'
+    use_act_planck = 'no'
+
+# class act15_act_TT_plus_planck_TT(act_pylike_extended):
+#     flux = '15mJy'
+#     use_act_planck = 'yes'
+#
+# class act100_act_TT_plus_planck_TT(act_pylike_extended):
+#     flux = '100mJy'
+#     use_act_planck = 'yes'

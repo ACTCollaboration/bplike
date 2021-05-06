@@ -6,26 +6,24 @@ timing: True
 # Run with bandpass corrections
 likelihood:
   # The 100 mJy likelihood
-  # WIDE
+
   bplike.act100:
     #path: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/
     stop_at_error: True
-    bandpass: False
+    bandpass: True
     # Optional line to do some debugging with an input theory curve
-    # theory_debug: /data/ctpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
-    # theory_debug: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/data/actpolfull_dr4.01/data/bf_ACTPol_lcdm.minimum.theory_cl
+    #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
     # theory_debug: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/data/bplike_data/cls_model.txt # boris's debug
-    use_act_planck: 'no'
+    use_act_planck: 'yes'
 
-  # # The 15 mJy likelihood
-  # DEEP
+  # # # The 15 mJy likelihood
   bplike.act15:
     stop_at_error: True
-    bandpass: False
+    bandpass: True
     # Optional line to do some debugging with an input theory curve
-    #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat # mat's debug
+    #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
     # theory_debug: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/data/bplike_data/cls_model.txt # boris's debug
-    use_act_planck: 'no'
+    use_act_planck: 'yes'
 
 
 
@@ -44,8 +42,8 @@ params:
     drop: true
     renames: theta
 
-  cosmomc_theta:
-    value: 'lambda theta_MC_100: 1.e-2*theta_MC_100'
+  100*theta_s:
+    value: 'lambda theta_MC_100: theta_MC_100'
     derived: false
 
   logA:
@@ -61,12 +59,10 @@ params:
     latex: \log(10^{10} A_\mathrm{s})
 
 
-  As:
+  A_s:
     value: "lambda logA: 1e-10*np.exp(logA)"
     latex: A_\mathrm{s}
-
-
-  ns:
+  n_s:
     prior:
       min: 0.8
       max: 1.2
@@ -324,7 +320,7 @@ params:
     #   dist: norm
     #   loc: 1
     #   scale: 0.02
-  cal_95: 1.
+  cal_090: 1.
     # latex: c_{95}
     # prior:
     #   max: 11
@@ -334,8 +330,9 @@ params:
     #   dist: norm
     #   loc: 1
     #   scale: 0.02
-  leak_150: 1.
-    # latex: l_{150}
+    #   scale: 0.02
+  cal_100: 1.
+    # latex: c_{95}
     # prior:
     #   max: 11
     #   min: 0.0
@@ -344,8 +341,8 @@ params:
     #   dist: norm
     #   loc: 1
     #   scale: 0.02
-  leak_95: 1.
-    # latex: l_{95}
+  cal_143: 1.
+    # latex: c_{95}
     # prior:
     #   max: 11
     #   min: 0.0
@@ -354,29 +351,41 @@ params:
     #   dist: norm
     #   loc: 1
     #   scale: 0.02
-  yp_150: #1.
-    latex: y_{150}
-    prior:
-      max: 11
-      min: 0.0
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  yp_95: #1.
-    latex: y_{95}
-    prior:
-      max: 11
-      min: 0.0
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
+  cal_217: 1.
+    # latex: c_{95}
+    # prior:
+    #   max: 11
+    #   min: 0.0
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  cal_353: 1.
+    # latex: c_{95}
+    # prior:
+    #   max: 11
+    #   min: 0.0
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  cal_545: 1.
+    # latex: c_{95}
+    # prior:
+    #   max: 11
+    #   min: 0.0
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+
+
 
 prior:
-  tau_prior: "lambda tau: stats.norm.logpdf(tau, loc=0.065, scale=0.015)"
+  tau_reio_prior: "lambda tau_reio: stats.norm.logpdf(tau_reio, loc=0.065, scale=0.015)"
   a_c_prior: "lambda a_c: stats.norm.logpdf(a_c, loc=4.9, scale=0.9)"
   # a_p_tt_100_prior: "lambda a_p_tt_100: stats.norm.logpdf(a_p_tt_100, loc=22.5, scale=3.0)"
   a_p_tt_15_prior: "lambda a_p_tt_15: stats.norm.logpdf(a_p_tt_15, loc=3.1, scale=0.4)"
@@ -388,15 +397,39 @@ prior:
   a_g_ee_100_prior: "lambda a_g_ee_100: stats.norm.logpdf(a_g_ee_100, loc=0.13, scale=0.03)"
 
 theory:
-  # classy:
-  #   path: /Users/boris/Work/CLASS-SZ/SO-SZ/class_public
-  camb:
-    stop_at_error: False
+  classy:
+    path: /Users/boris/Work/CLASS-SZ/SO-SZ/class_public
     extra_args:
-      lens_potential_accuracy: 1
-      theta_H0_range:
-        - 20
-        - 100
+      # non linear: halofit
+      # k_min_tau0 : 0.002
+      # k_max_tau0_over_l_max : 3.
+      # k_step_sub : 0.015
+      # k_step_super : 0.0001
+      # k_step_super_reduction : 0.1
+
+      perturbations_verbose: 0
+      thermodynamics_verbose: 0
+      background_verbose: 0
+      harmonic_verbose: 0
+      fourier_verbose : 0
+      input_verbose : 0
+      lensing_verbose : 0
+      # The base model features two massless
+      # and one massive neutrino with m=0.06eV.
+      # The settings below ensures that Neff=3.046
+      # and m/omega = 93.14 eV
+      N_ur : 2.0328
+      N_ncdm : 1
+      m_ncdm : 0.06
+      T_ncdm : 0.71611
+      YHe: 'BBN'
+  # camb:
+  #   stop_at_error: False
+  #   extra_args:
+  #     lens_potential_accuracy: 1
+  #     theta_H0_range:
+  #       - 20
+  #       - 100
 
 sampler:
   # Example for evaluating at a specific point
@@ -456,13 +489,13 @@ sampler:
     learn_proposal: True
     drag: True
     Rminus1_stop: 0.001
-  #   # Optionally use a covmat with the right theta convention
-  #   covmat: 'data/ACTPol_b5_new_cosmomc_theta2.covmat'
+    # Optionally use a covmat with the right theta convention
+    # covmat: 'data/ACTPol_b5_new_cosmomc_theta2.covmat'
 
   # Example for running the minimizer
   # minimize:
   #   covmat: 'data/ACTPol_b5_new_cosmomc_theta2.covmat'
 
 
-output: chains/act_extended_act_only
-resume: False
+output: chains/act_extended_act_plus_planck_bp
+resume: True

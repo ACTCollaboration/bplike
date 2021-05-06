@@ -95,6 +95,9 @@ fixed:
 
   galsync_p_n : -0.7 # same as f90
 
+sampled:
+  cal_353:
+
 bpass_modes:
   color_corr:
     mode: 'color_corr'

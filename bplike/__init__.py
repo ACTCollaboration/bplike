@@ -1,7 +1,9 @@
 from .config import *
 from .utils import *
 from .fg import *
-from .act_pylike_extended import *
+from .stevepower import * 
+from .act_pylike_extended_act_only_TTTEEE import *
+from .act_pylike_extended_act_TT_plus_planck_TT import *
 # from .gaussian import GaussianLikelihood, MultiGaussianLikelihood
 # from .ps import PSLikelihood, BinnedPSLikelihood
 # from .clusters import ClusterLikelihood

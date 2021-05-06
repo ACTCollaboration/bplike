@@ -170,16 +170,16 @@ params:
     #   dist: norm
     #   loc: 2.2
     #   scale: 0.5
-  cal_090:
-    latex: cal_90
-    value: 1
-  cal_100:
-    latex: cal_100
-    value: 1
-  cal_143:
-    latex: cal_143
-    value: 1
-  cal_150: 1.
+  # cal_090: 0.
+    # latex: cal_90
+    # value: 1
+  # cal_100:
+  #   latex: cal_100
+  #   value: 1
+  # cal_143:
+  #   latex: cal_143
+  #   value: 1
+  # cal_150: 1.
     # latex: cal_150
     # prior:
     #   max: 11
@@ -189,19 +189,32 @@ params:
     #   dist: norm
     #   loc: 1
     #   scale: 0.02
-  cal_217:
-    latex: cal_217
-    value: 1
-  cal_353:
-    latex: cal_353
-    value: 1
-  cal_545:
-    latex: cal_545
-    value: 1
+
+  # cal_217:
+  #   latex: cal_217
+  #   value: 1
+  # cal_353:
+  #   latex: cal_353
+  #   value: 1
+  # cal_545:
+  #   latex: cal_545
+  #   value: 1
+  yp_95: 0.9860632E+00  #OK CHECKED
+  yp_150: 0.9714017E+00 #OK CHECKED
+
+
+
+
+
+
   cal_95: 1.
+  cal_150: 1.
 
   leak_95: 1.
   leak_150: 1.
+  #
+  # leak_95: 1.
+  # leak_150: 1.
 
     # latex: cal_95
     # prior:
@@ -222,7 +235,7 @@ params:
     #   dist: norm
     #   loc: 0.0165
     #   scale: 0.05
-  yp_090: 0.
+  # yp_090: 0.
     # latex: yp_90
     # prior:
     #   max: 1.1
@@ -232,7 +245,7 @@ params:
     #   dist: norm
     #   loc: 1
     #   scale: 0.02
-  yp_100: 0.
+  # yp_100: 0.
     # latex: yp_100
     # prior:
     #   max: 1.1
@@ -242,7 +255,7 @@ params:
     #   dist: norm
     #   loc: 1
     #   scale: 0.02
-  yp_143: 0.
+  # yp_143: 0.
     # latex: yp_143
     # prior:
     #   max: 1.1
@@ -252,7 +265,7 @@ params:
     #   dist: norm
     #   loc: 1
     #   scale: 0.02
-  yp_150: 0.9714017E+00
+  # yp_150: 0.9714017E+00
     # latex: yp_150
     # prior:
     #   max: 1.1
@@ -262,7 +275,7 @@ params:
     #   dist: norm
     #   loc: 1
     #   scale: 0.02
-  yp_217: 0.
+  # yp_217: 0.
     # latex: yp_217
     # prior:
     #   max: 1.1
@@ -272,7 +285,7 @@ params:
     #   dist: norm
     #   loc: 1
     #   scale: 0.02
-  yp_353: 0.
+  # yp_353: 0.
     # latex: yp_353
     # prior:
     #   max: 1.1
@@ -282,7 +295,7 @@ params:
     #   dist: norm
     #   loc: 1
     #   scale: 0.02
-  yp_545: 0.
+  # yp_545: 0.
     # latex: yp_545
     # prior:
     #   max: 1.1
@@ -292,7 +305,7 @@ params:
     #   dist: norm
     #   loc: 1
     #   scale: 0.02
-  yp_95: 0.9860632E+00
+  # yp_95: 0.9860632E+00
     # latex: yp_95
     # prior:
     #   max: 1.1

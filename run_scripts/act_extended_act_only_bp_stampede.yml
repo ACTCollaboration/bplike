@@ -6,24 +6,22 @@ timing: True
 # Run with bandpass corrections
 likelihood:
   # The 100 mJy likelihood
-  # WIDE
+
   bplike.act100:
     #path: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/
     stop_at_error: True
-    bandpass: False
+    bandpass: True
     # Optional line to do some debugging with an input theory curve
-    # theory_debug: /data/ctpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
-    # theory_debug: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/data/actpolfull_dr4.01/data/bf_ACTPol_lcdm.minimum.theory_cl
+    #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
     # theory_debug: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/data/bplike_data/cls_model.txt # boris's debug
     use_act_planck: 'no'
 
-  # # The 15 mJy likelihood
-  # DEEP
+  # # # The 15 mJy likelihood
   bplike.act15:
     stop_at_error: True
-    bandpass: False
+    bandpass: True
     # Optional line to do some debugging with an input theory curve
-    #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat # mat's debug
+    #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
     # theory_debug: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/data/bplike_data/cls_model.txt # boris's debug
     use_act_planck: 'no'
 
@@ -64,8 +62,6 @@ params:
   As:
     value: "lambda logA: 1e-10*np.exp(logA)"
     latex: A_\mathrm{s}
-
-
   ns:
     prior:
       min: 0.8
@@ -388,8 +384,6 @@ prior:
   a_g_ee_100_prior: "lambda a_g_ee_100: stats.norm.logpdf(a_g_ee_100, loc=0.13, scale=0.03)"
 
 theory:
-  # classy:
-  #   path: /Users/boris/Work/CLASS-SZ/SO-SZ/class_public
   camb:
     stop_at_error: False
     extra_args:
@@ -456,13 +450,13 @@ sampler:
     learn_proposal: True
     drag: True
     Rminus1_stop: 0.001
-  #   # Optionally use a covmat with the right theta convention
-  #   covmat: 'data/ACTPol_b5_new_cosmomc_theta2.covmat'
+    # Optionally use a covmat with the right theta convention
+    # covmat: 'data/ACTPol_b5_new_cosmomc_theta2.covmat'
 
   # Example for running the minimizer
   # minimize:
   #   covmat: 'data/ACTPol_b5_new_cosmomc_theta2.covmat'
 
 
-output: chains/act_extended_act_only
-resume: False
+output: /home1/08134/tg874332/atsz_analysis/act_extended_act_only_bp
+resume: True

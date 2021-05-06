@@ -23,12 +23,10 @@
 #SBATCH -J act_only      # Job name
 #SBATCH -o act_only.o%j	  # Name of stdout output file
 #SBATCH -e act_only.e%j	  # Name of stderr error file
-#SBATCH -p skx-normal   # Queue (partition) name
+#SBATCH -p skx-large     # Queue (partition) name
 #SBATCH -N 1      # Total # of nodes (must be 1 for serial)
 #SBATCH -n 48        # Total # of mpi tasks (should be 1 for serial)
 #SBATCH -t 48:00:00    # Run time (hh:mm:ss)
 #SBATCH -A TG-AST140041
-export OMP_NUM_THREADS=24
-mpirun -np 4 /home1/08134/tg874332/.local/bin/cobaya-run /home1/08134/tg874332/bplike/run_scripts/act_extended_act_only_mcmc_classy_stampede.yml -f
-# mpirun -np 4 /home1/08134/tg874332/.local/bin/cobaya-run /home1/08134/tg874332/bplike/run_scripts/act_extended_act_only_bp_mcmc_classy_stampede.yml -f
-# mpirun -np 4 /home1/08134/tg874332/.local/bin/cobaya-run /home1/08134/tg874332/bplike/run_scripts/act_extended_act_plus_planck_bp_mcmc_classy_stampede.yml -f
+export OMP_NUM_THREADS=68
+mpirun -np 1 /home1/08134/tg874332/.local/bin/cobaya-run /home1/08134/tg874332/bplike/run_scripts/act_extended_act_only_evaluate_classy_stampede.yml -f

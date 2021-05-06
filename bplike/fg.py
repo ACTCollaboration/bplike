@@ -3,6 +3,7 @@ from scipy.interpolate import interp1d
 import tilec
 from tilec.fg import ArraySED
 
+
 # ## Full Spectra:
 # specs = ['f090xf090','f090xf100','f090xf143','f090xf150',
 #  'f090xf217','f090xf353','f090xf545','f100xf100',
@@ -16,6 +17,41 @@ from tilec.fg import ArraySED
 
 
 # exit(0)
+# def get_coadd_power_act_only_parallel(index_s,p1):#,
+# # self,cls,coadd_data,bbl,ells,dltt,dlte,dlee,params,lkl_setup):
+#     print(index_s)
+#     return index_s,p1
+    # i = index_spec
+    # sel = np.s_[i*52:(i+1)*52]
+    # if i<3:
+    #     spec = 'TT'
+    #     band1 = {0:'95',1:'95',2:'150'}[i]
+    #     band2 = {0:'95',1:'150',2:'150'}[i]
+    #     c1 = params[f'cal_{band1}']
+    #     c2 = params[f'cal_{band2}']
+    #
+    #     cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dltt,spec,params,lkl_setup) * c1 * c2
+    #
+    # elif i>=3 and i<=6:
+    #     spec = 'TE'
+    #     band1 = {0:'95',1:'95',2:'150',3:'150'}[i-3]
+    #     band2 = {0:'95',1:'150',2:'95',3:'150'}[i-3]
+    #     c1 = params[f'cal_{band1}']
+    #     c2 = params[f'cal_{band2}']
+    #     y = params[f'yp_{band2}']
+    #
+    #     cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dlte,spec,params,lkl_setup) * c1 * c2 * y
+    #
+    # else:
+    #     spec = 'EE'
+    #     band1 = {0:'95',1:'95',2:'150'}[i-7]
+    #     band2 = {0:'95',1:'150',2:'150'}[i-7]
+    #     c1 = params[f'cal_{band1}']
+    #     c2 = params[f'cal_{band2}']
+    #     y1 = params[f'yp_{band1}']
+    #     y2 = params[f'yp_{band2}']
+    #
+    #     cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dlee,spec,params,lkl_setup) * c1 * c2 * y1 * y2
 
 
 
@@ -619,21 +655,122 @@ class ForegroundPowers(ArraySED):
 
 
 
-    def get_theory_bandpassed(self,coadd_data,ells,bbl,dltt,dlte,dlee,params,lmax=6000,lkl_setup = None):
-
+    def get_theory_bandpassed_parallel(self,i,coadd_data,ells,bbl,dltt,dlte,dlee,params,lmax=6000,lkl_setup = None):
+        dim = lkl_setup.sp.n_bins*lkl_setup.sp.n_specs
+        sel = np.s_[i*lkl_setup.sp.n_bins:(i+1)*lkl_setup.sp.n_bins]
         assert len(self.cache['CIB'])==0
 
         if lmax is not None:
             dltt[ells>lmax] = 0
             dlte[ells>lmax] = 0
             dlee[ells>lmax] = 0
-
+        cls = np.zeros((dim,))
         if lkl_setup.use_act_planck == 'yes':
             # print(lkl_setup.sp.n_bins)
             # print(lkl_setup.sp.n_specs)
-            dim = lkl_setup.sp.n_bins*lkl_setup.sp.n_specs
+
             # exit(0)
-            cls = np.zeros((dim,))
+
+            # for i in range(lkl_setup.sp.n_specs):
+            # sel = np.s_[i*lkl_setup.sp.n_bins:(i+1)*lkl_setup.sp.n_bins]
+            # print(sel)
+
+
+            spec = 'TT'
+            band1 = lkl_setup.sp.fband1[i]
+            band2 = lkl_setup.sp.fband2[i]
+            c1 = params[f'cal_{band1}']
+            c2 = params[f'cal_{band2}']
+            # print('  ')
+            # print('  ')
+            # print('getting theory bp at:')
+            # print(c1,c2,band1,band2)
+            cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dltt,spec,params,lkl_setup) * c1 * c2
+            # exit(0)
+        else:
+            # cls = np.zeros((520,))
+
+            # parallel compoutation:
+
+
+            # a_pool = multiprocessing.Pool()
+            # print('starting pool')
+            #
+            # p1 = 0
+            # pool = multiprocessing.Pool()
+            # fn = functools.partial(get_coadd_power_act_only_parallel,p1=p1)
+            # print('pool.map')
+            # r = pool.map(fn,range(10))
+            #                             # self=self,
+            #                             # cls=cls,
+            #                             # coadd_data=coadd_data,
+            #                             # bbl=bbl,
+            #                             # ells=ells,
+            #                             # dltt=dltt,
+            #                             # dlte=dlte,
+            #                             # dlee=dlee,
+            #                             # params=params,
+            #                             # lkl_setup=lkl_setup),
+            #                             # range(10))
+            # pool.close()
+            # print('r:',r)
+            # exit(0)
+            # print('dim:',dim)
+            # for i in range(lkl_setup.sp.n_specs):
+
+
+            if i<3:
+                spec = 'TT'
+                band1 = {0:'95',1:'95',2:'150'}[i]
+                band2 = {0:'95',1:'150',2:'150'}[i]
+                c1 = params[f'cal_{band1}']
+                c2 = params[f'cal_{band2}']
+
+                cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dltt,spec,params,lkl_setup) * c1 * c2
+
+            elif i>=3 and i<=6:
+                spec = 'TE'
+                band1 = {0:'95',1:'95',2:'150',3:'150'}[i-3]
+                band2 = {0:'95',1:'150',2:'95',3:'150'}[i-3]
+                c1 = params[f'cal_{band1}']
+                c2 = params[f'cal_{band2}']
+                y = params[f'yp_{band2}']
+
+                cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dlte,spec,params,lkl_setup) * c1 * c2 * y
+
+            else:
+                spec = 'EE'
+                band1 = {0:'95',1:'95',2:'150'}[i-7]
+                band2 = {0:'95',1:'150',2:'150'}[i-7]
+                c1 = params[f'cal_{band1}']
+                c2 = params[f'cal_{band2}']
+                y1 = params[f'yp_{band1}']
+                y2 = params[f'yp_{band2}']
+
+                cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dlee,spec,params,lkl_setup) * c1 * c2 * y1 * y2
+
+
+
+        self.cache['CIB'] = {}
+        return cls
+
+
+
+    def get_theory_bandpassed(self,coadd_data,ells,bbl,dltt,dlte,dlee,params,lmax=6000,lkl_setup = None):
+        dim = lkl_setup.sp.n_bins*lkl_setup.sp.n_specs
+        assert len(self.cache['CIB'])==0
+
+        if lmax is not None:
+            dltt[ells>lmax] = 0
+            dlte[ells>lmax] = 0
+            dlee[ells>lmax] = 0
+        cls = np.zeros((dim,))
+        if lkl_setup.use_act_planck == 'yes':
+            # print(lkl_setup.sp.n_bins)
+            # print(lkl_setup.sp.n_specs)
+
+            # exit(0)
+
             for i in range(lkl_setup.sp.n_specs):
                 sel = np.s_[i*lkl_setup.sp.n_bins:(i+1)*lkl_setup.sp.n_bins]
                 # print(sel)
@@ -651,9 +788,36 @@ class ForegroundPowers(ArraySED):
                 cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dltt,spec,params,lkl_setup) * c1 * c2
             # exit(0)
         else:
-            cls = np.zeros((520,))
-            for i in range(10):
-                sel = np.s_[i*52:(i+1)*52]
+            # cls = np.zeros((520,))
+
+            # parallel compoutation:
+
+
+            # a_pool = multiprocessing.Pool()
+            # print('starting pool')
+            #
+            # p1 = 0
+            # pool = multiprocessing.Pool()
+            # fn = functools.partial(get_coadd_power_act_only_parallel,p1=p1)
+            # print('pool.map')
+            # r = pool.map(fn,range(10))
+            #                             # self=self,
+            #                             # cls=cls,
+            #                             # coadd_data=coadd_data,
+            #                             # bbl=bbl,
+            #                             # ells=ells,
+            #                             # dltt=dltt,
+            #                             # dlte=dlte,
+            #                             # dlee=dlee,
+            #                             # params=params,
+            #                             # lkl_setup=lkl_setup),
+            #                             # range(10))
+            # pool.close()
+            # print('r:',r)
+            # exit(0)
+            # print('dim:',dim)
+            for i in range(lkl_setup.sp.n_specs):
+                sel = np.s_[i*lkl_setup.sp.n_bins:(i+1)*lkl_setup.sp.n_bins]
 
                 if i<3:
                     spec = 'TT'
