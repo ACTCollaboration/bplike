@@ -765,11 +765,11 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
 
             ls_theory = self.sp.ls
             delta = self.sp.spec - dls_theory/fac
-            if save_theory_data_spectra:
-                np.save(path_to_output+'/ls_theory_'+self.flux+bps+'act_planck.npy',ls_theory)
+            if self.save_theory_data_spectra:
+                np.save(path_to_output+'/ls_theory_'+self.flux+bps+'act_planck_'+self.root_theory_data_spectra+'.npy',ls_theory)
 
                 for comp in comps:
-                    np.save(path_to_output+'/dls_theory_'+comp+'_'+self.flux+bps+'act_planck.npy',ps[comp])
+                    np.save(path_to_output+'/dls_theory_'+comp+'_'+self.flux+bps+'act_planck_'+self.root_theory_data_spectra+'.npy',ps[comp])
 
 
 
@@ -842,10 +842,10 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
 
 
             delta = self.sp.spec - ps_vec
-            if save_theory_data_spectra:
-                np.save(path_to_output+'/ls_theory_'+self.flux+bps+'act_only.npy',ls_theory)
+            if self.save_theory_data_spectra:
+                np.save(path_to_output+'/ls_theory_'+self.flux+bps+'act_only_'+self.root_theory_data_spectra+'.npy',ls_theory)
                 for comp in comps:
-                    np.save(path_to_output+'/dls_theory_'+comp+'_'+self.flux+bps+'act_only.npy',ps[comp]*fac)
+                    np.save(path_to_output+'/dls_theory_'+comp+'_'+self.flux+bps+'act_only_'+self.root_theory_data_spectra+'.npy',ps[comp]*fac)
 
 
             # np.save(path_to_output+'/dls_theory_galdust_'+self.flux+bps+'act_only.npy',ps_vec_galdust*fac)
@@ -1209,6 +1209,19 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
                                                         fgdict,
                                                         lmax=self.l_max,
                                                         lkl_setup = lkl_setup)
+            if self.save_theory_data_spectra:
+                for comp in comps:
+                    print('computing ',comp)
+                    fpower[comp] = self.fgpower.get_theory_bandpassed_comp(self.coadd_data,
+                                                            self.sp.ells,
+                                                            self.sp.bbl,
+                                                            ptt[l_min:],
+                                                            pte[l_min:],
+                                                            pee[l_min:],
+                                                            fgdict,
+                                                            lmax=self.l_max,
+                                                            lkl_setup = lkl_setup,
+                                                            comp = comp)
             # dim = lkl_setup.sp.n_bins*lkl_setup.sp.n_specs
             # clsp = np.zeros((dim,))
             # fgpow = []
@@ -1302,7 +1315,7 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
 
             if self.theory_debug is not None:
                 print('[debug] time for tot: ', time.time() - start)
-            if save_theory_data_spectra:
+            if self.save_theory_data_spectra:
                 for comp in comps:
                     if self.theory_debug is not None:
                         print('[debug] comp = ', comp)

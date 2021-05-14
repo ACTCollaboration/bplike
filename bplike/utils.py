@@ -11,7 +11,7 @@ from .config import *
 
 save_coadd_data = False
 save_coadd_data_extended = False
-save_theory_data_spectra = False
+# save_theory_data_spectra = False
 
 fgroot = resource_filename("bplike","data/actpolfull_dr4.01/data/Fg/")
 

@@ -1,4 +1,6 @@
 bandpass: false
+save_theory_data_spectra: false
+root_theory_data_spectra: ''
 params:
   a_c: 0.3648102E+01
     # latex: a_\mathrm{c}
