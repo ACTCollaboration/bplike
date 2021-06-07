@@ -4,57 +4,6 @@ import tilec
 from tilec.fg import ArraySED
 
 
-# ## Full Spectra:
-# specs = ['f090xf090','f090xf100','f090xf143','f090xf150',
-#  'f090xf217','f090xf353','f090xf545','f100xf100',
-#  'f100xf143','f143xf143','f100xf150','f143xf150',
-#  'f150xf150','f150xf217','f150xf353','f150xf545',
-#  'f100xf217','f143xf217','f217xf217','f100xf353',
-#  'f143xf353','f217xf353','f353xf353','f100xf545',
-#  'f143xf545','f217xf545','f353xf545','f545xf545']
-#
-
-
-
-# exit(0)
-# def get_coadd_power_act_only_parallel(index_s,p1):#,
-# # self,cls,coadd_data,bbl,ells,dltt,dlte,dlee,params,lkl_setup):
-#     print(index_s)
-#     return index_s,p1
-    # i = index_spec
-    # sel = np.s_[i*52:(i+1)*52]
-    # if i<3:
-    #     spec = 'TT'
-    #     band1 = {0:'95',1:'95',2:'150'}[i]
-    #     band2 = {0:'95',1:'150',2:'150'}[i]
-    #     c1 = params[f'cal_{band1}']
-    #     c2 = params[f'cal_{band2}']
-    #
-    #     cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dltt,spec,params,lkl_setup) * c1 * c2
-    #
-    # elif i>=3 and i<=6:
-    #     spec = 'TE'
-    #     band1 = {0:'95',1:'95',2:'150',3:'150'}[i-3]
-    #     band2 = {0:'95',1:'150',2:'95',3:'150'}[i-3]
-    #     c1 = params[f'cal_{band1}']
-    #     c2 = params[f'cal_{band2}']
-    #     y = params[f'yp_{band2}']
-    #
-    #     cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dlte,spec,params,lkl_setup) * c1 * c2 * y
-    #
-    # else:
-    #     spec = 'EE'
-    #     band1 = {0:'95',1:'95',2:'150'}[i-7]
-    #     band2 = {0:'95',1:'150',2:'150'}[i-7]
-    #     c1 = params[f'cal_{band1}']
-    #     c2 = params[f'cal_{band2}']
-    #     y1 = params[f'yp_{band1}']
-    #     y2 = params[f'yp_{band2}']
-    #
-    #     cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dlee,spec,params,lkl_setup) * c1 * c2 * y1 * y2
-
-
-
 def get_template(ells,template_file,ell_pivot=3000):
     ls,pow = np.loadtxt(template_file,unpack=True)
     if '_tsz_150' in template_file:
@@ -86,7 +35,7 @@ class ForegroundPowers(ArraySED):
              ):
         # print('getting ells')
         self.ells= ells
-        # print('ells in fg: ',ells)
+
         self.tsz_temp = get_template(ells,sz_temp_file,ell_pivot=params['high_ell0'])
         self.ksz_temp = get_template(ells,ksz_temp_file,ell_pivot=params['high_ell0'])
         self.tsz_x_cib_temp = get_template(ells,sz_x_cib_temp_file,ell_pivot=None)
@@ -109,10 +58,7 @@ class ForegroundPowers(ArraySED):
 
         self.comps = comps
         ArraySED.__init__(self,arrays=arrays,bp_file_dict=bp_file_dict,beam_file_dict=beam_file_dict,cfreq_dict=cfreq_dict)
-        # print('elf.effs:',self.effs)
-        # print('comps:',comps)
-        # print('bp_file_dict:',bp_file_dict)
-        # exit(0)
+
 
     def get_component_scale_dependence(self,comp,param_dict):
         p = param_dict
@@ -236,20 +182,6 @@ class ForegroundPowers(ArraySED):
                 raise ValueError
             rparam = f'a_g_{spec}_{fnum}'
             tpow = tpow + f1*f2*params[rparam]*self.get_component_scale_dependence(scale_str,params) # correct one
-            # tpow = tpow + f1*f2*params[f'a_g_{spec}']*self.get_component_scale_dependence(scale_str,params) # correct one
-
-            #
-            # if spec=='tt':
-            #     if self.fcut == '15mJy':
-            #         fnum = 15
-            #     elif self.fcut == '100mJy':
-            #         fnum = 100
-            #     else:
-            #         raise ValueError
-            #     rparam = f'a_p_{spec}_{fnum}'
-            # else:
-            #     rparam = f'a_p_{spec}'
-            # tpow = tpow + f1*f2*params[rparam]*self.get_component_scale_dependence('poisson',params) # incorrect
 
         if spec!='tt':
             if 'galsyn' in ocomps:
@@ -433,70 +365,7 @@ class ForegroundPowers(ArraySED):
 
             return bin_func(dls/ells/(ells+1.)*2.*np.pi)
 
-    #
-    # def get_galdust(self,ells,bin_func,dltt,dlte,dlee,params,lmax=6000,lkl_setup = None):
-    #     # print('getting theory')
-    #     if lmax is not None:
-    #         dltt[ells>lmax] = 0
-    #         dlte[ells>lmax] = 0
-    #         dlee[ells>lmax] = 0
-    #
-    #     if lkl_setup.use_act_planck == 'yes':
-    #         # print('use_act_planck :', lkl_setup.use_act_planck)
-    #         dls = np.zeros((28,3924))
-    #         for i in range(28):
-    #             # band1 = {0:'090',1:'100',2:'143',3:'150',4:'217',5:'353',6:'545'}[i]
-    #             # band2 = {0:'090',1:'100',2:'143',3:'150',4:'217',5:'353',6:'545'}[i]
-    #             band1 = lkl_setup.sp.fband1[i]
-    #             band2 = lkl_setup.sp.fband2[i]
-    #             c1 = params[f'cal_{band1}']
-    #             c2 = params[f'cal_{band2}']
-    #             # print('dltt 0-10',dltt[0:10])
-    #             # print('c1,c2:',c1,c2)
-    #             # print('b1,b2:',band1,band2)
-    #             # print('effs1,effs2:',self.effs[band1],self.effs[band2])
-    #             dls[i] = (self.get_power('TT',['galdust'],params,
-    #                                         eff_freq_ghz1=self.effs[band1],array1=None,
-    #                                         eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2
-    #
-    #             # print('dls 0-10',dls[i][0:10])
-    #         # exit(0)
-    #         return bin_func(dls/ells/(ells+1.)*2.*np.pi)
-    #     else:
-    #         dls = np.zeros((10,7924))
-    #         for i in range(10):
-    #             if i<3:
-    #                 band1 = {0:'95',1:'95',2:'150'}[i]
-    #                 band2 = {0:'95',1:'150',2:'150'}[i]
-    #                 c1 = params[f'cal_{band1}']
-    #                 c2 = params[f'cal_{band2}']
-    #                 # print('dltt 0-10',dltt[0:10])
-    #                 dls[i] = (self.get_power('TT',['galdust'],params,
-    #                                             eff_freq_ghz1=self.effs[band1],array1=None,
-    #                                             eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2
-    #                 # print('dls 0-10',dls[0:10])
-    #             elif i>=3 and i<=6:
-    #                 band1 = {0:'95',1:'95',2:'150',3:'150'}[i-3]
-    #                 band2 = {0:'95',1:'150',2:'95',3:'150'}[i-3]
-    #                 c1 = params[f'cal_{band1}']
-    #                 c2 = params[f'cal_{band2}']
-    #                 y = params[f'yp_{band2}']
-    #                 dls[i] = (self.get_power('TE',['galdust'],params,
-    #                                             eff_freq_ghz1=self.effs[band1],array1=None,
-    #                                             eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2 * y
-    #             else:
-    #                 band1 = {0:'95',1:'95',2:'150'}[i-7]
-    #                 band2 = {0:'95',1:'150',2:'150'}[i-7]
-    #                 c1 = params[f'cal_{band1}']
-    #                 c2 = params[f'cal_{band2}']
-    #                 y1 = params[f'yp_{band1}']
-    #                 y2 = params[f'yp_{band2}']
-    #                 dls[i] =  (self.get_power('EE',['galdust'],params,
-    #                                             eff_freq_ghz1=self.effs[band1],array1=None,
-    #                                             eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2 * y1 * y2
-    #             # print('dls 0-10',dls[i][0:10])
-    #         return bin_func(dls/ells/(ells+1.)*2.*np.pi)
-    #
+
 
     def get_comp(self,ells,bin_func,dltt,dlte,dlee,params,lmax=6000,lkl_setup = None, comp = None):
         # print('getting theory')
@@ -580,14 +449,7 @@ class ForegroundPowers(ArraySED):
     def get_coadd_power(self,cdata,ibbl,ells,dl,spec,fparams,lkl_setup = None):
 
         icov,icov_ibin,Pmat,arrays = cdata
-        # print('getting coadd power for spec:', spec)
-        # #print('fparams:', fparams)
-        # print('dls:', np.shape(dl),dl)
-        # print('ells:', np.shape(ells),ells)
-        # print('ibbl:', np.shape(ibbl),ibbl)
-        # print('icov:', np.shape(icov),icov)
-        # print('icov_ibin:', np.shape(icov_ibin),icov_ibin)
-        # print('arrays:', np.shape(arrays),arrays)
+
 
         if lkl_setup.use_act_planck == 'yes':
             l_max = 3924 #!ell max of the full window functions
@@ -616,14 +478,7 @@ class ForegroundPowers(ArraySED):
     def get_coadd_power_comp(self,cdata,ibbl,ells,dl,spec,fparams,lkl_setup = None,comp = None):
 
         icov,icov_ibin,Pmat,arrays = cdata
-        # print('getting coadd power for spec:', spec)
-        # #print('fparams:', fparams)
-        # print('dls:', np.shape(dl),dl)
-        # print('ells:', np.shape(ells),ells)
-        # print('ibbl:', np.shape(ibbl),ibbl)
-        # print('icov:', np.shape(icov),icov)
-        # print('icov_ibin:', np.shape(icov_ibin),icov_ibin)
-        # print('arrays:', np.shape(arrays),arrays)
+
 
         if lkl_setup.use_act_planck == 'yes':
             l_max = 3924  #!ell max of the full window functions
@@ -666,14 +521,6 @@ class ForegroundPowers(ArraySED):
             dlee[ells>lmax] = 0
         cls = np.zeros((dim,))
         if lkl_setup.use_act_planck == 'yes':
-            # print(lkl_setup.sp.n_bins)
-            # print(lkl_setup.sp.n_specs)
-
-            # exit(0)
-
-            # for i in range(lkl_setup.sp.n_specs):
-            # sel = np.s_[i*lkl_setup.sp.n_bins:(i+1)*lkl_setup.sp.n_bins]
-            # print(sel)
 
 
             spec = 'TT'
@@ -681,43 +528,10 @@ class ForegroundPowers(ArraySED):
             band2 = lkl_setup.sp.fband2[i]
             c1 = params[f'cal_{band1}']
             c2 = params[f'cal_{band2}']
-            # print('  ')
-            # print('  ')
-            # print('getting theory bp at:')
-            # print(c1,c2,band1,band2)
+
             cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dltt,spec,params,lkl_setup) * c1 * c2
             # exit(0)
         else:
-            # cls = np.zeros((520,))
-
-            # parallel compoutation:
-
-
-            # a_pool = multiprocessing.Pool()
-            # print('starting pool')
-            #
-            # p1 = 0
-            # pool = multiprocessing.Pool()
-            # fn = functools.partial(get_coadd_power_act_only_parallel,p1=p1)
-            # print('pool.map')
-            # r = pool.map(fn,range(10))
-            #                             # self=self,
-            #                             # cls=cls,
-            #                             # coadd_data=coadd_data,
-            #                             # bbl=bbl,
-            #                             # ells=ells,
-            #                             # dltt=dltt,
-            #                             # dlte=dlte,
-            #                             # dlee=dlee,
-            #                             # params=params,
-            #                             # lkl_setup=lkl_setup),
-            #                             # range(10))
-            # pool.close()
-            # print('r:',r)
-            # exit(0)
-            # print('dim:',dim)
-            # for i in range(lkl_setup.sp.n_specs):
-
 
             if i<3:
                 spec = 'TT'
@@ -766,10 +580,6 @@ class ForegroundPowers(ArraySED):
             dlee[ells>lmax] = 0
         cls = np.zeros((dim,))
         if lkl_setup.use_act_planck == 'yes':
-            # print(lkl_setup.sp.n_bins)
-            # print(lkl_setup.sp.n_specs)
-
-            # exit(0)
 
             for i in range(lkl_setup.sp.n_specs):
                 sel = np.s_[i*lkl_setup.sp.n_bins:(i+1)*lkl_setup.sp.n_bins]
@@ -781,41 +591,11 @@ class ForegroundPowers(ArraySED):
                 band2 = lkl_setup.sp.fband2[i]
                 c1 = params[f'cal_{band1}']
                 c2 = params[f'cal_{band2}']
-                # print('  ')
-                # print('  ')
-                # print('getting theory bp at:')
-                # print(c1,c2,band1,band2)
+
                 cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dltt,spec,params,lkl_setup) * c1 * c2
             # exit(0)
         else:
-            # cls = np.zeros((520,))
 
-            # parallel compoutation:
-
-
-            # a_pool = multiprocessing.Pool()
-            # print('starting pool')
-            #
-            # p1 = 0
-            # pool = multiprocessing.Pool()
-            # fn = functools.partial(get_coadd_power_act_only_parallel,p1=p1)
-            # print('pool.map')
-            # r = pool.map(fn,range(10))
-            #                             # self=self,
-            #                             # cls=cls,
-            #                             # coadd_data=coadd_data,
-            #                             # bbl=bbl,
-            #                             # ells=ells,
-            #                             # dltt=dltt,
-            #                             # dlte=dlte,
-            #                             # dlee=dlee,
-            #                             # params=params,
-            #                             # lkl_setup=lkl_setup),
-            #                             # range(10))
-            # pool.close()
-            # print('r:',r)
-            # exit(0)
-            # print('dim:',dim)
             for i in range(lkl_setup.sp.n_specs):
                 sel = np.s_[i*lkl_setup.sp.n_bins:(i+1)*lkl_setup.sp.n_bins]
 
@@ -879,10 +659,7 @@ class ForegroundPowers(ArraySED):
                 band2 = lkl_setup.sp.fband2[i]
                 c1 = params[f'cal_{band1}']
                 c2 = params[f'cal_{band2}']
-                # print('  ')
-                # print('  ')
-                # print('getting theory bp at:')
-                # print(c1,c2,band1,band2)
+
                 cls[sel] = self.get_coadd_power_comp(coadd_data[spec][(band1,band2)],bbl[i],ells,dltt,spec,params,lkl_setup,comp) * c1 * c2
             # exit(0)
         else:
