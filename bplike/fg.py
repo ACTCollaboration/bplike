@@ -83,11 +83,12 @@ class ForegroundPowers(ArraySED):
 
     def get_power(self,spec,comps,params,
                       eff_freq_ghz1=None,array1=None,
-                      eff_freq_ghz2=None,array2=None,lmax=None):
+                      eff_freq_ghz2=None,array2=None,lmax=None,ptsz=None):
         ocomps = [comp.lower() for comp in comps]
         spec = spec.lower()
         tpow = 0
         # print('getting power')
+        # exit(0)
         if spec=='tt':
             if ('tsz' in ocomps) or ('tsz_x_cib' in ocomps):
                 e1tsz = eff_freq_ghz1['tsz'] if eff_freq_ghz1 is not None else None
@@ -105,7 +106,14 @@ class ForegroundPowers(ArraySED):
                                            eff_freq_ghz=e2dusty,params=params,lmax=lmax)
 
             if ('tsz' in ocomps):
-                tpow = tpow + f1_tsz *f2_tsz *params['a_tsz']*self.get_component_scale_dependence('tSZ',params)
+                # print(ptsz)
+                # exit(0)
+                if ptsz is not None:
+                    # print(f1_tsz *f2_tsz *ptsz)
+                    # exit(0)
+                    tpow = tpow + f1_tsz *f2_tsz *ptsz
+                else:
+                    tpow = tpow + f1_tsz *f2_tsz *params['a_tsz']*self.get_component_scale_dependence('tSZ',params)
             if ('cibc' in ocomps):
                 tpow = tpow + f1_cib*f2_cib*params['a_c']*self.get_component_scale_dependence('cibc',params)
             if ('cibp' in ocomps):
@@ -256,7 +264,7 @@ class ForegroundPowers(ArraySED):
                               eff_freq_ghz2={'syn':eff_freq_ghz2},array2=array2)
 
 
-    def get_theory(self,ells,bin_func,dltt,dlte,dlee,params,lmax=6000,lkl_setup = None):
+    def get_theory(self,ells,bin_func,dltt,dlte,dlee,params,lmax=6000,lkl_setup = None,ptsz=None):
         # print('getting theory')
         if lmax is not None:
             dltt[ells>lmax] = 0
@@ -264,7 +272,8 @@ class ForegroundPowers(ArraySED):
             dlee[ells>lmax] = 0
 
         if lkl_setup.use_act_planck == 'yes':
-            # print('use_act_planck :', lkl_setup.use_act_planck)
+            print('use_act_planck :', lkl_setup.use_act_planck)
+            exit(0)
             dls = np.zeros((28,3924))
             for i in range(28):
                 # band1 = {0:'090',1:'100',2:'143',3:'150',4:'217',5:'353',6:'545'}[i]
@@ -276,7 +285,7 @@ class ForegroundPowers(ArraySED):
                 # print('dltt 0-10',dltt[0:10])
                 dls[i] = (dltt + self.get_power('TT',self.comps,params,
                                             eff_freq_ghz1=self.effs[band1],array1=None,
-                                            eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2
+                                            eff_freq_ghz2=self.effs[band2],array2=None,ptsz=ptsz) ) * c1 * c2
                 # print('dls 0-10',dls[0:10])
             return bin_func(dls/ells/(ells+1.)*2.*np.pi)
         else:
@@ -446,7 +455,7 @@ class ForegroundPowers(ArraySED):
 
 
 
-    def get_coadd_power(self,cdata,ibbl,ells,dl,spec,fparams,lkl_setup = None):
+    def get_coadd_power(self,cdata,ibbl,ells,dl,spec,fparams,lkl_setup = None,ptsz=None):
 
         icov,icov_ibin,Pmat,arrays = cdata
 
@@ -466,7 +475,8 @@ class ForegroundPowers(ArraySED):
             pow = dl + self.get_power(spec,self.comps,fparams,
                                       eff_freq_ghz1=None,array1=a1,
                                       eff_freq_ghz2=None,array2=a2,
-                                      lmax=l_max) # 7924 for act alone, 3924 for act_planck !ell max of the full window functions
+                                      lmax=l_max,
+                                      ptsz=ptsz) # 7924 for act alone, 3924 for act_planck !ell max of the full window functions
             pow = pow/ells/(ells+1)*2.*np.pi
             bpow = np.einsum('...k,...k',ibbl,pow)
             ps = np.append(ps,bpow.copy())
@@ -475,7 +485,7 @@ class ForegroundPowers(ArraySED):
         return np.dot(icov_ibin,np.dot(Pmat,np.dot(icov,ps)))
 
 
-    def get_coadd_power_comp(self,cdata,ibbl,ells,dl,spec,fparams,lkl_setup = None,comp = None):
+    def get_coadd_power_comp(self,cdata,ibbl,ells,dl,spec,fparams,lkl_setup = None,comp = None,ptsz=None):
 
         icov,icov_ibin,Pmat,arrays = cdata
 
@@ -498,7 +508,8 @@ class ForegroundPowers(ArraySED):
                 pow = self.get_power(spec,[comp],fparams,
                                           eff_freq_ghz1=None,array1=a1,
                                           eff_freq_ghz2=None,array2=a2,
-                                          lmax=l_max) # 7924 for act alone, 3924 for act_planck
+                                          lmax=l_max,
+                                          ptsz=ptsz) # 7924 for act alone, 3924 for act_planck
 
             pow = pow/ells/(ells+1)*2.*np.pi
             bpow = np.einsum('...k,...k',ibbl,pow)
@@ -570,7 +581,7 @@ class ForegroundPowers(ArraySED):
 
 
 
-    def get_theory_bandpassed(self,coadd_data,ells,bbl,dltt,dlte,dlee,params,lmax=6000,lkl_setup = None):
+    def get_theory_bandpassed(self,coadd_data,ells,bbl,dltt,dlte,dlee,params,lmax=6000,lkl_setup = None,ptsz = None):
         dim = lkl_setup.sp.n_bins*lkl_setup.sp.n_specs
         assert len(self.cache['CIB'])==0
 
@@ -592,7 +603,7 @@ class ForegroundPowers(ArraySED):
                 c1 = params[f'cal_{band1}']
                 c2 = params[f'cal_{band2}']
 
-                cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dltt,spec,params,lkl_setup) * c1 * c2
+                cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dltt,spec,params,lkl_setup,ptsz) * c1 * c2
             # exit(0)
         else:
 
@@ -606,7 +617,7 @@ class ForegroundPowers(ArraySED):
                     c1 = params[f'cal_{band1}']
                     c2 = params[f'cal_{band2}']
 
-                    cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dltt,spec,params,lkl_setup) * c1 * c2
+                    cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dltt,spec,params,lkl_setup,ptsz) * c1 * c2
 
                 elif i>=3 and i<=6:
                     spec = 'TE'
@@ -616,7 +627,7 @@ class ForegroundPowers(ArraySED):
                     c2 = params[f'cal_{band2}']
                     y = params[f'yp_{band2}']
 
-                    cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dlte,spec,params,lkl_setup) * c1 * c2 * y
+                    cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dlte,spec,params,lkl_setup,ptsz) * c1 * c2 * y
 
                 else:
                     spec = 'EE'
@@ -627,14 +638,14 @@ class ForegroundPowers(ArraySED):
                     y1 = params[f'yp_{band1}']
                     y2 = params[f'yp_{band2}']
 
-                    cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dlee,spec,params,lkl_setup) * c1 * c2 * y1 * y2
+                    cls[sel] = self.get_coadd_power(coadd_data[spec][(band1,band2)],bbl[i],ells,dlee,spec,params,lkl_setup,ptsz) * c1 * c2 * y1 * y2
 
 
 
         self.cache['CIB'] = {}
         return cls
 
-    def get_theory_bandpassed_comp(self,coadd_data,ells,bbl,dltt,dlte,dlee,params,lmax=6000,lkl_setup = None,comp=None):
+    def get_theory_bandpassed_comp(self,coadd_data,ells,bbl,dltt,dlte,dlee,params,lmax=6000,lkl_setup = None,comp=None,ptsz=None):
 
         assert len(self.cache['CIB'])==0
 
@@ -660,7 +671,7 @@ class ForegroundPowers(ArraySED):
                 c1 = params[f'cal_{band1}']
                 c2 = params[f'cal_{band2}']
 
-                cls[sel] = self.get_coadd_power_comp(coadd_data[spec][(band1,band2)],bbl[i],ells,dltt,spec,params,lkl_setup,comp) * c1 * c2
+                cls[sel] = self.get_coadd_power_comp(coadd_data[spec][(band1,band2)],bbl[i],ells,dltt,spec,params,lkl_setup,comp,ptsz) * c1 * c2
             # exit(0)
         else:
             cls = np.zeros((520,))
@@ -674,7 +685,7 @@ class ForegroundPowers(ArraySED):
                     c1 = params[f'cal_{band1}']
                     c2 = params[f'cal_{band2}']
 
-                    cls[sel] = self.get_coadd_power_comp(coadd_data[spec][(band1,band2)],bbl[i],ells,dltt,spec,params,lkl_setup,comp) * c1 * c2
+                    cls[sel] = self.get_coadd_power_comp(coadd_data[spec][(band1,band2)],bbl[i],ells,dltt,spec,params,lkl_setup,comp,ptsz) * c1 * c2
 
                 elif i>=3 and i<=6:
                     spec = 'TE'
@@ -684,7 +695,7 @@ class ForegroundPowers(ArraySED):
                     c2 = params[f'cal_{band2}']
                     y = params[f'yp_{band2}']
 
-                    cls[sel] = self.get_coadd_power_comp(coadd_data[spec][(band1,band2)],bbl[i],ells,dlte,spec,params,lkl_setup,comp) * c1 * c2 * y
+                    cls[sel] = self.get_coadd_power_comp(coadd_data[spec][(band1,band2)],bbl[i],ells,dlte,spec,params,lkl_setup,comp,ptsz) * c1 * c2 * y
 
                 else:
                     spec = 'EE'
@@ -695,7 +706,7 @@ class ForegroundPowers(ArraySED):
                     y1 = params[f'yp_{band1}']
                     y2 = params[f'yp_{band2}']
 
-                    cls[sel] = self.get_coadd_power_comp(coadd_data[spec][(band1,band2)],bbl[i],ells,dlee,spec,params,lkl_setup,comp) * c1 * c2 * y1 * y2
+                    cls[sel] = self.get_coadd_power_comp(coadd_data[spec][(band1,band2)],bbl[i],ells,dlee,spec,params,lkl_setup,comp,ptsz) * c1 * c2 * y1 * y2
 
 
 

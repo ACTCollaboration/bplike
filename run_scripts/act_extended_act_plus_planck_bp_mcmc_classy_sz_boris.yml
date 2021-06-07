@@ -11,6 +11,7 @@ likelihood:
     #path: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/
     stop_at_error: False
     bandpass: True
+    use_classy_sz_tsz : 'yes'
     # Optional line to do some debugging with an input theory curve
     #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
     # theory_debug: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/data/bplike_data/cls_model.txt # boris's debug
@@ -20,6 +21,7 @@ likelihood:
   bplike.act15_act_TT_plus_planck_TT:
     stop_at_error: False
     bandpass: True
+    use_classy_sz_tsz : 'yes'
     # Optional line to do some debugging with an input theory curve
     #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
     # theory_debug: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/data/bplike_data/cls_model.txt # boris's debug
@@ -406,11 +408,36 @@ theory:
       # k_step_sub : 0.015
       # k_step_super : 0.0001
       # k_step_super_reduction : 0.1
+      output : 'tSZ_1h'
+      units for tSZ spectrum : 'dimensionless'
+      component of tSZ power spectrum : 'total'
+      # write sz results to files : 'no'
+      mass function : 'M500'
+      integrate_wrt_m500c : 1
+      pressure profile : 'A10'
+      multipoles_sz : 'ell_mock'
+      ell_min_mock : 1.
+      ell_max_mock : 1e4
+      dlogell : 0.1
+      B : 1.25
+      nlSZ : 18
+
+      M1SZ : 1e11
+      M2SZ : 1e16
+
+      z1SZ : 1e-5
+      z2SZ : 4.
+      z_max_pk : 4.
+
+      non linear: 'halofit'
+      k_per_decade_class_sz : 20.
+      k_min_for_pk_class_sz : 1e-3
+      k_max_for_pk_class_sz : 1e1
 
       perturbations_verbose: 0
       thermodynamics_verbose: 0
       background_verbose: 0
-      sz_verbose: 1
+      sz_verbose: 0
       # harmonic_verbose: 0
       # fourier_verbose : 0
       # input_verbose : 0
@@ -491,5 +518,5 @@ sampler:
   #   covmat: 'data/ACTPol_b5_new_cosmomc_theta2.covmat'
 
 
-output: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/chains/act_extended_act_plus_planck_bp_mcmc_classy_test
+output: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/chains/act_extended_act_plus_planck_bp_mcmc_classy_sz_test
 resume: True
