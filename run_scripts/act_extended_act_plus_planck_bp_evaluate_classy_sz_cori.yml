@@ -410,10 +410,11 @@ theory:
       perturbations_verbose: 0
       thermodynamics_verbose: 0
       background_verbose: 0
-      harmonic_verbose: 0
-      fourier_verbose : 0
-      input_verbose : 0
-      lensing_verbose : 0
+      sz_verbose: 1
+      # harmonic_verbose: 0
+      # fourier_verbose : 0
+      # input_verbose : 0
+      # lensing_verbose : 0
       # The base model features two massless
       # and one massive neutrino with m=0.06eV.
       # The settings below ensures that Neff=3.046
