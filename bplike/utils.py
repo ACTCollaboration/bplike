@@ -7,32 +7,16 @@ from scipy.interpolate import interp1d
 from pkg_resources import resource_filename
 from .config import *
 
-# fgroot = os.path.dirname(os.path.abspath(__file__)) +  f"/data/actpol_2f_full_s1316_2flux_fin/data/Fg/"
-
 save_coadd_data = False
 save_coadd_data_extended = False
-# save_theory_data_spectra = False
-
-fgroot = resource_filename("bplike","data/actpolfull_dr4.01/data/Fg/")
-
-# run with:
-# $ cobaya-run run_scripts/act_extended_act_plus_planck.yml -f
-
-
-dfroot = resource_filename("bplike","data/actpolfull_dr4.01/data/data_act/")
-
-# dfroot_coadd_w = resource_filename("bplike","data")+"/bplike_data/big_coadd_weights/200226/"
-# dfroot_coadd_d = resource_filename("bplike","data")+"/bplike_data/coadd_data/"
-# dfroot_fg = resource_filename("bplike","data")+"/actpolfull_dr4.01/data/Fg/"
-# dfroot_bpass = resource_filename("bplike","data")+"/bplike_data/bpass/"
-
 
 dfroot = path_to_data+"/actpolfull_dr4.01/data/data_act/"
-
 dfroot_coadd_w = path_to_data+"/bplike_data/big_coadd_weights/200226/"
 dfroot_coadd_d = path_to_data+"/bplike_data/coadd_data/"
 dfroot_fg = path_to_data+"/actpolfull_dr4.01/data/Fg/"
 dfroot_bpass = path_to_data+"/bplike_data/bpass/"
+fgroot = dfroot_fg
+
 
 sz_temp_file = dfroot_fg+"cl_tsz_150_bat.dat"
 sz_x_cib_temp_file = dfroot_fg+"sz_x_cib_template.dat"

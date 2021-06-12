@@ -117,7 +117,7 @@ class ForegroundPowers(ArraySED):
                     new_f2 = np.zeros(lmax)
                     new_f2[:f2_cib.size] = f2_cib
                     f2_cib = new_f2
-                    new_f2[f2_tsz.size:] = np.repeat(f2_cib[f2_cib.size-1], lmax-f2_cib.size)
+                    new_f2[f2_cib.size:] = np.repeat(f2_cib[f2_cib.size-1], lmax-f2_cib.size)
                 if (f1_cib.size<lmax):
                     new_f1 = np.zeros(lmax)
                     new_f1[:f1_cib.size] = f1_cib
@@ -308,10 +308,8 @@ class ForegroundPowers(ArraySED):
             print('use_act_planck :', lkl_setup.use_act_planck)
             exit(0)
             # dls = np.zeros((28,3924))
-            dls = np.zeros((28,7924))
+            dls = np.zeros((28,lkl_setup.sp.l_max))
             for i in range(28):
-                # band1 = {0:'090',1:'100',2:'143',3:'150',4:'217',5:'353',6:'545'}[i]
-                # band2 = {0:'090',1:'100',2:'143',3:'150',4:'217',5:'353',6:'545'}[i]
                 band1 = lkl_setup.sp.fband1[i]
                 band2 = lkl_setup.sp.fband2[i]
                 c1 = params[f'cal_{band1}']
@@ -323,7 +321,7 @@ class ForegroundPowers(ArraySED):
                 # print('dls 0-10',dls[0:10])
             return bin_func(dls/ells/(ells+1.)*2.*np.pi)
         else:
-            dls = np.zeros((10,7924))
+            dls = np.zeros((10,lkl_setup.sp.l_max))
             for i in range(10):
                 if i<3:
                     band1 = {0:'95',1:'95',2:'150'}[i]
@@ -368,10 +366,8 @@ class ForegroundPowers(ArraySED):
         if lkl_setup.use_act_planck == 'yes':
             # print('use_act_planck :', lkl_setup.use_act_planck)
             # dls = np.zeros((28,3924))
-            dls = np.zeros((28,7924))
+            dls = np.zeros((28,lkl_setup.sp.l_max))
             for i in range(28):
-                # band1 = {0:'090',1:'100',2:'143',3:'150',4:'217',5:'353',6:'545'}[i]
-                # band2 = {0:'090',1:'100',2:'143',3:'150',4:'217',5:'353',6:'545'}[i]
                 band1 = lkl_setup.sp.fband1[i]
                 band2 = lkl_setup.sp.fband2[i]
                 c1 = params[f'cal_{band1}']
@@ -381,7 +377,7 @@ class ForegroundPowers(ArraySED):
                 # print('dls 0-10',dls[0:10])
             return bin_func(dls/ells/(ells+1.)*2.*np.pi)
         else:
-            dls = np.zeros((10,7924))
+            dls = np.zeros((10,lkl_setup.sp.l_max))
             for i in range(10):
                 if i<3:
                     band1 = {0:'95',1:'95',2:'150'}[i]
@@ -421,7 +417,7 @@ class ForegroundPowers(ArraySED):
         if lkl_setup.use_act_planck == 'yes':
             # print('use_act_planck :', lkl_setup.use_act_planck)
             # dls = np.zeros((28,3924))
-            dls = np.zeros((28,7924))
+            dls = np.zeros((28,lkl_setup.sp.l_max))
             for i in range(28):
                 # band1 = {0:'090',1:'100',2:'143',3:'150',4:'217',5:'353',6:'545'}[i]
                 # band2 = {0:'090',1:'100',2:'143',3:'150',4:'217',5:'353',6:'545'}[i]
@@ -445,7 +441,7 @@ class ForegroundPowers(ArraySED):
             # exit(0)
             return bin_func(dls/ells/(ells+1.)*2.*np.pi)
         else:
-            dls = np.zeros((10,7924))
+            dls = np.zeros((10,lkl_setup.sp.l_max))
             for i in range(10):
                 if i<3:
                     band1 = {0:'95',1:'95',2:'150'}[i]
@@ -494,16 +490,8 @@ class ForegroundPowers(ArraySED):
     def get_coadd_power(self,cdata,ibbl,ells,dl,spec,fparams,lkl_setup = None,ptsz=None):
 
         icov,icov_ibin,Pmat,arrays = cdata
-        # print(dl.size)
-        # exit(0)
 
-
-        # if lkl_setup.use_act_planck == 'yes':
-        #     # l_max = 3924 #!ell max of the full window functions
-        #     l_max = 7924 #!ell max of the full window functions
-        # else:
-        #     l_max = 7924 #!ell max of the full window functions
-        l_max = 7924
+        l_max = lkl_setup.sp.l_max
 
         ps = []
         for row in arrays:
@@ -530,13 +518,7 @@ class ForegroundPowers(ArraySED):
 
         icov,icov_ibin,Pmat,arrays = cdata
 
-
-        if lkl_setup.use_act_planck == 'yes':
-            # l_max = 3924  #!ell max of the full window functions
-            l_max = 7924  #!ell max of the full window functions
-        else:
-            l_max = 7924  #!ell max of the full window functions
-
+        l_max = lkl_setup.sp.l_max
 
         ps = []
         for row in arrays:

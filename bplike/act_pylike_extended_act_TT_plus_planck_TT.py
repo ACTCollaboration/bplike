@@ -69,7 +69,7 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
               # "yp_545"
               ]
         # self.l_max = 3924
-        self.l_max = 7924
+        self.l_max = self.l_max_data
         # self.l_max = 6051
         self.fparams = config_from_yaml('params_extended.yml')['fixed']
         self.aparams = config_from_yaml('params_extended.yml')['act_like']
@@ -158,9 +158,11 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
     def prepare_data(self, verbose=False):
         str_current = '[bplike prepare_data] '
         flux = self.flux
-        # data_root = path_to_data + '/act_planck_data_210328/'
-        data_root = path_to_data + '/act_planck_data_210610/'
-        self.sp = StevePower_extended(data_root,self.flux)
+        if self.l_max_data == 7924:
+            data_root = path_to_data + '/act_planck_data_210610/'
+        else:
+            data_root = path_to_data + '/act_planck_data_210328/'
+        self.sp = StevePower_extended(data_root,self.flux,l_max_data = self.l_max_data)
     # exit(0)
         if self.bandpass:
             self.coadd_data = {}

@@ -1,5 +1,4 @@
 import numpy as np
-#from cobaya.conventions import _path_install
 from cobaya.log import LoggedError
 from cobaya.tools import are_different_params_lists
 from cobaya.likelihoods.base_classes import InstallableLikelihood
@@ -8,8 +7,6 @@ from .config import *
 from .utils import *
 from .fg import *
 from .stevepower import *
-# import utils
-# import fg
 from soapack import interfaces as sints
 from pkg_resources import resource_filename
 
@@ -22,11 +19,6 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
 
 
     def initialize(self):
-        # print('initializing')
-        # exit(0)
-
-        # self.l_max = 3826
-        # self.l_max = 6000
 
         self.log.info("Initialising.")
         self.expected_params = [
@@ -48,10 +40,7 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
             "a_g_ee_100", # EE Galactic dust at ell=500
             "a_s_te", # TE Synchrotron at ell=500
             "a_s_ee"] # EE Synchrotron at ell=500
-        # "cal_95",
-        # "cal_150",
-        # "yp_95",
-        # "yp_150"]
+
         self.cal_yp_act_only =[
             "cal_95",
             "cal_150",
@@ -75,13 +64,7 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
               "cal_545"#,
               # "yp_545"
               ]
-        # file = resource_filename("bplike","act_pylike_extended_full.yaml")
-        # with open(file) as f:
-        #     act_pylike_extended_full = yaml.load(f, Loader=yaml.FullLoader)
-        # print('act_pylike_extended_full')
-        # print(act_pylike_extended_full)
-        # exit(0)
-        # Load path_params from yaml file
+
         if self.use_act_planck == 'no':
             # self.l_max = 6000
             self.l_max = 6051
@@ -91,33 +74,6 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
             # for the act only lkl:
 
             cal_yp =  self.cal_yp_act_only
-            # for s in self.cal_yp_act_plus_planck:
-            #     if s not in self.cal_yp_act_only:
-            #         act_pylike_extended_full['params'].pop(s,None)
-            # print('act_pylike_extended_full act only')
-            # print(act_pylike_extended_full)
-
-        elif self.use_act_planck == 'yes':
-            self.l_max = 3924
-            # self.l_max = 6051
-            self.fparams = config_from_yaml('params_extended.yml')['fixed']
-            self.aparams = config_from_yaml('params_extended.yml')['act_like']
-            self.bpmodes = config_from_yaml('params_extended.yml')['bpass_modes']
-            # for the act+planck lkl:
-
-            cal_yp = self.cal_yp_act_plus_planck
-            # for s in self.cal_yp_act_only:
-            #     if s not in self.cal_yp_act_plus_planck:
-            #         act_pylike_extended_full['params'].pop(s,None)
-            # print('act_pylike_extended_full act+planck')
-            # print(act_pylike_extended_full)
-        # new_file = file.replace('_full', '')
-        # print('new_file')
-        # print(new_file)
-        # with open(new_file, 'w') as f:
-        #     yaml.dump(act_pylike_extended_full, f)
-        # # exit(0)
-
 
 
 
@@ -130,16 +86,6 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
         # Read data
         # print('preparing data')
         self.prepare_data()
-
-        # State requisites to the theory code
-        # if self.use_act_planck == 'yes':
-        #     self.requested_cls = ["tt"]
-        # else:
-        #     self.requested_cls = ["tt", "te", "ee"]
-
-
-
-
 
 
         self.cal_params = []
@@ -168,21 +114,6 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
             new_l = [s for s in l if s not in l_pop_cal_yp ]
             self.input_params = new_l
 
-
-            # self.input_params.remove('cal_95','yp_95')
-
-        # print('expected params: ',self.expected_params)
-        # print('input params: ',self.input_params)
-
-        # differences = are_different_params_lists(
-        #     self.input_params, self.expected_params,
-        #     name_A="given", name_B="expected")
-        # if differences:
-        #     # self.input_params = self.expected_params
-        #     raise LoggedError(
-        #         self.log, "Configuration error in parameters: %r.",
-        #         differences)
-
     def get_requirements(self):
         l_max = 5000
         # l_max = self.l_max
@@ -194,20 +125,11 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
         return reqs
 
     def logp(self, **params_values):
-        # return 0
-        # print('doing logp')
-
         cl = self.theory.get_Cl(ell_factor=True)
         # print("cl's: ",cl)
         return self.loglike(cl, **params_values)
 
     def loglike(self, cl, **params_values):
-        # print('params:',params_values)
-        # print('##############')
-        # print(' ')
-
-        # print('doing loglike')
-        # print('cls 0:10:', cl['tt'][:10] )
         comps = ['tot','primary','tsz','ksz','cibc','cibp','tsz_x_cib','radio','galdust','galsyn']
 
 
@@ -215,18 +137,7 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
         ps = self._get_power_spectra(cl, lkl_setup = self, **params_values)
         # print('loglike done getting power spectra')
         ps_vec = ps['tot']
-        # ps_vec = ps['primary']
-        # print('model')
-        # for idb in range(52):
-        #     print(idb,ps_vec[:52][idb])
-        # print('data')
 
-
-        # ps_vec_galdust = ps['galdust']
-        # ps_vec_primary = ps['primary']
-        # print('shape ls: ',np.shape(self.sp.ls))
-        # print('shape ps_vec : ', np.shape(ps_vec))
-        # print('shape self.sp.spec : ', np.shape(self.sp.spec))
         n_bins = self.sp.n_bins
         if self.bandpass:
             bps = '_bp_'
@@ -252,12 +163,8 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
 
 
         elif self.use_act_planck == 'no':
-            # print('ps_vec : ', ps_vec[:n_bins])
-            # print('self.sp.spec : ', self.sp.spec[:n_bins])
             dls_theory = ps_vec.copy()
             ls_theory = self.sp.ls
-
-            # print('len ls ps:',len(ls_theory),len(dls_theory))
 
             # add T to P leakage Eq. 26-27 of choi et al https://arxiv.org/pdf/2007.07289.pdf
             # T95E95
@@ -312,37 +219,11 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
                                     + dls_theory[ids_leak_TT]*params_values['leak_95']*self.sp.leak_95[:]*params_values['leak_150']*self.sp.leak_150[:]
 
 
-
-
-            # print(ids_leak)
-            #
-            # exit(0)
-
-            # ps_vec - dls_theory)
-
-
-            # delta = self.sp.spec - ps_vec
             delta = self.sp.spec - dls_theory
             if self.save_theory_data_spectra:
                 np.save(path_to_output+'/ls_theory_'+self.flux+bps+'act_only_'+self.root_theory_data_spectra+'.npy',ls_theory)
                 for comp in comps:
                     np.save(path_to_output+'/dls_theory_'+comp+'_'+self.flux+bps+'act_only_'+self.root_theory_data_spectra+'.npy',ps[comp]*fac)
-
-
-            # np.save(path_to_output+'/dls_theory_galdust_'+self.flux+bps+'act_only.npy',ps_vec_galdust*fac)
-            # np.save(path_to_output+'/dls_theory_primary_'+self.flux+bps+'act_only.npy',ps_vec_primary*fac)
-        if do_chi2_breakdown:
-            for j in self.sp.n_specs:
-                print('spec : ', self.sp.fband1[j],self.sp.fband2[j])
-                cov_dl = self.sp.cov[j*self.sp.n_bins:(j+1)*self.sp.n_bins,j*self.sp.n_bins:(j+1)*self.sp.n_bins]
-                inv_covmat = np.linalg.inv(cov_dl)
-                difference = data-theory/fac
-                chi2 =  np.dot(difference, np.dot(inv_covmat, difference))
-                print('chi2 : %.5e'%chi2)
-        #
-        # for idb in range(520):
-        #     print("%s %s %d\t%.10e\t%.10e\t%.10e\t%.10e"%(self.sp.rfband1[idb],self.sp.rfband2[idb],idb+1,self.sp.cinv[idb,idb],delta[idb],self.sp.spec[idb],dls_theory[idb]))
-        # # exit(0)
 
 
         logp = -0.5 * np.dot(delta,np.dot(self.sp.cinv,delta))
@@ -355,204 +236,52 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
     def prepare_data(self, verbose=False):
         str_current = '[bplike prepare_data] '
         flux = self.flux
-        # exit(0)
-        # self.sp = StevePower("data/actpol_2f_full_s1316_2flux_fin/data/data_act/ps_200519/",self.flux)
-        if self.use_act_planck == 'no':
-            data_root = dfroot
-            print(str_current+'Collecting power spectra from %s and with flux %s'%(data_root,self.flux))
-            self.sp = StevePower(data_root,self.flux)
-            if self.bandpass:
-                # print('doing bandpasses')
-                sbands = { 'TT':[('95','95'),('95','150'),('150','150')],
-                           'TE':[('95','95'),('95','150'),('150','95'),('150','150')],
-                           'EE':[('95','95'),('95','150'),('150','150')] }
-                self.coadd_data = {}
-                for spec in ['TT','TE','EE']:
-                    self.coadd_data[spec] = {}
-                    for bands in sbands[spec]:
-                        band1,band2 = bands
-                        self.coadd_data[spec][bands] = load_coadd_matrix(spec,band1,band2,
-                                                                         self.flux,f"{dfroot_coadd_d}coadds_20200305")
+        data_root = dfroot
+        print(str_current+'Collecting power spectra from %s and with flux %s'%(data_root,self.flux))
+        self.sp = StevePower(data_root,self.flux,l_max_data = self.l_max_data)
+        if self.bandpass:
+            # print('doing bandpasses')
+            sbands = { 'TT':[('95','95'),('95','150'),('150','150')],
+                       'TE':[('95','95'),('95','150'),('150','95'),('150','150')],
+                       'EE':[('95','95'),('95','150'),('150','150')] }
+            self.coadd_data = {}
+            for spec in ['TT','TE','EE']:
+                self.coadd_data[spec] = {}
+                for bands in sbands[spec]:
+                    band1,band2 = bands
+                    self.coadd_data[spec][bands] = load_coadd_matrix(spec,band1,band2,
+                                                                     self.flux,f"{dfroot_coadd_d}coadds_20200305")
 
-                dm = sints.ACTmr3()
-                beam_dict = {}
-                bp_dict = {}
-                cfreq_dict = {}
-                cfreqs = {'pa1_f150':148.9,'pa2_f150':149.1,'pa3_f150':146.6,'pa3_f090':97.1}
+            dm = sints.ACTmr3()
+            beam_dict = {}
+            bp_dict = {}
+            cfreq_dict = {}
+            cfreqs = {'pa1_f150':148.9,'pa2_f150':149.1,'pa3_f150':146.6,'pa3_f090':97.1}
 
-                if flux=='15mJy':
-                    anames = [f'd56_0{i}' for i in range(1,7)]
-                elif flux=='100mJy':
-                    anames = [f'boss_0{i}' for i in range(1,5)] +  [f's16_0{i}' for i in range(1,4)]
-                else:
-                    raise ValueError
-                # print('anames:',anames)
-
-                pnames = []
-                # print('loop over anames:',anames)
-                for aname in anames:
-                    season,array,freq,patch = sints.arrays(aname,'season'),sints.arrays(aname,'array'),sints.arrays(aname,'freq'),sints.arrays(aname,'region')
-                    pname = '_'.join([season,array,freq])
-                    pnames.append(pname)
-                    beam_dict[pname] = dm.get_beam_fname(season,patch,array+"_"+freq, version=None)
-                    bp_dict[pname] = dfroot_bpass+dm.get_bandpass_file_name(array+"_"+freq)
-                    cfreq_dict[pname] = cfreqs[array + "_" + freq]
-                    # print('freq:',freq)
-                    # print('bp files:',bp_dict[pname])
-                    # print('beam files:',beam_dict[pname])
-                # print('cfreq_dict:',cfreq_dict )
-                # print('beam_dict:',beam_dict )
-                # print('bp/beam files loaded')
-                # print('###################')
-                # print('###################')
-                # print('###################')
-                # exit(0)
-                #exit(0)
+            if flux=='15mJy':
+                anames = [f'd56_0{i}' for i in range(1,7)]
+            elif flux=='100mJy':
+                anames = [f'boss_0{i}' for i in range(1,5)] +  [f's16_0{i}' for i in range(1,4)]
             else:
-                print(str_current+'Not using bandpass - set in the param file if you want to include these.')
-                pnames = None
-                bp_dict = None
-                beam_dict = None
-                cfreq_dict = None
+                raise ValueError
+            # print('anames:',anames)
+
+            pnames = []
+            # print('loop over anames:',anames)
+            for aname in anames:
+                season,array,freq,patch = sints.arrays(aname,'season'),sints.arrays(aname,'array'),sints.arrays(aname,'freq'),sints.arrays(aname,'region')
+                pname = '_'.join([season,array,freq])
+                pnames.append(pname)
+                beam_dict[pname] = dm.get_beam_fname(season,patch,array+"_"+freq, version=None)
+                bp_dict[pname] = dfroot_bpass+dm.get_bandpass_file_name(array+"_"+freq)
+                cfreq_dict[pname] = cfreqs[array + "_" + freq]
+
         else:
-            data_root = path_to_data + '/act_planck_data_210328/'
-            # print(str_current+'Collecting power spectra from %s and with flux %s'%(data_root,self.flux))
-            self.sp = StevePower_extended(data_root,self.flux)
-        # exit(0)
-            if self.bandpass:
-                # print(' ')
-                # print(' ')
-                # print(' ')
-                # print('doing bandpasses')
-                # sbands = { 'TT':[('95','95'),('95','150'),('150','150')],
-                #            'TE':[('95','95'),('95','150'),('150','95'),('150','150')],
-                #            'EE':[('95','95'),('95','150'),('150','150')] }
-                self.coadd_data = {}
-                for spec in ['TT']:
-                    self.coadd_data[spec] = {}
-                    # for bands in sbands[spec]:
-                    # print('looping over %d spectra'%self.sp.n_specs)
-                    for i in range(self.sp.n_specs):
-                        # band1,band2 = bands
-                        band1 = self.sp.fband1[i]
-                        band2 = self.sp.fband2[i]
-                        # print('spec:',spec)
-
-                        # print('dfroot_coadd_d:',dfroot_coadd_d)
-                        # print()
-                        bands = (band1,band2)
-                        # print('bands:',band1,band2)
-                        data_root = path_to_data + '/act_planck_data_210328/'
-                        if flux=='15mJy':
-                            reg = 'deep56'
-                        elif flux=='100mJy':
-                            reg = 'boss'
-                        self.coadd_data[spec][bands] = load_coadd_matrix(spec,band1,band2,
-                                                                  self.flux,f"{data_root}{reg}")
-                # exit(0)
-
-                # print('coadds matrix loaded')
-                dm = sints.ACTmr3() # data model ACT
-
-                beam_dict = {}
-                bp_dict = {}
-                cfreq_dict = {}
-                cfreqs = {'pa1_f150':148.9,
-                          'pa2_f150':149.1,
-                          'pa3_f150':146.6,
-                          'pa3_f090':97.1,
-                          'pa0_f100':100.1,
-                          'pa0_f143':143.1,
-                          'pa0_f217':217.1,
-                          'pa0_f353':353.1,
-                          'pa0_f545':545.1,
-                          }
-
-                if flux=='15mJy':
-                    anames = [f'd56_0{i}' for i in range(1,7)]
-                elif flux=='100mJy':
-                    anames = [f'boss_0{i}' for i in range(1,5)] +  [f's16_0{i}' for i in range(1,4)]
-                else:
-                    raise ValueError
-                # print(anames)
-                # exit(0)
-
-                pnames = []
-                for aname in anames:
-                    # print('aname:',aname)
-
-                    season,array,freq,patch = sints.arrays(aname,'season'),sints.arrays(aname,'array'),sints.arrays(aname,'freq'),sints.arrays(aname,'region')
-                    # print('season:',season)
-                    # print('patch:',patch)
-                    # print('freq:',freq)
-                    pname = '_'.join([season,array,freq])
-                    pnames.append(pname)
-                    # print('pname:',pnames)
-                    beam_dict[pname] = dm.get_beam_fname(season,patch,array+"_"+freq, version=None)
-                    # print('beam_dict[pname]:',beam_dict[pname])
-
-                    bp_dict[pname] = dfroot_bpass+dm.get_bandpass_file_name(array+"_"+freq)
-                    # print('bp_dict[pname]:',bp_dict[pname])
-                    #col0: freq in GHz
-                    #col1: 90 GHz response
-                    #col2: 1-sigma error
-                    cfreq_dict[pname] = cfreqs[array + "_" + freq]
-                # print('  ')
-                # print('  ')
-                # print('doing planck part:')
-                data_root = path_to_data + '/act_planck_data_210328/'
-                bp_dict['s12_pa0_f100'] = data_root + 'HFI_BANDPASS_F100_reformat.txt'
-                pnames.append('s12_pa0_f100')
-                bp_dict['s12_pa0_f143'] = data_root + 'HFI_BANDPASS_F143_reformat.txt'
-                pnames.append('s12_pa0_f143')
-                bp_dict['s12_pa0_f217'] = data_root + 'HFI_BANDPASS_F217_reformat.txt'
-                pnames.append('s12_pa0_f217')
-                bp_dict['s12_pa0_f353'] = data_root + 'HFI_BANDPASS_F353_reformat.txt'
-                pnames.append('s12_pa0_f353')
-                bp_dict['s12_pa0_f545'] = data_root + 'HFI_BANDPASS_F545_reformat.txt'
-                pnames.append('s12_pa0_f545')
-
-                # beam_dict['s12_pa0_f100'] = data_root + 'HFI_BEAM_F100.txt'
-                # beam_dict['s12_pa0_f143'] = data_root + 'HFI_BEAM_F143.txt'
-                # beam_dict['s12_pa0_f217'] = data_root + 'HFI_BEAM_F217.txt'
-                # beam_dict['s12_pa0_f353'] = data_root + 'HFI_BEAM_F353.txt'
-                # beam_dict['s12_pa0_f545'] = data_root + 'HFI_BEAM_F545.txt'
-
-
-
-
-                beam_dict['s12_pa0_f100'] = data_root + 'HFI_BEAM_resave_210414_F100.txt'
-                beam_dict['s12_pa0_f143'] = data_root + 'HFI_BEAM_resave_210414_F143.txt'
-                beam_dict['s12_pa0_f217'] = data_root + 'HFI_BEAM_resave_210414_F217.txt'
-                beam_dict['s12_pa0_f353'] = data_root + 'HFI_BEAM_resave_210414_F353.txt'
-                beam_dict['s12_pa0_f545'] = data_root + 'HFI_BEAM_resave_210414_F545.txt'
-
-                cfreq_dict['s12_pa0_f100'] =cfreqs['pa0_f100']
-                cfreq_dict['s12_pa0_f143'] =cfreqs['pa0_f143']
-                cfreq_dict['s12_pa0_f217'] =cfreqs['pa0_f217']
-                cfreq_dict['s12_pa0_f353'] =cfreqs['pa0_f353']
-                cfreq_dict['s12_pa0_f545'] =cfreqs['pa0_f545']
-                # print('  ')
-                # print('  ')
-                # print('beam_dict:',beam_dict)
-                # print('bp_dict:',bp_dict)
-                # print('cfreq_dict:',cfreq_dict)
-
-                # exit(0)
-            else:
-                print(str_current+'Not using bandpass - set in the param file if you want to include these.')
-                pnames = None
-                bp_dict = None
-                beam_dict = None
-                cfreq_dict = None
-
-        # print(str_current+'frequencies: ')
-        # print('getting foreground power with cfrq: ', cfreq_dict)
-        # print('bp_dict: ', bp_dict)
-        # print('beam_dict: ', beam_dict)
-        # print('flux:',self.flux)
-        # print('pnammes:',pnames)
-        # exit(0)
+            print(str_current+'Not using bandpass - set in the param file if you want to include these.')
+            pnames = None
+            bp_dict = None
+            beam_dict = None
+            cfreq_dict = None
 
         self.fgpower = ForegroundPowers(self.fparams,self.sp.ells,
                                             sz_temp_file,
@@ -565,11 +294,6 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
                                             cfreq_dict=cfreq_dict,
                                             lkl_setup = self)
 
-        # print('foreground power loaded')
-        # print('###################')
-        # print('###################')
-        # print('###################')
-        # exit(0)
 
     def _get_power_spectra(self, cl, lkl_setup = None, **params_values):
         # print('getting power spectra')
@@ -580,21 +304,10 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
             print('[debug] theory debug:',self.theory_debug)
             # ells,cltt,clee,clte = np.loadtxt(self.theory_debug,usecols=[0,1,2,4],unpack=True) # mat's debig
             ells,cltt,clte,clee = np.loadtxt(self.theory_debug,usecols=[0,1,2,3],unpack=True) # boris's debug
-            # print('ell0,ell1:',ells[0],ells[1],ells[:self.l_max])
 
             assert ells[0] == 2
             assert ells[1] == 3
             cl = {}
-            # cl['ell'] = np.zeros(2+self.l_max+50)
-            # cl['tt'] = np.zeros(2+self.l_max+50)
-            # cl['te'] = np.zeros(2+self.l_max+50)
-            # cl['ee'] = np.zeros(2+self.l_max+50)
-            # cl['ell'][1] = 1
-            # cl['ell'][2:] = ells[:self.l_max+50]
-            # cl['tt'][2:] = cltt[:self.l_max+50]
-            # cl['te'][2:] = clte[:self.l_max+50]
-            # cl['ee'][2:] = clee[:self.l_max+50]
-            # 6051
             l_max = len(ells) + 2
 
             cl['ell'] = np.zeros(l_max)
@@ -608,44 +321,13 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
             cl['te'][l_min:] = clte[:l_max]
             cl['ee'][l_min:] = clee[:l_max]
 
-            # cl['ell'] = np.zeros(self.l_max)
-            # cl['tt'] = np.zeros(self.l_max)
-            # cl['te'] = np.zeros(self.l_max)
-            # cl['ee'] = np.zeros(self.l_max)
-            #
-            # cl['ell'][1] = 1
-            # cl['ell'][2:] = ells[2:self.l_max]
-            # cl['tt'][2:] = cltt[2:self.l_max]
-            # cl['te'][2:] = clte[2:self.l_max]
-            # cl['ee'][2:] = clee[2:self.l_max]
-            # cl['ell'] = np.zeros(6051)
-            # cl['tt'] = np.zeros(6051)
-            # cl['te'] = np.zeros(6051)
-            # cl['ee'] = np.zeros(6051)
-            # cl['ell'][1] = 1
-            # cl['ell'][2:] = ells[:6051]
-            # cl['tt'][2:] = cltt[:6051]
-            # cl['te'][2:] = clte[:6051]
-            # cl['ee'][2:] = clee[:6051]
-        # print('cl:',cl)
-        # save some cls to do debugging fun
-        # np.savetxt(path_to_output+'/cls_model.txt',np.c_[cl['ell'],cl['tt'],cl['te'],cl['ee']])
-        # exit(0)
-        # exit(0)
 
         fgdict =    {k: params_values[k] for k in self.expected_params}
         fgdict.update(self.fparams)
         nells_camb = cl['ell'].size
 
         nells = self.sp.ells.size
-        # print('nells_camb (dim of cl["ell"]): ', nells_camb)
-        # print('nells (dim of cl["ell"]): ', nells_camb)
-        # print('self.sp.ells.size: ', nells)
-        # exit(0)
-        # print('camb l0,l1: ',cl['ell'][0],cl['ell'][1])
-        # print('camb l-1,l-2: ',cl['ell'][-1],cl['ell'][-2])
-        # print('sp.ells l0,l1: ',self.sp.ells[0],self.sp.ells[1])
-        # print('sp.ells l-1,l-2: ',self.sp.ells[-1],self.sp.ells[-2])
+
         assert cl['ell'][0]==0
         assert cl['ell'][1]==1
         assert self.sp.ells[0]==l_min
@@ -654,28 +336,10 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
         pte = np.zeros(nells+l_min)
         pee = np.zeros(nells+l_min)
 
+        ptt[l_min:nells_camb] = cl['tt'][l_min:len(ptt[l_min:nells_camb])+l_min]
+        pte[l_min:nells_camb] = cl['te'][l_min:len(ptt[l_min:nells_camb])+l_min]
+        pee[l_min:nells_camb] = cl['ee'][l_min:len(ptt[l_min:nells_camb])+l_min]
 
-        # ptt[l_min:nells_camb] = cl['tt'][l_min:]
-        # pte[l_min:nells_camb] = cl['te'][l_min:]
-        # pee[l_min:nells_camb] = cl['ee'][l_min:]
-
-        # ptt[l_min:nells_camb] = cl['tt'][l_min:nells_camb]
-        # pte[l_min:nells_camb] = cl['te'][l_min:nells_camb]
-        # pee[l_min:nells_camb] = cl['ee'][l_min:nells_camb]
-
-
-        # print('lencl["tt"][l_min:] :', len(cl['tt'][l_min:]))
-        # print('lenptt[l_min:nells_camb] :', len(ptt[l_min:nells_camb]))
-
-        # exit(0)
-        if lkl_setup.use_act_planck == 'no':
-            ptt[l_min:nells_camb] = cl['tt'][l_min:len(ptt[l_min:nells_camb])+l_min]
-            pte[l_min:nells_camb] = cl['te'][l_min:len(ptt[l_min:nells_camb])+l_min]
-            pee[l_min:nells_camb] = cl['ee'][l_min:len(ptt[l_min:nells_camb])+l_min]
-        elif lkl_setup.use_act_planck == 'yes':
-            ptt[l_min:nells_camb] = cl['tt'][l_min:len(ptt[l_min:nells_camb])+l_min]
-            pte[l_min:nells_camb] = cl['tt'][l_min:len(ptt[l_min:nells_camb])+l_min]
-            pee[l_min:nells_camb] = cl['tt'][l_min:len(ptt[l_min:nells_camb])+l_min]
         # print('starting get theory')
 
         comps = ['primary','tsz','ksz','cibc','cibp','tsz_x_cib','radio','galdust','galsyn']
@@ -709,75 +373,6 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
                                                             lmax=self.l_max,
                                                             lkl_setup = lkl_setup,
                                                             comp = comp)
-            # dim = lkl_setup.sp.n_bins*lkl_setup.sp.n_specs
-            # clsp = np.zeros((dim,))
-            # fgpow = []
-            # for i in range(lkl_setup.sp.n_specs):
-            #     fgpowp = get_theory_bandpassed_parallel(i,self.fgpower,
-            #                                                 self.coadd_data,
-            #                                                 self.sp.ells,
-            #                                                 self.sp.bbl,
-            #                                                 ptt[l_min:],
-            #                                                 pte[l_min:],
-            #                                                 pee[l_min:],
-            #                                                 fgdict,
-            #                                                 lmax=self.l_max,
-            #                                                 lkl_setup = lkl_setup)
-            #     fgpow.append(fgpowp)
-            #     print('fgpow:',np.shape(fgpowp),fgpowp)
-            #
-            #
-            # pool = multiprocessing.Pool()
-            # fgstructure = self.fgpower
-            # fn = functools.partial(get_theory_bandpassed_parallel_2,
-            #                        coadd_data = fgstructure)
-            #
-            # r = pool.map(fn,range(lkl_setup.sp.n_specs))
-            # pool.close()
-            # print('r:',r)
-            # exit(0)
-            # pool = multiprocessing.Pool()
-            # fn = functools.partial(get_theory_bandpassed_parallel,
-            #                        fgpower = self.fgpower,
-            #                        coadd_data = self.coadd_data,
-            #                        ells = self.sp.ells,
-            #                        bbl = self.sp.bbl,
-            #                        ptt = ptt[l_min:],
-            #                        pte = pte[l_min:],
-            #                        pee = pee[l_min:],
-            #                        fgdict = fgdict,
-            #                        lmax=self.l_max,
-            #                        lkl_setup = lkl_setup)
-            # r = pool.map(fn,range(lkl_setup.sp.n_specs))
-            # pool.close()
-            # print('r:',r)
-            # exit(0)
-            #
-            # for i in range(lkl_setup.sp.n_specs):
-            #     sel = np.s_[i*lkl_setup.sp.n_bins:(i+1)*lkl_setup.sp.n_bins]
-            #     clsp[sel] = fgpow[i][sel]
-            # fpower['tot'] = clsp
-            # print('fpower:',fpower)
-            # # exit(0)
-            #
-            # if self.theory_debug is not None:
-            #     print('[debug] time for tot: ', time.time() - start)
-            # for comp in comps:
-            #     if self.theory_debug is not None:
-            #         print('[debug] comp = ', comp)
-            #         start = time.time()
-            #     fpower[comp] = self.fgpower.get_theory_bandpassed_comp(self.coadd_data,
-            #                                             self.sp.ells,
-            #                                             self.sp.bbl,
-            #                                             ptt[l_min:],
-            #                                             pte[l_min:],
-            #                                             pee[l_min:],
-            #                                             fgdict,
-            #                                             lmax=self.l_max,
-            #                                             lkl_setup = lkl_setup,
-            #                                             comp = comp)
-            #     if self.theory_debug is not None:
-            #         print('[debug] time for comp: ', time.time() - start)
 
             return fpower
 
@@ -830,11 +425,3 @@ class act15_act_only_TTTEEE(act_pylike_extended_act_only_TTTEEE):
 class act100_act_only_TTTEEE(act_pylike_extended_act_only_TTTEEE):
     flux = '100mJy'
     use_act_planck = 'no'
-
-# class act15_act_TT_plus_planck_TT(act_pylike_extended):
-#     flux = '15mJy'
-#     use_act_planck = 'yes'
-#
-# class act100_act_TT_plus_planck_TT(act_pylike_extended):
-#     flux = '100mJy'
-#     use_act_planck = 'yes'

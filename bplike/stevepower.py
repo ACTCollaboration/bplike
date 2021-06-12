@@ -17,11 +17,12 @@ import functools
 
 
 class StevePower(object):
-    def __init__(self,froot,flux,infval=1e100,tt_lmin=600,tt_lmax=None):
+    def __init__(self,froot,flux,infval=1e100,tt_lmin=600,tt_lmax=None,l_max_data = 0):
         # print('doing stevepower')
         spec=np.loadtxt(f"{froot}coadd_cl_{flux}_data_200124.txt")
         cov =np.loadtxt(f'{froot}coadd_cov_{flux}_200519.txt')
         bbl = np.loadtxt(f'{froot}coadd_bpwf_{flux}_191127_lmin2.txt')
+        self.l_max = l_max_data
 
         if flux=='15mJy':
             lregion = 'deep'
@@ -31,12 +32,12 @@ class StevePower(object):
         # print('bbl shape:',np.shape(bbl))
         # exit(0)
         self.n_specs = 10
-        self.bbl =bbl.reshape((10,52,7924))
+        self.bbl =bbl.reshape((10,52,self.l_max))
         self.spec = spec[:520]
         self.cov = cov[:520,:520]
         nbin = 52
         self.n_bins = nbin
-        self.ells = np.arange(2,7924+2)  # ell max of the full window functions = 7924
+        self.ells = np.arange(2,self.l_max+2)  # ell max of the full window functions = self.l_max
         rells = np.repeat(self.ells[None],10,axis=0)
         self.ls = self.bin(rells)
 
@@ -119,7 +120,8 @@ class StevePower(object):
 
 
 class StevePower_extended(object):
-    def __init__(self,data_root,flux,infval=1e100,tt_lmin=600,tt_lmax=None):
+    def __init__(self,data_root,flux,infval=1e100,tt_lmin=600,tt_lmax=None,l_max_data = 0):
+        self.l_max = l_max_data
         # data_root = path_to_data + '/act_planck_data_210328/'
         specs = ['f090xf090','f090xf100','f090xf143','f090xf150',
          'f090xf217','f090xf353','f090xf545','f100xf100',
@@ -161,15 +163,16 @@ class StevePower_extended(object):
         if flux == '100mJy':
             rfroot = 'boss'
 
-        # spec = np.load(data_root+f'{rfroot}_all_ps_mean_C_ell_data_210327.npy')
-        # cov = np.load(data_root+f'{rfroot}_all_ps_Cov_from_coadd_ps_210327.npy')
-        # covx = np.load(data_root+f'{rfroot}_all_covmat_anal_210327.npy')
-        # bbl = np.load(data_root+f'{rfroot}_bpwf_210327.npy')
-
-        spec = np.load(data_root+f'{rfroot}_all_ps_mean_C_ell_data_210610.npy')
-        cov = np.load(data_root+f'{rfroot}_all_ps_Cov_from_coadd_ps_210610.npy')
-        covx = np.load(data_root+f'{rfroot}_all_covmat_anal_210610.npy')
-        bbl = np.load(data_root+f'{rfroot}_bpwf_210610.npy')
+        if l_max_data == 7924:
+            spec = np.load(data_root+f'{rfroot}_all_ps_mean_C_ell_data_210610.npy')
+            cov = np.load(data_root+f'{rfroot}_all_ps_Cov_from_coadd_ps_210610.npy')
+            covx = np.load(data_root+f'{rfroot}_all_covmat_anal_210610.npy')
+            bbl = np.load(data_root+f'{rfroot}_bpwf_210610.npy')
+        else:
+            spec = np.load(data_root+f'{rfroot}_all_ps_mean_C_ell_data_210327.npy')
+            cov = np.load(data_root+f'{rfroot}_all_ps_Cov_from_coadd_ps_210327.npy')
+            covx = np.load(data_root+f'{rfroot}_all_covmat_anal_210327.npy')
+            bbl = np.load(data_root+f'{rfroot}_bpwf_210327.npy')
 
         l_min = 2
         n_specs = len(specs)
@@ -290,7 +293,7 @@ class StevePower_extended(object):
         nbin = n_bins
         #self.ells = np.arange(2,n_ells+2)
         self.ells = np.arange(l_min,n_ells+2)
-        # self.ells = np.arange(2,7924+2)
+        # self.ells = np.arange(2,self.l_max+2)
         # self.ells = spec[:,0]
         #rells = np.repeat(self.ells[None],n_specs,axis=0)
         #print(np.shape(rells))

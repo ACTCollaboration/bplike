@@ -1,0 +1,379 @@
+likelihood:
+  bplike.act100_act_TT_plus_planck_TT:
+    bandpass: true
+    flux: 100mJy
+    input_params:
+    - a_tsz
+    - a_ksz
+    - xi
+    - a_d
+    - a_c
+    - beta_CIB
+    - a_p_tt_15
+    - a_p_tt_100
+    - a_g_tt_15
+    - a_g_tt_100
+    - cal_150
+    - cal_090
+    - cal_100
+    - cal_143
+    - cal_217
+    - cal_353
+    - cal_545
+    - a_g_ee_100
+    - a_g_ee_15
+    - a_g_te_100
+    - a_g_te_15
+    - a_p_ee
+    - a_p_te
+    - a_s_ee
+    - a_s_te
+    output_params: []
+    root_theory_data_spectra: act_extended_act_plus_planck_bp
+    save_theory_data_spectra: 'true'
+    speed: -1
+    stop_at_error: false
+    theory_debug: null
+    type: []
+    use_act_planck: 'yes'
+    version: null
+  bplike.act15_act_TT_plus_planck_TT:
+    bandpass: true
+    flux: 15mJy
+    input_params:
+    - a_tsz
+    - a_ksz
+    - xi
+    - a_d
+    - a_c
+    - beta_CIB
+    - a_p_tt_15
+    - a_p_tt_100
+    - a_g_tt_15
+    - a_g_tt_100
+    - cal_150
+    - cal_090
+    - cal_100
+    - cal_143
+    - cal_217
+    - cal_353
+    - cal_545
+    - a_g_ee_100
+    - a_g_ee_15
+    - a_g_te_100
+    - a_g_te_15
+    - a_p_ee
+    - a_p_te
+    - a_s_ee
+    - a_s_te
+    output_params: []
+    root_theory_data_spectra: act_extended_act_plus_planck_bp
+    save_theory_data_spectra: 'true'
+    speed: -1
+    stop_at_error: false
+    theory_debug: null
+    type: []
+    use_act_planck: 'yes'
+    version: null
+output: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/chains/act_extended_act_plus_planck_bp_mcmc_classy_test_lmax_7924
+packages_path: null
+params:
+  100*theta_s:
+    derived: false
+    value: 'lambda theta_MC_100: theta_MC_100'
+  A_s:
+    derived: 'lambda A_s: A_s'
+    latex: A_\mathrm{s}
+    renames:
+    - As
+    value: 'lambda logA: 1e-10*np.exp(logA)'
+  H0:
+    derived: true
+    latex: H_0
+  a_c:
+    latex: a_\mathrm{c}
+    prior:
+      max: 15
+      min: 0
+    proposal: 1
+    ref:
+      dist: norm
+      loc: 4.9
+      scale: 1
+  a_d:
+    latex: a_\mathrm{d}
+    prior:
+      max: 11
+      min: 0
+    proposal: 1
+    ref:
+      dist: norm
+      loc: 6.872966
+      scale: 1
+  a_g_ee_100:
+    value: 0.1293905
+  a_g_ee_15:
+    value: 0.03436806
+  a_g_te_100:
+    value: 0.355993
+  a_g_te_15:
+    value: 0.104994
+  a_g_tt_100:
+    latex: a_\mathrm{g,TT,100}
+    prior:
+      max: 20.0
+      min: 0.0
+    proposal: 0.3
+    ref:
+      dist: norm
+      loc: 8.717251
+      scale: 0.3
+  a_g_tt_15:
+    latex: a_\mathrm{g,TT,15}
+    prior:
+      max: 5
+      min: 0.0
+    proposal: 0.4
+    ref:
+      dist: norm
+      loc: 2.81171
+      scale: 0.4
+  a_ksz:
+    latex: a_\mathrm{kSZ}
+    prior:
+      max: 10
+      min: 0
+    proposal: 0.5
+    ref:
+      dist: norm
+      loc: 0.0001024734
+      scale: 0.5
+  a_p_ee:
+    value: 5.342375e-05
+  a_p_te:
+    value: 0.04443353
+  a_p_tt_100:
+    latex: a_\mathrm{p,TT,100}
+    prior:
+      max: 40
+      min: 0.0
+    proposal: 3
+    ref:
+      dist: norm
+      loc: 22.5
+      scale: 6
+  a_p_tt_15:
+    latex: a_\mathrm{p,TT,15}
+    prior:
+      max: 6
+      min: 0
+    proposal: 0.4
+    ref:
+      dist: norm
+      loc: 3.1
+      scale: 0.5
+  a_s_ee:
+    value: 0.0
+  a_s_te:
+    value: 0.0
+  a_tsz:
+    latex: a_\mathrm{tSZ}
+    prior:
+      max: 10
+      min: 0
+    proposal: 0.2
+    ref:
+      dist: norm
+      loc: 5.806115
+      scale: 0.5
+  beta_CIB:
+    latex: \beta_c
+    prior:
+      max: 5
+      min: 0
+    proposal: 0.2
+    ref:
+      dist: norm
+      loc: 2.2
+      scale: 0.5
+  cal_090:
+    value: 1.0
+  cal_100:
+    value: 1.0
+  cal_143:
+    value: 1.0
+  cal_150:
+    value: 1.0
+  cal_217:
+    value: 1.0
+  cal_353:
+    value: 1.0
+  cal_545:
+    value: 1.0
+  logA:
+    drop: true
+    latex: \log(10^{10} A_\mathrm{s})
+    prior:
+      max: 4
+      min: 2
+    proposal: 0.001
+    ref:
+      dist: norm
+      loc: 3.1
+      scale: 0.001
+  n_s:
+    latex: n_\mathrm{s}
+    prior:
+      max: 1.2
+      min: 0.8
+    proposal: 0.002
+    ref:
+      dist: norm
+      loc: 0.96
+      scale: 0.004
+    renames:
+    - ns
+  omega_b:
+    latex: \Omega_\mathrm{b}h^2
+    prior:
+      max: 0.1
+      min: 0.005
+    proposal: 0.0001
+    ref:
+      dist: norm
+      loc: 0.0221
+      scale: 0.0001
+    renames:
+    - omegabh2
+  omega_cdm:
+    latex: \Omega_\mathrm{c}h^2
+    prior:
+      max: 0.99
+      min: 0.001
+    proposal: 0.0005
+    ref:
+      dist: norm
+      loc: 0.12
+      scale: 0.001
+    renames:
+    - omegach2
+  sigma8:
+    derived: true
+    latex: \sigma_8
+  tau_reio:
+    latex: \tau_\mathrm{reio}
+    prior:
+      max: 0.8
+      min: 0.01
+    proposal: 0.005
+    ref:
+      dist: norm
+      loc: 0.065
+      scale: 0.01
+    renames:
+    - tau
+  theta_MC_100:
+    drop: true
+    latex: 100\theta_\mathrm{MC}
+    prior:
+      max: 10
+      min: 0.5
+    proposal: 0.0002
+    ref:
+      dist: norm
+      loc: 1.04109
+      scale: 0.0004
+    renames: theta
+  xi:
+    latex: \xi^{tSZ-CIB}
+    prior:
+      max: 0.2
+      min: 0
+    proposal: 0.05
+    ref:
+      dist: norm
+      loc: 0.199822
+      scale: 0.05
+prior:
+  a_c_prior: 'lambda a_c: stats.norm.logpdf(a_c, loc=4.9, scale=0.9)'
+  a_g_tt_100_prior: 'lambda a_g_tt_100: stats.norm.logpdf(a_g_tt_100, loc=8.77, scale=0.30)'
+  a_g_tt_15_prior: 'lambda a_g_tt_15: stats.norm.logpdf(a_g_tt_15, loc=2.79, scale=0.45)'
+  a_p_tt_15_prior: 'lambda a_p_tt_15: stats.norm.logpdf(a_p_tt_15, loc=3.1, scale=0.4)'
+  tau_reio_prior: 'lambda tau_reio: stats.norm.logpdf(tau_reio, loc=0.065, scale=0.015)'
+sampler:
+  evaluate:
+    override:
+      a_c: 14.992451
+      a_d: 1.068492
+      a_g_tt_100: 2.5523711
+      a_g_tt_15: 2.2528316
+      a_ksz: 0.018820977
+      a_p_tt_100: 21.59985
+      a_p_tt_15: 2.0635366
+      a_tsz: 9.845078
+      beta_CIB: 1.8051352
+      logA: 2.981044
+      n_s: 1.0380552
+      omega_b: 0.01915977
+      omega_cdm: 0.11052594
+      tau_reio: 0.058282807
+      theta_MC_100: 1.0402399
+      xi: 0.19893787
+test: false
+theory:
+  classy:
+    extra_args:
+      N_ncdm: 1
+      N_ur: 2.0328
+      T_ncdm: 0.71611
+      YHe: BBN
+      background_verbose: 0
+      fourier_verbose: 0
+      harmonic_verbose: 0
+      input_verbose: 0
+      lensing_verbose: 0
+      m_ncdm: 0.06
+      perturbations_verbose: 0
+      thermodynamics_verbose: 0
+    input_params:
+    - 100*theta_s
+    - A_s
+    - n_s
+    - omega_b
+    - omega_cdm
+    - tau_reio
+    output_params:
+    - H0
+    - sigma8
+    path: /Users/boris/Work/CLASS-SZ/SO-SZ/class_public
+    renames:
+      As: A_s
+      deltazrei: reionization_width
+      helium_delta_redshift: helium_fullreio_width
+      helium_redshift: helium_fullreio_redshift
+      nrun: alpha_s
+      nrunrun: beta_s
+      ns: n_s
+      nt: n_t
+      ntrun: alpha_t
+      omegab: Omega_b
+      omegabh2: omega_b
+      omegac: Omega_cdm
+      omegach2: omega_cdm
+      omegak: Omega_k
+      omegal: Omega_Lambda
+      omegam: Omega_m
+      omegan: Omega_nu
+      rdrag: rs_drag
+      tau: tau_reio
+      w: w0_fld
+      wa: wa_fld
+      yhe: YHe
+      yheused: YHe
+      zrei: z_reio
+    speed: 0.2
+    stop_at_error: false
+    use_renames: false
+    version: v3.0.1
+timing: true
+version: 3.0.4

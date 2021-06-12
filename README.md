@@ -12,6 +12,8 @@ bandpass corrections.
 It currently has dependencies that include soapack and tilec,
 which should ideally be removed.
 
+Bplike currently runs with camb, class and class_sz.
+
 ## Data
 
 and on NERSC:
@@ -21,7 +23,7 @@ and on NERSC:
  ```
 
 You should download that directory and move it to bplike/data/.
-Data path are set up in utils.py and may need some adjustments (TBC).
+Data paths are set up in utils.py. Take a look at the paths there and make sure you have all these data (bandpass, beams, foregrounds, spectra, etc).
 
 
 ## Installing bplike
@@ -34,8 +36,30 @@ $ pip install -e .
 
 ## Running chains with Cobaya
 
-Simply run
+A simple example is available here:
 ```
-$ cobaya-run bplike/run_scripts/ac_extended_act_only_bp.yml -f
+$ cobaya-run bplike/run_scripts/act_extended_act_only_bp.evaluate_bestfit.120621.yaml -f
 ```
-and adapt the yml file acccording to what you would like to do.
+You can then adapt this yml file acccording to what you would like to do.
+
+If set up properly, this should return the following:
+
+```
+[evaluate] log-likelihood = -537.313
+[evaluate]    chi2_bplike.act100_act_only_TTTEEE = 567.182
+[evaluate]    chi2_bplike.act15_act_only_TTTEEE = 507.443
+[evaluate] Derived params:
+[evaluate]    A_s = 2.12599e-09
+[evaluate]    H0 = 67.0712
+[evaluate]    sigma8 = 0.833653
+[bplike.act100_act_only_ttteee] Average evaluation time for bplike.act100_act_only_TTTEEE: 2.21904 s  (1 evaluations)
+[bplike.act15_act_only_ttteee] Average evaluation time for bplike.act15_act_only_TTTEEE: 1.66744 s  (1 evaluations)
+[classy] Average evaluation time for classy: 1.77039 s  (1 evaluations)
+```
+For this to run smoothly, you need to set your local path in the yaml file at the following entries:
+
+```
+path: /global/path/to/class/repo/class_public
+...
+output: /global/path/where/to/save/chains/act_extended_act_only_bp_classy_120621
+```
