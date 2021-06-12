@@ -10,11 +10,13 @@ from .config import *
 save_coadd_data = False
 save_coadd_data_extended = False
 
-dfroot = path_to_data+"/actpolfull_dr4.01/data/data_act/"
+
 dfroot_coadd_w = path_to_data+"/bplike_data/big_coadd_weights/200226/"
 dfroot_coadd_d = path_to_data+"/bplike_data/coadd_data/"
-dfroot_fg = path_to_data+"/actpolfull_dr4.01/data/Fg/"
 dfroot_bpass = path_to_data+"/bplike_data/bpass/"
+dfroot = path_to_data+"/actpolfull_dr4.01/data/data_act/"
+dfroot_fg = path_to_data+"/actpolfull_dr4.01/data/Fg/"
+
 fgroot = dfroot_fg
 
 
