@@ -112,7 +112,7 @@ params:
   a_tsz: #0.5806115E+01
     latex: a_\mathrm{tSZ}
     prior:
-      max: 10
+      max: 100
       min: 0
     proposal: 0.2
     ref:
