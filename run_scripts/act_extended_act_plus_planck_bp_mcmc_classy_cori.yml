@@ -483,7 +483,7 @@ sampler:
     drag: True
     Rminus1_stop: 0.001
     # Optionally use a covmat with the right theta convention
-    covmat: 'input_covmat/act_extended_act_plus_planck_bp.covmat'
+    covmat: '/global/homes/b/bb3028/bplike/input_covmat/act_extended_act_plus_planck_bp.covmat'
 
   # Example for running the minimizer
   # minimize:
