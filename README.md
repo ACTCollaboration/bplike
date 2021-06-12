@@ -2,9 +2,9 @@
 
 This is a version of Erminia's multi-frequency likelihood
 for the ACT DR4 release, but with the following changes:
-- includes (optional) scale-dependent bandpass corrections
-- it is re-written in Python
-- it interfaces with Cobaya (use the `devel` branch)
+- includes (optional) scale-dependent bandpass corrections,
+- it is re-written in Python,
+- It interfaces with `cobaya <https://github.com/CobayaSampler/cobaya>`_.
 
 It reproduces Erminia's results when run without the
 bandpass corrections.
@@ -12,7 +12,9 @@ bandpass corrections.
 It currently has dependencies that include soapack and tilec,
 which should ideally be removed.
 
-Bplike currently runs with camb, class and class_sz.
+bplike currently runs with either of the latest versions of `camb <https://github.com/cmbant/CAMB>`_, `class <https://github.com/lesgourg/class_public>`_, or `class_sz <https://github.com/borisbolliet/class_sz>`_.
+
+
 
 ## Data
 
@@ -40,7 +42,7 @@ A simple example is available here:
 ```
 $ cobaya-run bplike/run_scripts/act_extended_act_only_bp.evaluate_bestfit.120621.yaml -f
 ```
-You can then adapt this yml file acccording to what you would like to do.
+You can then adapt this yaml file acccording to what you would like to do.
 
 If set up properly, this should return the following:
 
