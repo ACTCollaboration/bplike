@@ -15,9 +15,10 @@ from pkg_resources import resource_filename
 import multiprocessing
 import functools
 
+infval = 1e200
 
 class StevePower(object):
-    def __init__(self,froot,flux,infval=1e100,tt_lmin=600,tt_lmax=None,l_max_data = 0):
+    def __init__(self,froot,flux,infval=infval,tt_lmin=600,tt_lmax=None,l_max_data = 0):
         # print('doing stevepower')
         spec=np.loadtxt(f"{froot}coadd_cl_{flux}_data_200124.txt")
         cov =np.loadtxt(f'{froot}coadd_cov_{flux}_200519.txt')
@@ -120,7 +121,7 @@ class StevePower(object):
 
 
 class StevePower_extended(object):
-    def __init__(self,data_root,flux,infval=1e100,tt_lmin=600,tt_lmax=None,l_max_data = 0):
+    def __init__(self,data_root,flux,infval=infval,tt_lmin=600,tt_lmax=None,l_max_data = 0):
         self.l_max = l_max_data
         # data_root = path_to_data + '/act_planck_data_210328/'
         specs = ['f090xf090','f090xf100','f090xf143','f090xf150',

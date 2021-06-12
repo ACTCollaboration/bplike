@@ -35,7 +35,7 @@ params:
       max: 10
     ref:
       dist: norm
-      loc: 1.04109
+      loc: 1.0402399
       scale: 0.0004
     proposal: 0.0002
     latex: 100\theta_\mathrm{MC}
@@ -52,7 +52,7 @@ params:
       max: 4
     ref:
       dist: norm
-      loc:   3.1
+      loc: 2.981044
       scale: 0.001
     proposal: 0.001
     drop: True
@@ -68,7 +68,7 @@ params:
       max: 1.2
     ref:
       dist: norm
-      loc:   0.96
+      loc:   1.0380552
       scale: 0.004
     proposal: 0.002
     latex: n_\mathrm{s}
@@ -78,7 +78,7 @@ params:
       max: 0.1
     ref:
       dist: norm
-      loc:   0.0221
+      loc:   0.01915977
       scale: 0.0001
     proposal: 0.0001
     latex: \Omega_\mathrm{b}h^2
@@ -89,7 +89,7 @@ params:
       max: 0.99
     ref:
       dist: norm
-      loc:   0.12
+      loc:   0.11052594
       scale: 0.001
     proposal: 0.0005
     latex: \Omega_\mathrm{c}h^2
@@ -99,7 +99,7 @@ params:
       max: 0.8
     ref:
       dist: norm
-      loc:   0.065
+      loc:  0.058282807
       scale: 0.01
     proposal: 0.005
     latex: \tau_\mathrm{reio}
@@ -117,7 +117,7 @@ params:
     proposal: 0.2
     ref:
       dist: norm
-      loc: 0.5806115E+01
+      loc: 9.845078
       scale: 0.5
 
 
@@ -129,7 +129,7 @@ params:
     proposal: 0.5
     ref:
       dist: norm
-      loc: 0.1024734E-03
+      loc: 0.018820977
       scale: 0.5
 
 
@@ -141,7 +141,7 @@ params:
     proposal: 0.05
     ref:
       dist: norm
-      loc: 0.1998220E+00
+      loc: 0.19893787
       scale: 0.05
 
   a_d: #0.6872966E+01
@@ -152,7 +152,7 @@ params:
     proposal: 1
     ref:
       dist: norm
-      loc: 0.6872966E+01
+      loc: 1.068492
       scale: 1
 
   a_c:
@@ -163,7 +163,7 @@ params:
     proposal: 1
     ref:
       dist: norm
-      loc: 4.9
+      loc: 14.992451
       scale: 1
 
   beta_CIB: #0.2447908E+01
@@ -174,7 +174,7 @@ params:
     proposal: 0.2
     ref:
       dist: norm
-      loc: 2.2
+      loc: 1.8051352
       scale: 0.5
 
 
@@ -186,7 +186,7 @@ params:
     proposal: 0.4
     ref:
       dist: norm
-      loc: 3.1
+      loc: 2.0635366
       scale: 0.5
 
   a_p_tt_100: #0.2249012E+02
@@ -197,7 +197,7 @@ params:
     proposal: 3
     ref:
       dist: norm
-      loc: 22.5
+      loc: 21.59985
       scale: 6
 
   a_g_tt_15: #0.2811710E+01
@@ -208,7 +208,7 @@ params:
     proposal: 0.4
     ref:
       dist: norm
-      loc: 0.2811710E+01
+      loc: 2.2528316
       scale: 0.4
 
   a_g_tt_100: #0.8717251E+01
@@ -219,7 +219,7 @@ params:
     proposal: 0.3
     ref:
       dist: norm
-      loc: 0.8717251E+01
+      loc: 2.5523711
       scale: 0.3
   #
   # a_g_te_15: #0.1049940E+00
@@ -483,7 +483,7 @@ sampler:
     drag: True
     Rminus1_stop: 0.001
     # Optionally use a covmat with the right theta convention
-    covmat: '/global/homes/b/bb3028/bplike/input_covmat/act_extended_act_only_bp.covmat'
+    covmat: '/global/homes/b/bb3028/bplike/input_covmat/act_extended_act_plus_planck_bp.covmat'
 
   # Example for running the minimizer
   # minimize:
