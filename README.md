@@ -14,11 +14,6 @@ which should ideally be removed.
 
 ## Data
 
-You can find the data files here on niagara:
-```
-/scratch/r/rbond/msyriac/data/depot/bplike/data
-```
-<<<<<<< HEAD
 and on NERSC:
 
 ```
@@ -26,22 +21,14 @@ and on NERSC:
  ```
 
 You should download that directory and move it to bplike/data/.
-Then adapt the path in bplike/config.py so that it points toward the bplike/data directory.
-=======
+Data path are set up in utils.py and may need some adjustments (TBC).
 
-and on cori (NERSC):
-```
-/global/project/projectdirs/act/data/msyriac/bplike_data
-```
-
-You should symlink that directory to the root repository directory with the name `data`.
->>>>>>> 0932af78273aa1a934c53e9d898c0894c6e204d5
 
 
 ## Running chains with Cobaya
 
 Simply run
 ```
-$ cobaya-run act_extended.yml -f
+$ cobaya-run bplike/run_scripts/ac_extended_act_only_bp.yml -f
 ```
 and adapt the yml file acccording to what you would like to do.
