@@ -26,7 +26,7 @@ Data path are set up in utils.py and may need some adjustments (TBC).
 
 ## Installing bplike
 
-Inside the bplike directory, Simply do
+Inside the bplike directory, simply do
 ```
 $ pip install -e .
 ```
