@@ -17,7 +17,7 @@ import functools
 
 
 class StevePower(object):
-    def __init__(self,froot,flux,infval=1e10,tt_lmin=600,tt_lmax=None):
+    def __init__(self,froot,flux,infval=1e100,tt_lmin=600,tt_lmax=None):
         # print('doing stevepower')
         spec=np.loadtxt(f"{froot}coadd_cl_{flux}_data_200124.txt")
         cov =np.loadtxt(f'{froot}coadd_cov_{flux}_200519.txt')
@@ -119,7 +119,7 @@ class StevePower(object):
 
 
 class StevePower_extended(object):
-    def __init__(self,data_root,flux,infval=1e10,tt_lmin=600,tt_lmax=None):
+    def __init__(self,data_root,flux,infval=1e100,tt_lmin=600,tt_lmax=None):
         # data_root = path_to_data + '/act_planck_data_210328/'
         specs = ['f090xf090','f090xf100','f090xf143','f090xf150',
          'f090xf217','f090xf353','f090xf545','f100xf100',
@@ -161,20 +161,21 @@ class StevePower_extended(object):
         if flux == '100mJy':
             rfroot = 'boss'
 
-        spec = np.load(data_root+f'{rfroot}_all_ps_mean_C_ell_data_210327.npy')
-        cov = np.load(data_root+f'{rfroot}_all_ps_Cov_from_coadd_ps_210327.npy')
-        covx = np.load(data_root+f'{rfroot}_all_covmat_anal_210327.npy')
-        bbl = np.load(data_root+f'{rfroot}_bpwf_210327.npy')
+        # spec = np.load(data_root+f'{rfroot}_all_ps_mean_C_ell_data_210327.npy')
+        # cov = np.load(data_root+f'{rfroot}_all_ps_Cov_from_coadd_ps_210327.npy')
+        # covx = np.load(data_root+f'{rfroot}_all_covmat_anal_210327.npy')
+        # bbl = np.load(data_root+f'{rfroot}_bpwf_210327.npy')
+
+        spec = np.load(data_root+f'{rfroot}_all_ps_mean_C_ell_data_210610.npy')
+        cov = np.load(data_root+f'{rfroot}_all_ps_Cov_from_coadd_ps_210610.npy')
+        covx = np.load(data_root+f'{rfroot}_all_covmat_anal_210610.npy')
+        bbl = np.load(data_root+f'{rfroot}_bpwf_210610.npy')
 
         l_min = 2
-        # print('bbl shape:',np.shape(bbl))
         n_specs = len(specs)
-        # print('n_specs: ',n_specs)
         n_bins = int(len(spec)/n_specs)
-        # print('n_bins: ',n_bins)
-        # exit(0)
         n_ells = np.shape(bbl)[1]  # ell max of the full window functions = 3926
-        # print('n_ells: ',n_ells)
+
         n_ells = n_ells-l_min
         bbl_2 = np.zeros((n_bins*n_specs,n_ells))
         for i in range(n_bins*n_specs):
@@ -236,15 +237,6 @@ class StevePower_extended(object):
                     # print('b1,b2:',b1,b2)
 
                     if (b1==band1 and b2==band2) or (b1==band2 and b2==band1):
-                        #print('row:',row)
-                        # print('rmap(region):',index,ibx,rmap(region))
-                        # print('rmap b1,b2:',b1,b2)
-                        # print('row.s1:',row.s1)
-                        # print('row.s2:',row.s2)
-                        # print('row.a1:',row.a1)
-                        # print('row.a2:',row.a2)
-                        # print(' ')
-                        # print('#####')
                         arrays.append((index,rmap(region),row.s1,row.s2,row.a1,row.a2))
                         barrays.append((index,rmap(region),row.s1,row.s2,row.a1,row.a2))
                         ibx += 1
@@ -253,10 +245,6 @@ class StevePower_extended(object):
                 oids = []
                 for ind in ids:
                     oids = oids + list(range(ind*nbin+rbin,(ind+1)*nbin))
-                # print('oids:',oids)
-                # print('scov:',np.shape(cov))
-                # print('soids:',np.shape(oids))
-                # try:
                 ocov = covx[oids,:][:,oids]
 
                 #exit(0)
@@ -370,12 +358,6 @@ class StevePower_extended(object):
         lmax_beam_cutoff['353'] = lmax_353
         lmax_beam_cutoff['545'] = lmax_545
 
-        # print(lmax_090,lmax_150,lmax_100,lmax_143,lmax_217,lmax_353,lmax_545)
-        # cov has dimension 1344
-        # this is n_bin (48) times n_spec (28)
-        # print(np.shape(self.cov))
-        # print('fband1 : ',self.fband1)
-        # print('fband2 : ',self.fband2)
         lmax_order_list = []
 
         for (fb1,fb2) in zip(self.fband1,self.fband2):

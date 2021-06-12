@@ -12,7 +12,7 @@ act_like:
   nbinte: 48  # max nbins in ACT TE data
   nbinee: 48  # max nbins in ACT EE data
   nbint : 1344  # total bins 48*28 = 1344
-  lmax_win: 3926 # ell max of the full window functions
+  lmax_win: 7926 # ell max of the full window functions
   bmax0 : 548   # number of bins in full window function
   b0: 5
   b1: 0

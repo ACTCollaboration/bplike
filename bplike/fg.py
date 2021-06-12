@@ -63,7 +63,6 @@ class ForegroundPowers(ArraySED):
     def get_component_scale_dependence(self,comp,param_dict):
         p = param_dict
         comp = comp.lower()
-
         if comp == 'tsz':
             return self.tsz_temp
         elif comp == 'ksz':
@@ -87,8 +86,7 @@ class ForegroundPowers(ArraySED):
         ocomps = [comp.lower() for comp in comps]
         spec = spec.lower()
         tpow = 0
-        # print('getting power')
-        # exit(0)
+
         if spec=='tt':
             if ('tsz' in ocomps) or ('tsz_x_cib' in ocomps):
                 e1tsz = eff_freq_ghz1['tsz'] if eff_freq_ghz1 is not None else None
@@ -97,6 +95,17 @@ class ForegroundPowers(ArraySED):
                                            eff_freq_ghz=e1tsz,params=params,lmax=lmax)
                 f2_tsz = self.get_response("tSZ",array=array2,norm_freq_ghz=params['nu0'],
                                            eff_freq_ghz=e2tsz,params=params,lmax=lmax)
+                if (f2_tsz.size<lmax):
+                    new_f2 = np.zeros(lmax)
+                    new_f2[:f2_tsz.size] = f2_tsz
+                    new_f2[f2_tsz.size:] = np.repeat(f2_tsz[f2_tsz.size-1], lmax-f2_tsz.size)
+                    f2_tsz = new_f2
+                if (f1_tsz.size<lmax):
+                    new_f1 = np.zeros(lmax)
+                    new_f1[:f1_tsz.size] = f1_tsz
+                    new_f1[f1_tsz.size:] = np.repeat(f1_tsz[f1_tsz.size-1], lmax-f1_tsz.size)
+                    f1_tsz = new_f1
+
             if ('cibc' in ocomps) or ('cibp' in ocomps) or ('tsz_x_cib' in ocomps):
                 e1dusty = eff_freq_ghz1['dust'] if eff_freq_ghz1 is not None else None
                 e2dusty = eff_freq_ghz2['dust'] if eff_freq_ghz2 is not None else None
@@ -104,16 +113,22 @@ class ForegroundPowers(ArraySED):
                                            eff_freq_ghz=e1dusty,params=params,lmax=lmax)
                 f2_cib = self.get_response("CIB",array=array2,norm_freq_ghz=params['nu0'],
                                            eff_freq_ghz=e2dusty,params=params,lmax=lmax)
-
+                if (f2_cib.size<lmax):
+                    new_f2 = np.zeros(lmax)
+                    new_f2[:f2_cib.size] = f2_cib
+                    f2_cib = new_f2
+                    new_f2[f2_tsz.size:] = np.repeat(f2_cib[f2_cib.size-1], lmax-f2_cib.size)
+                if (f1_cib.size<lmax):
+                    new_f1 = np.zeros(lmax)
+                    new_f1[:f1_cib.size] = f1_cib
+                    new_f1[f1_cib.size:] = np.repeat(f1_cib[f1_cib.size-1], lmax-f1_cib.size)
+                    f1_cib = new_f1
             if ('tsz' in ocomps):
-                # print(ptsz)
-                # exit(0)
                 if ptsz is not None:
-                    # print(f1_tsz *f2_tsz *ptsz)
-                    # exit(0)
                     tpow = tpow + f1_tsz *f2_tsz *ptsz
                 else:
                     tpow = tpow + f1_tsz *f2_tsz *params['a_tsz']*self.get_component_scale_dependence('tSZ',params)
+                    # exit(0)
             if ('cibc' in ocomps):
                 tpow = tpow + f1_cib*f2_cib*params['a_c']*self.get_component_scale_dependence('cibc',params)
             if ('cibp' in ocomps):
@@ -130,8 +145,6 @@ class ForegroundPowers(ArraySED):
         if 'radio' in ocomps:
             e1syn = eff_freq_ghz1['syn'] if eff_freq_ghz1 is not None else None
             e2syn = eff_freq_ghz2['syn'] if eff_freq_ghz2 is not None else None
-            # print('e1,e2:',e1syn,e2syn)
-            # print('params radio:',params)
             f1 = self.get_response("radio",
                                     array=array1,
                                     norm_freq_ghz=params['nu0'],
@@ -144,7 +157,16 @@ class ForegroundPowers(ArraySED):
                                     eff_freq_ghz=e2syn,
                                     params=params,
                                     lmax=lmax)
-
+            if (f2.size<lmax):
+                new_f2 = np.zeros(lmax)
+                new_f2[:f2.size] = f2
+                new_f2[f2.size:] = np.repeat(f2[f2.size-1], lmax-f2.size)
+                f2 = new_f2
+            if (f1.size<lmax):
+                new_f1 = np.zeros(lmax)
+                new_f1[:f1.size] = f1
+                new_f1[f1.size:] = np.repeat(f1[f1.size-1], lmax-f1.size)
+                f1 = new_f1
             if spec=='tt':
                 if self.fcut == '15mJy':
                     fnum = 15
@@ -178,6 +200,17 @@ class ForegroundPowers(ArraySED):
                                    dust_beta_param_name='beta_galdust',#'beta_galdust',
                                    # dust_beta_param_name='beta_galdust',
                                    lmax=lmax)
+
+            if (f2.size<lmax):
+                new_f2 = np.zeros(lmax)
+                new_f2[:f2.size] = f2
+                new_f2[f2.size:] = np.repeat(f2[f2.size-1], lmax-f2.size)
+                f2 = new_f2
+            if (f1.size<lmax):
+                new_f1 = np.zeros(lmax)
+                new_f1[:f1.size] = f1
+                new_f1[f1.size:] = np.repeat(f1[f1.size-1], lmax-f1.size)
+                f1 = new_f1
             # print('f1,f2:',f1,f2)
             scale_str = 'galdust_t' if spec=='tt' else 'galdust_p'
             # print('spec,scale_str:',spec,scale_str)
@@ -274,7 +307,8 @@ class ForegroundPowers(ArraySED):
         if lkl_setup.use_act_planck == 'yes':
             print('use_act_planck :', lkl_setup.use_act_planck)
             exit(0)
-            dls = np.zeros((28,3924))
+            # dls = np.zeros((28,3924))
+            dls = np.zeros((28,7924))
             for i in range(28):
                 # band1 = {0:'090',1:'100',2:'143',3:'150',4:'217',5:'353',6:'545'}[i]
                 # band2 = {0:'090',1:'100',2:'143',3:'150',4:'217',5:'353',6:'545'}[i]
@@ -333,7 +367,8 @@ class ForegroundPowers(ArraySED):
 
         if lkl_setup.use_act_planck == 'yes':
             # print('use_act_planck :', lkl_setup.use_act_planck)
-            dls = np.zeros((28,3924))
+            # dls = np.zeros((28,3924))
+            dls = np.zeros((28,7924))
             for i in range(28):
                 # band1 = {0:'090',1:'100',2:'143',3:'150',4:'217',5:'353',6:'545'}[i]
                 # band2 = {0:'090',1:'100',2:'143',3:'150',4:'217',5:'353',6:'545'}[i]
@@ -385,7 +420,8 @@ class ForegroundPowers(ArraySED):
 
         if lkl_setup.use_act_planck == 'yes':
             # print('use_act_planck :', lkl_setup.use_act_planck)
-            dls = np.zeros((28,3924))
+            # dls = np.zeros((28,3924))
+            dls = np.zeros((28,7924))
             for i in range(28):
                 # band1 = {0:'090',1:'100',2:'143',3:'150',4:'217',5:'353',6:'545'}[i]
                 # band2 = {0:'090',1:'100',2:'143',3:'150',4:'217',5:'353',6:'545'}[i]
@@ -458,28 +494,33 @@ class ForegroundPowers(ArraySED):
     def get_coadd_power(self,cdata,ibbl,ells,dl,spec,fparams,lkl_setup = None,ptsz=None):
 
         icov,icov_ibin,Pmat,arrays = cdata
+        # print(dl.size)
+        # exit(0)
 
 
-        if lkl_setup.use_act_planck == 'yes':
-            l_max = 3924 #!ell max of the full window functions
-        else:
-            l_max = 7924 #!ell max of the full window functions
-
+        # if lkl_setup.use_act_planck == 'yes':
+        #     # l_max = 3924 #!ell max of the full window functions
+        #     l_max = 7924 #!ell max of the full window functions
+        # else:
+        #     l_max = 7924 #!ell max of the full window functions
+        l_max = 7924
 
         ps = []
         for row in arrays:
             ind,r,season1,season2,array1,array2 = row
             a1 = '_'.join([season1,array1])
             a2 = '_'.join([season2,array2])
-            # print('a1,a2:',a1,a2)
+
             pow = dl + self.get_power(spec,self.comps,fparams,
                                       eff_freq_ghz1=None,array1=a1,
                                       eff_freq_ghz2=None,array2=a2,
                                       lmax=l_max,
                                       ptsz=ptsz) # 7924 for act alone, 3924 for act_planck !ell max of the full window functions
+
             pow = pow/ells/(ells+1)*2.*np.pi
             bpow = np.einsum('...k,...k',ibbl,pow)
             ps = np.append(ps,bpow.copy())
+        # exit(0)
 
 
         return np.dot(icov_ibin,np.dot(Pmat,np.dot(icov,ps)))
@@ -491,7 +532,8 @@ class ForegroundPowers(ArraySED):
 
 
         if lkl_setup.use_act_planck == 'yes':
-            l_max = 3924  #!ell max of the full window functions
+            # l_max = 3924  #!ell max of the full window functions
+            l_max = 7924  #!ell max of the full window functions
         else:
             l_max = 7924  #!ell max of the full window functions
 
