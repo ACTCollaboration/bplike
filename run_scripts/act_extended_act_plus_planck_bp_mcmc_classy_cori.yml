@@ -483,12 +483,12 @@ sampler:
     drag: True
     Rminus1_stop: 0.001
     # Optionally use a covmat with the right theta convention
-    # covmat: 'data/ACTPol_b5_new_cosmomc_theta2.covmat'
+    covmat: 'input_covmat/act_extended_act_plus_planck_bp.covmat'
 
   # Example for running the minimizer
   # minimize:
   #   covmat: 'data/ACTPol_b5_new_cosmomc_theta2.covmat'
 
 
-output: /global/homes/b/bb3028/atsz_analysis/act_extended_act_plus_planck_bp
+output: /global/homes/b/bb3028/atsz_analysis/act_extended_act_plus_planck_bp_high_ells
 resume: True
