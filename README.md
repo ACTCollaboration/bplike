@@ -16,7 +16,7 @@ Bplike currently runs with camb, class and class_sz.
 
 ## Data
 
-and on NERSC:
+located on NERSC:
 
 ```
  /global/project/projectdirs/act/data/msyriac/bplike_data
