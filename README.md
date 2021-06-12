@@ -4,15 +4,14 @@ This is a version of Erminia's multi-frequency likelihood
 for the ACT DR4 release, but with the following changes:
 - includes (optional) scale-dependent bandpass corrections,
 - it is re-written in Python,
-- It interfaces with `cobaya <https://github.com/CobayaSampler/cobaya>`_.
+- It interfaces with [cobaya](https://github.com/CobayaSampler/cobaya).
 
 It reproduces Erminia's results when run without the
 bandpass corrections.
 
-It currently has dependencies that include soapack and tilec,
-which should ideally be removed.
+It currently has dependencies that include [soapack](https://github.com/simonsobs/soapack/tree/master/soapack) and [tilec](https://github.com/ACTCollaboration/tilec/tree/boris), which should ideally be removed.
 
-bplike currently runs with either of the latest versions of `camb <https://github.com/cmbant/CAMB>`_, `class <https://github.com/lesgourg/class_public>`_, or `class_sz <https://github.com/borisbolliet/class_sz>`_.
+bplike currently runs with either of the latest versions of [camb](https://github.com/cmbant/CAMB), [class](https://github.com/lesgourg/class_public), or [class_sz ](https://github.com/borisbolliet/class_sz).
 
 
 
