@@ -480,6 +480,7 @@ sampler:
     max_samples: .inf
     max_tries: 400
     learn_proposal: True
+    learn_proposal_Rminus1_max: 10.0
     drag: True
     Rminus1_stop: 0.001
     # Optionally use a covmat with the right theta convention
