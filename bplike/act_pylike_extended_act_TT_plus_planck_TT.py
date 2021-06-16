@@ -29,7 +29,7 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
             "xi", # tSZ-CIB cross-correlation coefficient
             "a_c", # clustered CIB power
             "beta_CIB", # CIB frequency scaling
-            #"beta_radio", # radio frequency scaling
+            "beta_radio", # radio frequency scaling
             "a_ksz", # kSZ
             "a_d", # dusty/CIB Poisson
             "a_p_tt_15", # TT radio Poisson with given flux cut
@@ -103,6 +103,8 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
         l_pop_cal_yp = [s for s in self.cal_yp_act_only  if s not in self.cal_yp_act_plus_planck]
         new_l = [s for s in l if s not in l_pop_cal_yp ]
         self.input_params = new_l
+        print('expected params: ',self.expected_params)
+        print('input params: ',self.input_params)
 
     def get_requirements(self):
         l_max = 8000
@@ -153,6 +155,7 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
             print('[debug] logp: ',logp)
         self.log.debug(
             f"ACT-like {self.flux} lnLike value = {logp} (chisquare = {-2 * logp})")
+        # print(f"ACT-like {self.flux} lnLike value = {logp} (chisquare = {-2 * logp})")
         return logp
 
     def prepare_data(self, verbose=False):

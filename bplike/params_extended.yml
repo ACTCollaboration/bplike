@@ -72,7 +72,7 @@ fixed:
 
 
   beta_galdust : 1.5 #was 3.8
-  beta_radio : -0.5 # beta_p in erminia's code = to beta_cib
+  # beta_radio : -3. # 
   beta_galsyn : -1.
 
   high_ell0 : 3000

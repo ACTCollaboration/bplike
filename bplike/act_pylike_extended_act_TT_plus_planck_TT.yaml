@@ -1,6 +1,6 @@
 bandpass: false
 use_classy_sz_tsz : 'no'
-l_max_data: 7924 
+l_max_data: 7924
 save_theory_data_spectra: false
 root_theory_data_spectra: ''
 params:
@@ -164,7 +164,7 @@ params:
     #   dist: norm
     #   loc: 3.3
     #   scale: 0.5
-  #beta_radio: -0.5
+  beta_radio: -0.5
   beta_CIB: 0.2447908E+01
     # latex: \beta_c
     # prior:

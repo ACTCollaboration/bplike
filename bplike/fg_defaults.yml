@@ -51,7 +51,7 @@ fsyn_150_100mJy  : 147.14
 # Spectral index for Galactic dust
 beta_galdust : 3.8
 # Spectral index for CIB
-beta_CIB : 2.2
+# beta_CIB : 2.2
 # Spectral index for radio
 beta_radio : -0.5
 # Spectral index for Galactic synchrotron
