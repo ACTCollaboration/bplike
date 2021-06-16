@@ -103,8 +103,6 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
         l_pop_cal_yp = [s for s in self.cal_yp_act_only  if s not in self.cal_yp_act_plus_planck]
         new_l = [s for s in l if s not in l_pop_cal_yp ]
         self.input_params = new_l
-        print('expected params: ',self.expected_params)
-        print('input params: ',self.input_params)
 
     def get_requirements(self):
         l_max = 8000
