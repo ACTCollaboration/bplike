@@ -220,6 +220,6 @@ sampler:
       rhoend: 0.01
     covmat: /global/homes/b/bb3028/bplike/input_covmat/act_extended_act_plus_planck_bp.covmat
 timing: true
-output: act_extended_act_plus_planck_bp_high_ells_minimize
+output: /global/homes/b/bb3028/atsz_analysis/act_extended_act_plus_planck_bp_high_ells_minimize
 packages_path: null
 test: false
