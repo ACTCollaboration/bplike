@@ -334,6 +334,15 @@ class StevePower_extended(object):
             self.cov[:,ids] = 0
             self.cov[ids,:] = 0
             self.cov[ids,ids] = infval
+
+            # cutting higher bins for tests:
+            ids_act = np.argwhere((self.ls>3924) & ((rfband1 == '090') | (rfband1 == '150') | (rfband2 == '090') | (rfband2 == '150')))[:,0]
+            # print('idsact : ',ids_act)
+            # exit(0)
+            ids = ids_act
+            self.cov[:,ids] = 0
+            self.cov[ids,:] = 0
+            self.cov[ids,ids] = infval
             # print('cov')
             # print(cov)
         # print('setting inf in cov where beam too small')
