@@ -323,28 +323,21 @@ class StevePower_extended(object):
             rfband2 = np.repeat(self.fband2,nbin)
             self.rfband1 =  rfband1
             self.rfband2 =  rfband2
-            # print(len(rfband2))
-            # print(type(rfband2[0]))
-            # cd_act =
-            # set cov to infal (ignore points) where l is smaller than tt_lmin=600 (default) for the ACT bands
+
             ids_act = np.argwhere((self.ls<tt_lmin) & ((rfband1 == '090') | (rfband1 == '150') | (rfband2 == '090') | (rfband2 == '150')))[:,0]
-            # print('idsact : ',ids_act)
-            # exit(0)
             ids = ids_act
             self.cov[:,ids] = 0
             self.cov[ids,:] = 0
             self.cov[ids,ids] = infval
 
             # cutting higher bins for tests:
-            ids_act = np.argwhere((self.ls>3924) & ((rfband1 == '090') | (rfband1 == '150') | (rfband2 == '090') | (rfband2 == '150')))[:,0]
-            # print('idsact : ',ids_act)
-            # exit(0)
-            ids = ids_act
-            self.cov[:,ids] = 0
-            self.cov[ids,:] = 0
-            self.cov[ids,ids] = infval
-            # print('cov')
-            # print(cov)
+        ids_act = np.argwhere((self.ls>3924))[:,0]
+            #
+        ids = ids_act
+        self.cov[:,ids] = 0
+        self.cov[ids,:] = 0
+        self.cov[ids,ids] = infval
+
         # print('setting inf in cov where beam too small')
 
         beam_dict_f100 = np.loadtxt(data_root + 'HFI_BEAM_resave_210414_F100.txt')

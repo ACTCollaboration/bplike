@@ -142,6 +142,36 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
 
         ls_theory = self.sp.ls
         delta = self.sp.spec - dls_theory/fac
+
+
+        # label_bps = []
+        # # print(self.sp.fband1)
+        # # print(self.sp.fband2)
+        # # exit(0)
+        # for b1,b2 in zip(self.sp.fband1,self.sp.fband2):
+        #     label_bps.append(b1 +'x' +b2)
+        # ps_list = ['090x090', '090x100', '090x143', '090x150', '090x217', '090x353', '090x545', '100x100', '100x143', '143x143', '100x150', '143x150', '150x150', '150x217', '150x353', '150x545', '100x217', '143x217', '217x217', '100x353', '143x353', '217x353', '353x353', '100x545', '143x545', '217x545', '353x545', '545x545']
+        # for ps in ps_list:
+        #     j = label_bps.index(ps)
+        #     # print(j)
+        #     # exit(0)
+        #     for l,cl_data,cl_theory,delta_cl,sigmas_cl in zip(ls_theory[j*self.sp.n_bins:(j+1)*self.sp.n_bins],\
+        #     (dls_theory/fac)[j*self.sp.n_bins:(j+1)*self.sp.n_bins],\
+        #     self.sp.spec[j*self.sp.n_bins:(j+1)*self.sp.n_bins],\
+        #     delta[j*self.sp.n_bins:(j+1)*self.sp.n_bins],\
+        #     np.diagonal(self.sp.cov)[j*self.sp.n_bins:(j+1)*self.sp.n_bins]):
+        #         print("%s : l = %.3e\t cl_data = %.3e\t cl_theo = %.3e\t dcl = %.3e\t sigma = %.3e"%(ps,l,cl_data,cl_theory,delta_cl,np.sqrt(sigmas_cl)))
+        #     print("\n\n")
+        #     print("###################################################")
+        #     print("########################\t%s\t#########################"%self.flux)
+        #     print("###################################################")
+        #     print("\n\n")
+        # print('first ls:',ls_theory[j*sp.n_bins:(j+1)*sp.n_bins])
+        # print('first theory:',(dls_theory/fac)[j*sp.n_bins:(j+1)*sp.n_bins])
+        # print('first data:',self.sp.spec[j*sp.n_bins:(j+1)*sp.n_bins])
+        # print('first deltas:',delta[j*sp.n_bins:(j+1)*sp.n_bins])
+        # print('first sigmas:',np.diagonal(self.sp.cinv)[j*sp.n_bins:(j+1)*sp.n_bins])
+        # exit(0)
         if self.save_theory_data_spectra:
             np.save(path_to_output+'/ls_theory_'+self.flux+bps+'act_planck_'+self.root_theory_data_spectra+'.npy',ls_theory)
 
@@ -153,7 +183,7 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
             print('[debug] logp: ',logp)
         self.log.debug(
             f"ACT-like {self.flux} lnLike value = {logp} (chisquare = {-2 * logp})")
-        # print(f"ACT-like {self.flux} lnLike value = {logp} (chisquare = {-2 * logp})")
+        print(f"ACT-like {self.flux} lnLike value = {logp} (chisquare = {-2 * logp})")
         return logp
 
     def prepare_data(self, verbose=False):
