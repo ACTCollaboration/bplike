@@ -9,6 +9,7 @@ likelihood:
     - a_d
     - a_c
     - beta_CIB
+    - beta_radio
     - a_p_tt_15
     - a_p_tt_100
     - a_g_tt_15
@@ -46,6 +47,7 @@ likelihood:
     - a_d
     - a_c
     - beta_CIB
+    - beta_radio
     - a_p_tt_15
     - a_p_tt_100
     - a_g_tt_15
@@ -232,6 +234,9 @@ params:
       dist: norm
       loc: 5.806115
       scale: 0.5
+  beta_radio:
+    value: -0.5
+    latex: \beta_radio
   beta_CIB:
     latex: \beta_c
     prior:
@@ -382,6 +387,7 @@ sampler:
       a_p_tt_15: 4.0946102
       a_tsz: 5.5652422
       beta_CIB: 2.7834766
+      # beta_radio: -0.5
       logA: 3.0568226
       n_s: 1.0054159
       omega_b: 0.021250829

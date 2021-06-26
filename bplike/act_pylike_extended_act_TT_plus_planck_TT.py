@@ -175,7 +175,7 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
             print('[debug] logp: ',logp)
         self.log.debug(
             f"ACT-like {self.flux} lnLike value = {logp} (chisquare = {-2 * logp})")
-        # print(f"ACT-like {self.flux} lnLike value = {logp} (chisquare = {-2 * logp})")
+        print(f"ACT-like {self.flux} lnLike value = {logp} (chisquare = {-2 * logp})")
         return logp
 
     def prepare_data(self, verbose=False):

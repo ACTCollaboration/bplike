@@ -163,7 +163,7 @@ params:
     #   dist: norm
     #   loc: 3.3
     #   scale: 0.5
-  # beta_radio: -0.5
+  beta_radio: -0.5
   beta_CIB: 0.2447908E+01
     # latex: \beta_c
     # prior:

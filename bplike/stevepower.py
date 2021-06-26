@@ -308,7 +308,10 @@ class StevePower_extended(object):
         # print('shape fac : ', np.shape(fac))
         self.cov = self.cov/fac**2.
 
-
+        rfband1 = np.repeat(self.fband1,nbin)
+        rfband2 = np.repeat(self.fband2,nbin)
+        self.rfband1 =  rfband1
+        self.rfband2 =  rfband2
 
         if tt_lmin is not None:
             # n = 3
@@ -319,10 +322,7 @@ class StevePower_extended(object):
             # print('nbins: ',nbin)
             # print('ids ls<tt_lmin: ', ids)
             # print('fband1 : ',self.fband1)
-            rfband1 = np.repeat(self.fband1,nbin)
-            rfband2 = np.repeat(self.fband2,nbin)
-            self.rfband1 =  rfband1
-            self.rfband2 =  rfband2
+
 
             ids_act = np.argwhere((self.ls<tt_lmin) & ((rfband1 == '090') | (rfband1 == '150') | (rfband2 == '090') | (rfband2 == '150')))[:,0]
             ids = ids_act
@@ -330,13 +330,46 @@ class StevePower_extended(object):
             self.cov[ids,:] = 0
             self.cov[ids,ids] = infval
 
-            # cutting higher bins for tests:
+        # cutting higher bins for tests:
         ids_act = np.argwhere((self.ls>3924))[:,0]
             #
         ids = ids_act
         self.cov[:,ids] = 0
         self.cov[ids,:] = 0
         self.cov[ids,ids] = infval
+
+
+        # cutting out some spectra
+
+        ps_list = ['090x090', '090x100', '090x143', '090x150', '090x217', '090x353', '090x545', '100x100', '100x143', '143x143', '100x150', '143x150', '150x150', '150x217', '150x353', '150x545', '100x217', '143x217', '217x217', '100x353', '143x353', '217x353', '353x353', '100x545', '143x545', '217x545', '353x545', '545x545']
+        ps_list_to_keep = ps_list#['090x100','090x143','150x545']
+        # label_bps = []
+        print(self.rfband1)
+        print(self.rfband2)
+
+        # for b1,b2 in zip(self.fband1,self.fband2):
+        #     label_bps.append(b1 +'x' +b2)
+        for ps in ps_list:
+            if ps in ps_list_to_keep:
+                continue
+            # print(ps)
+            # print(ids)
+
+            ids_act = np.argwhere( (self.rfband1 == ps.split('x')[0]) & (self.rfband2 == ps.split('x')[1]) )[:,0]
+            ids = ids_act
+            # print(ps)
+            # print(ids)
+            self.cov[:,ids] = 0
+            self.cov[ids,:] = 0
+            self.cov[ids,ids] = infval
+        # self.cov = np.diag(np.diagonal(self.cov))
+
+            # j = label_bps.index(ps)
+            # self.cov[j*self.n_bins:(j+1)*self.n_bins,j*self.n_bins:(j+1)*self.n_bins] = infval
+            # self.cov[:,j*self.n_bins:(j+1)*self.n_bins] = 0.
+            # self.cov[j*self.n_bins:(j+1)*self.n_bins,:] = 0.
+
+
 
         # print('setting inf in cov where beam too small')
 

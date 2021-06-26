@@ -26,6 +26,7 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
             "xi", # tSZ-CIB cross-correlation coefficient
             "a_c", # clustered CIB power
             "beta_CIB", # CIB frequency scaling
+            "beta_radio", # radio frequency scaling
             "a_ksz", # kSZ
             "a_d", # dusty/CIB Poisson
             "a_p_tt_15", # TT radio Poisson with given flux cut
