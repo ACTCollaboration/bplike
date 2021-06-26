@@ -168,6 +168,7 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
             np.save(path_to_output+'/ls_theory_'+self.flux+bps+'act_planck_'+self.root_theory_data_spectra+'.npy',ls_theory)
 
             for comp in comps:
+                print(ps['cibc'])
                 np.save(path_to_output+'/dls_theory_'+comp+'_'+self.flux+bps+'act_planck_'+self.root_theory_data_spectra+'.npy',ps[comp])
 
         logp = -0.5 * np.dot(delta,np.dot(self.sp.cinv,delta))
@@ -268,6 +269,7 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
 
 
         self.fgpower = ForegroundPowers(self.fparams,self.sp.ells,
+                                            cib_temp_file,
                                             sz_temp_file,
                                             ksz_temp_file,
                                             sz_x_cib_temp_file,

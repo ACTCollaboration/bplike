@@ -285,6 +285,7 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
             cfreq_dict = None
 
         self.fgpower = ForegroundPowers(self.fparams,self.sp.ells,
+                                            cib_temp_file,
                                             sz_temp_file,
                                             ksz_temp_file,
                                             sz_x_cib_temp_file,

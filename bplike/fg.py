@@ -4,14 +4,8 @@ import tilec
 from tilec.fg import ArraySED
 
 
-def get_template(ells,template_file,ell_pivot=3000):
+def get_template(ells,template_file,ell_pivot=None):
     ls,pow = np.loadtxt(template_file,unpack=True)
-    if '_tsz_150' in template_file:
-        # print('tsz template rescaling')
-        pow = pow/5.59550
-    if '_ksz_bat' in template_file:
-        # print('ksz template rescaling')
-        pow = pow/1.51013
     powfunc = interp1d(ls,pow)
     if ell_pivot is not None:
         pow_pivot = powfunc(ell_pivot)
@@ -22,6 +16,7 @@ def get_template(ells,template_file,ell_pivot=3000):
 
 class ForegroundPowers(ArraySED):
     def __init__(self,params,ells,
+                 cib_temp_file,
                  sz_temp_file,
                  ksz_temp_file,
                  sz_x_cib_temp_file,
@@ -35,7 +30,7 @@ class ForegroundPowers(ArraySED):
              ):
         # print('getting ells')
         self.ells= ells
-
+        self.cib_temp = get_template(ells,cib_temp_file,ell_pivot=None)
         self.tsz_temp = get_template(ells,sz_temp_file,ell_pivot=params['high_ell0'])
         self.ksz_temp = get_template(ells,ksz_temp_file,ell_pivot=params['high_ell0'])
         self.tsz_x_cib_temp = get_template(ells,sz_x_cib_temp_file,ell_pivot=None)
@@ -68,7 +63,8 @@ class ForegroundPowers(ArraySED):
         elif comp=='tsz_x_cib':
             return self.tsz_x_cib_temp
         elif comp=='cibc':
-            return self.ells * (self.ells+1) / p['high_ell0'] / (p['high_ell0']+1.) * (self.ells / p['high_ell0'])**p['cibc_n']
+            return self.cib_temp
+            # return self.ells * (self.ells+1) / p['high_ell0'] / (p['high_ell0']+1.) * (self.ells / p['high_ell0'])**p['cibc_n']
         elif comp=='poisson':
             return self.ells * (self.ells+1) / p['high_ell0'] / (p['high_ell0']+1.)
         elif comp in ['galdust_t','galdust_p','galsync_t','galsync_p']:

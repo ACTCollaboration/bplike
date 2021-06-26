@@ -60,16 +60,16 @@ You can then adapt this yaml file acccording to what you would like to do.
 If set up properly, this should return the following:
 
 ```
-[evaluate] log-likelihood = -537.313
-[evaluate]    chi2_bplike.act100_act_only_TTTEEE = 567.182
-[evaluate]    chi2_bplike.act15_act_only_TTTEEE = 507.443
+[evaluate] log-likelihood = -537.626
+[evaluate]    chi2_bplike.act100_act_only_TTTEEE = 567.175
+[evaluate]    chi2_bplike.act15_act_only_TTTEEE = 508.078
 [evaluate] Derived params:
 [evaluate]    A_s = 2.12599e-09
 [evaluate]    H0 = 67.0712
 [evaluate]    sigma8 = 0.833653
-[bplike.act100_act_only_ttteee] Average evaluation time for bplike.act100_act_only_TTTEEE: 2.21904 s  (1 evaluations)
-[bplike.act15_act_only_ttteee] Average evaluation time for bplike.act15_act_only_TTTEEE: 1.66744 s  (1 evaluations)
-[classy] Average evaluation time for classy: 1.77039 s  (1 evaluations)
+[bplike.act100_act_only_ttteee] Average evaluation time for bplike.act100_act_only_TTTEEE: 2.19557 s  (1 evaluations)
+[bplike.act15_act_only_ttteee] Average evaluation time for bplike.act15_act_only_TTTEEE: 1.6663 s  (1 evaluations)
+[classy] Average evaluation time for classy: 1.7928 s  (1 evaluations)
 ```
 The same example, without the bandpass integration is obtained by running:
 
@@ -80,16 +80,16 @@ $ cobaya-run run_scripts/act_extended_act_only.evaluate_bestfit.260621.yaml -f
 and should return:
 
 ```
-[evaluate] log-likelihood = -533.205
-[evaluate]    chi2_bplike.act100_act_only_TTTEEE = 563.01
-[evaluate]    chi2_bplike.act15_act_only_TTTEEE = 503.399
+[evaluate] log-likelihood = -533.471
+[evaluate]    chi2_bplike.act100_act_only_TTTEEE = 562.963
+[evaluate]    chi2_bplike.act15_act_only_TTTEEE = 503.98
 [evaluate] Derived params:
 [evaluate]    A_s = 2.07049e-09
 [evaluate]    H0 = 67.0126
 [evaluate]    sigma8 = 0.82004
-[bplike.act100_act_only_ttteee] Average evaluation time for bplike.act100_act_only_TTTEEE: 0.0620279 s  (1 evaluations)
-[bplike.act15_act_only_ttteee] Average evaluation time for bplike.act15_act_only_TTTEEE: 0.0567734 s  (1 evaluations)
-[classy] Average evaluation time for classy: 1.826 s  (1 evaluations)
+[bplike.act100_act_only_ttteee] Average evaluation time for bplike.act100_act_only_TTTEEE: 0.0561554 s  (1 evaluations)
+[bplike.act15_act_only_ttteee] Average evaluation time for bplike.act15_act_only_TTTEEE: 0.0566746 s  (1 evaluations)
+[classy] Average evaluation time for classy: 1.83636 s  (1 evaluations)
 ```
 
 This reproduces the best-fitting chi^2 reported in Choi el al (chi^2=1061) to 0.4%.
