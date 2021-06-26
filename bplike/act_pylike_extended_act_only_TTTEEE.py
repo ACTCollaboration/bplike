@@ -379,8 +379,6 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
 
 
         else:
-            # print('doing theory no bandpass')
-            # print('sp.ells: ',self.sp.ells)
             fpower = {}
             if self.theory_debug is not None:
                 import time
@@ -394,12 +392,14 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
                                              fgdict,
                                              lmax=self.l_max,
                                              lkl_setup = lkl_setup)
+            # print('fpower:',fpower)
 
 
             if self.theory_debug is not None:
                 print('[debug] time for tot: ', time.time() - start)
             if self.save_theory_data_spectra:
                 for comp in comps:
+                    print('computing ',comp)
                     if self.theory_debug is not None:
                         print('[debug] comp = ', comp)
                         start = time.time()

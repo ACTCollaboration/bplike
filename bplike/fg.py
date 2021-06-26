@@ -53,8 +53,6 @@ class ForegroundPowers(ArraySED):
                 self.effs[cfreqs] = {}
                 for c in ['tsz','dust','syn']:
                     self.effs[cfreqs][c] = params[f'f{c}_{cfreqs}_{self.fcut}']
-        # print('elf.effs:',self.effs)
-
 
         self.comps = comps
         ArraySED.__init__(self,arrays=arrays,bp_file_dict=bp_file_dict,beam_file_dict=beam_file_dict,cfreq_dict=cfreq_dict)
@@ -95,12 +93,12 @@ class ForegroundPowers(ArraySED):
                                            eff_freq_ghz=e1tsz,params=params,lmax=lmax)
                 f2_tsz = self.get_response("tSZ",array=array2,norm_freq_ghz=params['nu0'],
                                            eff_freq_ghz=e2tsz,params=params,lmax=lmax)
-                if (f2_tsz.size<lmax):
+                if (f2_tsz.size<lmax and f2_tsz.size>1):
                     new_f2 = np.zeros(lmax)
                     new_f2[:f2_tsz.size] = f2_tsz
                     new_f2[f2_tsz.size:] = np.repeat(f2_tsz[f2_tsz.size-1], lmax-f2_tsz.size)
                     f2_tsz = new_f2
-                if (f1_tsz.size<lmax):
+                if (f1_tsz.size<lmax and f1_tsz.size>1):
                     new_f1 = np.zeros(lmax)
                     new_f1[:f1_tsz.size] = f1_tsz
                     new_f1[f1_tsz.size:] = np.repeat(f1_tsz[f1_tsz.size-1], lmax-f1_tsz.size)
@@ -113,12 +111,12 @@ class ForegroundPowers(ArraySED):
                                            eff_freq_ghz=e1dusty,params=params,lmax=lmax)
                 f2_cib = self.get_response("CIB",array=array2,norm_freq_ghz=params['nu0'],
                                            eff_freq_ghz=e2dusty,params=params,lmax=lmax)
-                if (f2_cib.size<lmax):
+                if (f2_cib.size<lmax and f2_cib.size>1):
                     new_f2 = np.zeros(lmax)
                     new_f2[:f2_cib.size] = f2_cib
                     f2_cib = new_f2
                     new_f2[f2_cib.size:] = np.repeat(f2_cib[f2_cib.size-1], lmax-f2_cib.size)
-                if (f1_cib.size<lmax):
+                if (f1_cib.size<lmax and f1_cib.size>1):
                     new_f1 = np.zeros(lmax)
                     new_f1[:f1_cib.size] = f1_cib
                     new_f1[f1_cib.size:] = np.repeat(f1_cib[f1_cib.size-1], lmax-f1_cib.size)
@@ -128,7 +126,6 @@ class ForegroundPowers(ArraySED):
                     tpow = tpow + f1_tsz *f2_tsz *ptsz
                 else:
                     tpow = tpow + f1_tsz *f2_tsz *params['a_tsz']*self.get_component_scale_dependence('tSZ',params)
-                    # exit(0)
             if ('cibc' in ocomps):
                 tpow = tpow + f1_cib*f2_cib*params['a_c']*self.get_component_scale_dependence('cibc',params)
             if ('cibp' in ocomps):
@@ -157,12 +154,12 @@ class ForegroundPowers(ArraySED):
                                     eff_freq_ghz=e2syn,
                                     params=params,
                                     lmax=lmax)
-            if (f2.size<lmax):
+            if (f2.size<lmax and f2.size>1):
                 new_f2 = np.zeros(lmax)
                 new_f2[:f2.size] = f2
                 new_f2[f2.size:] = np.repeat(f2[f2.size-1], lmax-f2.size)
                 f2 = new_f2
-            if (f1.size<lmax):
+            if (f1.size<lmax and f1.size>1):
                 new_f1 = np.zeros(lmax)
                 new_f1[:f1.size] = f1
                 new_f1[f1.size:] = np.repeat(f1[f1.size-1], lmax-f1.size)
@@ -181,8 +178,6 @@ class ForegroundPowers(ArraySED):
 
 
         if 'galdust' in ocomps:
-            # print('doing galdust')
-            # print('params galdust:',params)
             e1dusty = eff_freq_ghz1['dust'] if eff_freq_ghz1 is not None else None
             e2dusty = eff_freq_ghz2['dust'] if eff_freq_ghz2 is not None else None
             # print('e1,e2:',e1dusty,e2dusty)
@@ -201,12 +196,12 @@ class ForegroundPowers(ArraySED):
                                    # dust_beta_param_name='beta_galdust',
                                    lmax=lmax)
 
-            if (f2.size<lmax):
+            if (f2.size<lmax and f2.size>1):
                 new_f2 = np.zeros(lmax)
                 new_f2[:f2.size] = f2
                 new_f2[f2.size:] = np.repeat(f2[f2.size-1], lmax-f2.size)
                 f2 = new_f2
-            if (f1.size<lmax):
+            if (f1.size<lmax and f1.size>1):
                 new_f1 = np.zeros(lmax)
                 new_f1[:f1.size] = f1
                 new_f1[f1.size:] = np.repeat(f1[f1.size-1], lmax-f1.size)
@@ -305,8 +300,8 @@ class ForegroundPowers(ArraySED):
             dlee[ells>lmax] = 0
 
         if lkl_setup.use_act_planck == 'yes':
-            print('use_act_planck :', lkl_setup.use_act_planck)
-            exit(0)
+            # print('use_act_planck :', lkl_setup.use_act_planck)
+            # exit(0)
             # dls = np.zeros((28,3924))
             dls = np.zeros((28,lkl_setup.sp.l_max))
             for i in range(28):
@@ -317,7 +312,7 @@ class ForegroundPowers(ArraySED):
                 # print('dltt 0-10',dltt[0:10])
                 dls[i] = (dltt + self.get_power('TT',self.comps,params,
                                             eff_freq_ghz1=self.effs[band1],array1=None,
-                                            eff_freq_ghz2=self.effs[band2],array2=None,ptsz=ptsz) ) * c1 * c2
+                                            eff_freq_ghz2=self.effs[band2],array2=None,lmax=lkl_setup.sp.l_max,ptsz=ptsz) ) * c1 * c2
                 # print('dls 0-10',dls[0:10])
             return bin_func(dls/ells/(ells+1.)*2.*np.pi)
         else:
@@ -331,8 +326,7 @@ class ForegroundPowers(ArraySED):
                     # print('dltt 0-10',dltt[0:10])
                     dls[i] = (dltt + self.get_power('TT',self.comps,params,
                                                 eff_freq_ghz1=self.effs[band1],array1=None,
-                                                eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2
-                    # print('dls 0-10',dls[0:10])
+                                                eff_freq_ghz2=self.effs[band2],array2=None,lmax=lkl_setup.sp.l_max,ptsz=ptsz) ) * c1 * c2
                 elif i>=3 and i<=6:
                     band1 = {0:'95',1:'95',2:'150',3:'150'}[i-3]
                     band2 = {0:'95',1:'150',2:'95',3:'150'}[i-3]
@@ -341,7 +335,7 @@ class ForegroundPowers(ArraySED):
                     y = params[f'yp_{band2}']
                     dls[i] = (dlte + self.get_power('TE',self.comps,params,
                                                 eff_freq_ghz1=self.effs[band1],array1=None,
-                                                eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2 * y
+                                                eff_freq_ghz2=self.effs[band2],array2=None,lmax=lkl_setup.sp.l_max) ) * c1 * c2 * y
                 else:
                     band1 = {0:'95',1:'95',2:'150'}[i-7]
                     band2 = {0:'95',1:'150',2:'150'}[i-7]
@@ -351,7 +345,7 @@ class ForegroundPowers(ArraySED):
                     y2 = params[f'yp_{band2}']
                     dls[i] =  (dlee + self.get_power('EE',self.comps,params,
                                                 eff_freq_ghz1=self.effs[band1],array1=None,
-                                                eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2 * y1 * y2
+                                                eff_freq_ghz2=self.effs[band2],array2=None,lmax=lkl_setup.sp.l_max) ) * c1 * c2 * y1 * y2
 
             return bin_func(dls/ells/(ells+1.)*2.*np.pi)
 
@@ -407,7 +401,7 @@ class ForegroundPowers(ArraySED):
 
 
 
-    def get_comp(self,ells,bin_func,dltt,dlte,dlee,params,lmax=6000,lkl_setup = None, comp = None):
+    def get_comp(self,ells,bin_func,dltt,dlte,dlee,params,lmax=6000,lkl_setup = None, comp = None,ptsz=None):
         # print('getting theory')
         if lmax is not None:
             dltt[ells>lmax] = 0
@@ -435,7 +429,7 @@ class ForegroundPowers(ArraySED):
                 else:
                     dls[i] = (self.get_power('TT',[comp],params,
                                                 eff_freq_ghz1=self.effs[band1],array1=None,
-                                                eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2
+                                                eff_freq_ghz2=self.effs[band2],array2=None,lmax=lkl_setup.sp.l_max,ptsz=ptsz) ) * c1 * c2
 
                 # print('dls 0-10',dls[i][0:10])
             # exit(0)
@@ -454,7 +448,7 @@ class ForegroundPowers(ArraySED):
                     else:
                         dls[i] = (self.get_power('TT',[comp],params,
                                                 eff_freq_ghz1=self.effs[band1],array1=None,
-                                                eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2
+                                                eff_freq_ghz2=self.effs[band2],array2=None,lmax=lkl_setup.sp.l_max,ptsz=ptsz) ) * c1 * c2
                     # print('dls 0-10',dls[0:10])
                 elif i>=3 and i<=6:
                     band1 = {0:'95',1:'95',2:'150',3:'150'}[i-3]
@@ -467,7 +461,7 @@ class ForegroundPowers(ArraySED):
                     else:
                         dls[i] = (self.get_power('TE',[comp],params,
                                                     eff_freq_ghz1=self.effs[band1],array1=None,
-                                                    eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2 * y
+                                                    eff_freq_ghz2=self.effs[band2],array2=None,lmax=lkl_setup.sp.l_max,ptsz=ptsz) ) * c1 * c2 * y
                 else:
                     band1 = {0:'95',1:'95',2:'150'}[i-7]
                     band2 = {0:'95',1:'150',2:'150'}[i-7]
@@ -480,7 +474,7 @@ class ForegroundPowers(ArraySED):
                     else:
                         dls[i] =  (self.get_power('EE',[comp],params,
                                                     eff_freq_ghz1=self.effs[band1],array1=None,
-                                                    eff_freq_ghz2=self.effs[band2],array2=None) ) * c1 * c2 * y1 * y2
+                                                    eff_freq_ghz2=self.effs[band2],array2=None,lmax=lkl_setup.sp.l_max,ptsz=ptsz) ) * c1 * c2 * y1 * y2
                 # print('dls 0-10',dls[i][0:10])
             return bin_func(dls/ells/(ells+1.)*2.*np.pi)
 

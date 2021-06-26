@@ -1,6 +1,6 @@
 likelihood:
   bplike.act100_act_only_TTTEEE:
-    bandpass: true
+    bandpass: false
     flux: 100mJy
     input_params:
     - a_tsz
@@ -9,7 +9,6 @@ likelihood:
     - a_d
     - a_c
     - beta_CIB
-    - beta_radio
     - a_p_tt_15
     - a_p_tt_100
     - a_g_tt_15
@@ -28,8 +27,10 @@ likelihood:
     - leak_95
     - yp_150
     - yp_95
+    - beta_radio
+    l_max_data: 7924
     output_params: []
-    root_theory_data_spectra: act_extended_act_only_bp
+    root_theory_data_spectra: act_extended_act_only
     save_theory_data_spectra: true
     speed: -1
     stop_at_error: false
@@ -38,7 +39,7 @@ likelihood:
     use_act_planck: 'no'
     version: null
   bplike.act15_act_only_TTTEEE:
-    bandpass: true
+    bandpass: false
     flux: 15mJy
     input_params:
     - a_tsz
@@ -47,7 +48,6 @@ likelihood:
     - a_d
     - a_c
     - beta_CIB
-    - beta_radio
     - a_p_tt_15
     - a_p_tt_100
     - a_g_tt_15
@@ -66,8 +66,10 @@ likelihood:
     - leak_95
     - yp_150
     - yp_95
+    - beta_radio
+    l_max_data: 7924
     output_params: []
-    root_theory_data_spectra: act_extended_act_only_bp
+    root_theory_data_spectra: act_extended_act_only
     save_theory_data_spectra: true
     speed: -1
     stop_at_error: false
@@ -75,7 +77,7 @@ likelihood:
     type: []
     use_act_planck: 'no'
     version: null
-output: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/chains/act_extended_act_only_bp_classy_120621
+output: /Users/boris/Work/CLASS-SZ/ATSZ_ACMB/analysis/atsz_analysis/act_extended_act_only.evaluate_bestfit
 packages_path: null
 params:
   100*theta_s:
@@ -234,9 +236,6 @@ params:
       dist: norm
       loc: 5.806115
       scale: 0.5
-  beta_radio:
-    value: -0.5
-    latex: \beta_radio
   beta_CIB:
     latex: \beta_c
     prior:
@@ -247,6 +246,8 @@ params:
       dist: norm
       loc: 2.2
       scale: 0.5
+  beta_radio:
+    value: -0.5
   cal_150:
     value: 1.0
   cal_95:
@@ -372,30 +373,30 @@ prior:
 sampler:
   evaluate:
     override:
-      a_c: 3.9711221
-      a_d: 5.8390643
-      a_g_ee_100: 0.11345268
-      a_g_ee_15: 0.046193941
-      a_g_te_100: 0.35638303
-      a_g_te_15: 0.14213126
-      a_g_tt_100: 8.6016058
-      a_g_tt_15: 2.802307
-      a_ksz: 0.29813846
-      a_p_ee: 0.018175548
-      a_p_te: 0.091964234
-      a_p_tt_100: 23.702936
-      a_p_tt_15: 4.0946102
-      a_tsz: 5.5652422
-      beta_CIB: 2.7834766
-      logA: 3.0568226
-      n_s: 1.0054159
-      omega_b: 0.021250829
-      omega_cdm: 0.11966384
-      tau_reio: 0.066792073
-      theta_MC_100: 1.043612
-      xi: 0.18109982
-      yp_150: 0.9702048
-      yp_95: 0.98518108
+      a_c: 4.4027181
+      a_d: 6.1785703
+      a_g_ee_100: 0.11648623
+      a_g_ee_15: 0.073617855
+      a_g_te_100: 0.36622662
+      a_g_te_15: 0.09947606
+      a_g_tt_100: 8.5693263
+      a_g_tt_15: 2.8671247
+      a_ksz: 0.041725851
+      a_p_ee: 0.0027912677
+      a_p_te: 0.060101099
+      a_p_tt_100: 22.587749
+      a_p_tt_15: 3.7662584
+      a_tsz: 5.4720268
+      beta_CIB: 2.5710581
+      logA: 3.030369
+      n_s: 1.0035955
+      omega_b: 0.021355989
+      omega_cdm: 0.11938639
+      tau_reio: 0.056469056
+      theta_MC_100: 1.0428594
+      xi: 0.12401623
+      yp_150: 0.9702333
+      yp_95: 0.98426773
 test: false
 theory:
   classy:
