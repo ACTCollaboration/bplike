@@ -25,7 +25,7 @@ fixed:
   ftsz_143_15mJy   : 143.14
   ftsz_150_15mJy   : 150.14
   ftsz_217_15mJy   : 217.14
-  ftsz_353_15mJy   : 353.14
+  ftsz_353_15mJy   : 364.2
   ftsz_545_15mJy   : 545.14
 
   fdust_090_15mJy   : 98.38
@@ -33,7 +33,7 @@ fixed:
   fdust_143_15mJy   : 143.14
   fdust_150_15mJy   : 150.14
   fdust_217_15mJy   : 217.14
-  fdust_353_15mJy   : 353.14
+  fdust_353_15mJy   : 364.2
   fdust_545_15mJy   : 545.14
 
   fsyn_090_15mJy   : 98.38
@@ -41,7 +41,7 @@ fixed:
   fsyn_143_15mJy   : 143.14
   fsyn_150_15mJy   : 150.14
   fsyn_217_15mJy   : 217.14
-  fsyn_353_15mJy   : 353.14
+  fsyn_353_15mJy   : 364.2
   fsyn_545_15mJy   : 545.14
 
 
@@ -50,7 +50,7 @@ fixed:
   ftsz_143_100mJy   : 143.14
   ftsz_150_100mJy   : 150.14
   ftsz_217_100mJy   : 217.14
-  ftsz_353_100mJy   : 353.14
+  ftsz_353_100mJy   : 364.2
   ftsz_545_100mJy   : 545.14
 
   fdust_090_100mJy   : 98.38
@@ -58,7 +58,7 @@ fixed:
   fdust_143_100mJy   : 143.14
   fdust_150_100mJy   : 150.14
   fdust_217_100mJy   : 217.14
-  fdust_353_100mJy   : 353.14
+  fdust_353_100mJy   : 364.2
   fdust_545_100mJy   : 545.14
 
   fsyn_090_100mJy   : 98.38
@@ -66,13 +66,13 @@ fixed:
   fsyn_143_100mJy   : 143.14
   fsyn_150_100mJy   : 150.14
   fsyn_217_100mJy   : 217.14
-  fsyn_353_100mJy   : 353.14
+  fsyn_353_100mJy   : 364.2
   fsyn_545_100mJy   : 545.14
 
 
 
   beta_galdust : 1.5 #was 3.8
-  # beta_radio : -3. # 
+  # beta_radio : -3. #
   beta_galsyn : -1.
 
   high_ell0 : 3000

@@ -8,10 +8,12 @@ likelihood:
   bplike.act100_act_TT_plus_planck_TT:
     stop_at_error: True
     bandpass: True
+    l_max_data: 7924
 
   bplike.act15_act_TT_plus_planck_TT:
     stop_at_error: True
     bandpass: True
+    l_max_data: 7924
 
 
 params:

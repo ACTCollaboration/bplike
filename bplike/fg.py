@@ -30,7 +30,7 @@ class ForegroundPowers(ArraySED):
              ):
         # print('getting ells')
         self.ells= ells
-        self.cib_temp = get_template(ells,cib_temp_file,ell_pivot=None)
+        self.cib_temp = get_template(ells,cib_temp_file,ell_pivot=3000)
         self.tsz_temp = get_template(ells,sz_temp_file,ell_pivot=params['high_ell0'])
         self.ksz_temp = get_template(ells,ksz_temp_file,ell_pivot=params['high_ell0'])
         self.tsz_x_cib_temp = get_template(ells,sz_x_cib_temp_file,ell_pivot=None)
@@ -80,7 +80,6 @@ class ForegroundPowers(ArraySED):
         ocomps = [comp.lower() for comp in comps]
         spec = spec.lower()
         tpow = 0
-
         if spec=='tt':
             if ('tsz' in ocomps) or ('tsz_x_cib' in ocomps):
                 e1tsz = eff_freq_ghz1['tsz'] if eff_freq_ghz1 is not None else None
@@ -134,7 +133,6 @@ class ForegroundPowers(ArraySED):
                 xi = params['xi']
                 fp = (f1_tsz*f2_cib + f2_tsz*f1_cib)/2.
                 tpow = tpow - 2.*fp*xi*np.sqrt(a_sz*a_c)*self.get_component_scale_dependence('tsz_x_cib',params)
-
         if 'radio' in ocomps:
             e1syn = eff_freq_ghz1['syn'] if eff_freq_ghz1 is not None else None
             e2syn = eff_freq_ghz2['syn'] if eff_freq_ghz2 is not None else None
@@ -172,11 +170,9 @@ class ForegroundPowers(ArraySED):
                 rparam = f'a_p_{spec}'
             tpow = tpow + f1*f2*params[rparam]*self.get_component_scale_dependence('poisson',params)
 
-
         if 'galdust' in ocomps:
             e1dusty = eff_freq_ghz1['dust'] if eff_freq_ghz1 is not None else None
             e2dusty = eff_freq_ghz2['dust'] if eff_freq_ghz2 is not None else None
-            # print('e1,e2:',e1dusty,e2dusty)
             f1 = self.get_response("galdust",array=array1,
                                    norm_freq_ghz=params['nu0'],
                                    eff_freq_ghz=e1dusty,
@@ -214,7 +210,6 @@ class ForegroundPowers(ArraySED):
                 raise ValueError
             rparam = f'a_g_{spec}_{fnum}'
             tpow = tpow + f1*f2*params[rparam]*self.get_component_scale_dependence(scale_str,params) # correct one
-
         if spec!='tt':
             if 'galsyn' in ocomps:
                 e1syn = eff_freq_ghz1['syn'] if eff_freq_ghz1 is not None else None

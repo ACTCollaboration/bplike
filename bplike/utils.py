@@ -20,6 +20,7 @@ dfroot_fg = path_to_data+"/actpolfull_dr4.01/data/Fg/"
 fgroot = dfroot_fg
 
 cib_temp_file = dfroot_fg+"cib_extra.dat"
+# cib_temp_file = dfroot_fg+"cib_extra_steve.dat"
 sz_temp_file = dfroot_fg+"cl_tsz_150_bat.dat"
 sz_x_cib_temp_file = dfroot_fg+"sz_x_cib_template.dat"
 ksz_temp_file = dfroot_fg+"cl_ksz_bat.dat"

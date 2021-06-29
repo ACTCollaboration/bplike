@@ -34,6 +34,7 @@ class StevePower(object):
         # exit(0)
         self.n_specs = 10
         self.bbl =bbl.reshape((10,52,self.l_max))
+        self.bbl[:,:,:100] = 0
         self.spec = spec[:520]
         self.cov = cov[:520,:520]
         nbin = 52
@@ -165,8 +166,10 @@ class StevePower_extended(object):
             rfroot = 'boss'
 
         if l_max_data == 7924:
-            spec = np.load(data_root+f'{rfroot}_all_ps_mean_C_ell_data_210610.npy')
-            cov = np.load(data_root+f'{rfroot}_all_ps_Cov_from_coadd_ps_210610.npy')
+            # spec = np.load(data_root+f'{rfroot}_all_ps_mean_C_ell_data_210610.npy')
+            # cov = np.load(data_root+f'{rfroot}_all_ps_Cov_from_coadd_ps_210610.npy')
+            spec = np.load(data_root+f'{rfroot}_all_ps_mean_C_ell_data_210627.npy')
+            cov = np.load(data_root+f'{rfroot}_all_ps_Cov_from_coadd_ps_210627.npy')
             covx = np.load(data_root+f'{rfroot}_all_covmat_anal_210610.npy')
             bbl = np.load(data_root+f'{rfroot}_bpwf_210610.npy')
         else:
@@ -288,6 +291,7 @@ class StevePower_extended(object):
 
 
         self.bbl = bbl_2.reshape((n_specs,n_bins,n_ells))
+        self.bbl[:,:,:100] = 0
         self.spec = spec[:,1]
         self.cov = cov
         # print('shape cov : ', np.shape(self.cov))
@@ -313,16 +317,11 @@ class StevePower_extended(object):
         self.rfband1 =  rfband1
         self.rfband2 =  rfband2
 
+        # cut all l<600 for act bands
         if tt_lmin is not None:
             # n = 3
             ids = []
             ids = np.argwhere(self.ls<tt_lmin)[:,0]
-            # print('ls: ', self.ls)
-            # print(len(self.ls))
-            # print('nbins: ',nbin)
-            # print('ids ls<tt_lmin: ', ids)
-            # print('fband1 : ',self.fband1)
-
 
             ids_act = np.argwhere((self.ls<tt_lmin) & ((rfband1 == '090') | (rfband1 == '150') | (rfband2 == '090') | (rfband2 == '150')))[:,0]
             ids = ids_act
@@ -330,38 +329,45 @@ class StevePower_extended(object):
             self.cov[ids,:] = 0
             self.cov[ids,ids] = infval
 
-        # cutting higher bins for tests:
-        ids_act = np.argwhere((self.ls>3924))[:,0]
-            #
-        ids = ids_act
+
+        # cutting lower bins (most power is filtered then):
+        ids = np.argwhere((self.ls<200))[:,0]
         self.cov[:,ids] = 0
         self.cov[ids,:] = 0
         self.cov[ids,ids] = infval
 
+        # cutting higher bins for tests:
+        # ids_act = np.argwhere((self.ls>3924))[:,0]
+        #     #
+        # ids = ids_act
+        # self.cov[:,ids] = 0
+        # self.cov[ids,:] = 0
+        # self.cov[ids,ids] = infval
+
 
         # cutting out some spectra
 
-        ps_list = ['090x090', '090x100', '090x143', '090x150', '090x217', '090x353', '090x545', '100x100', '100x143', '143x143', '100x150', '143x150', '150x150', '150x217', '150x353', '150x545', '100x217', '143x217', '217x217', '100x353', '143x353', '217x353', '353x353', '100x545', '143x545', '217x545', '353x545', '545x545']
-        ps_list_to_keep = ps_list#['090x100','090x143','150x545']
-        # label_bps = []
-        print(self.rfband1)
-        print(self.rfband2)
+        # ps_list = ['090x090', '090x100', '090x143', '090x150', '090x217', '090x353', '090x545', '100x100', '100x143', '143x143', '100x150', '143x150', '150x150', '150x217', '150x353', '150x545', '100x217', '143x217', '217x217', '100x353', '143x353', '217x353', '353x353', '100x545', '143x545', '217x545', '353x545', '545x545']
+        # ps_list_to_keep = ps_list#['090x100','090x143','150x545']
+        # # label_bps = []
+        # print(self.rfband1)
+        # print(self.rfband2)
+        #
+        # for ps in ps_list:
+        #     if ps in ps_list_to_keep:
+        #         continue
+        #     # print(ps)
+        #     # print(ids)
+        #
+        #     ids_act = np.argwhere( (self.rfband1 == ps.split('x')[0]) & (self.rfband2 == ps.split('x')[1]) )[:,0]
+        #     ids = ids_act
+        #     # print(ps)
+        #     # print(ids)
+        #     self.cov[:,ids] = 0
+        #     self.cov[ids,:] = 0
+        #     self.cov[ids,ids] = infval
 
-        # for b1,b2 in zip(self.fband1,self.fband2):
-        #     label_bps.append(b1 +'x' +b2)
-        for ps in ps_list:
-            if ps in ps_list_to_keep:
-                continue
-            # print(ps)
-            # print(ids)
-
-            ids_act = np.argwhere( (self.rfband1 == ps.split('x')[0]) & (self.rfband2 == ps.split('x')[1]) )[:,0]
-            ids = ids_act
-            # print(ps)
-            # print(ids)
-            self.cov[:,ids] = 0
-            self.cov[ids,:] = 0
-            self.cov[ids,ids] = infval
+        # keeping only diagonal elements to covmat
         # self.cov = np.diag(np.diagonal(self.cov))
 
             # j = label_bps.index(ps)
@@ -402,32 +408,16 @@ class StevePower_extended(object):
         for (fb1,fb2) in zip(self.fband1,self.fband2):
             lmax_order_list.append(min(lmax_beam_cutoff[fb1],lmax_beam_cutoff[fb2]))
 
-        # print('lmax_order_list:',lmax_order_list)
 
-
-
-        # rfband1 = np.repeat(self.fband1,nbin)
-        # print('repeated fband1:',rfband1)
-        # rfband2 = np.repeat(self.fband2,nbin)
         rlmax_order_list = np.repeat(lmax_order_list,nbin)
-        # print(rlmax_order_list)
-
         ids_cutoff = np.argwhere((self.ls>rlmax_order_list))[:,0]
-        # print(self.ls)
-        # print(ids_cutoff)
+
         ids = ids_cutoff
         self.cov[:,ids] = 0
         self.cov[ids,:] = 0
         self.cov[ids,ids] = infval
-        # exit(0)
-        # if tt_lmax is not None:
-        #     n = 3
-        #     ids = []
-        #     ids = np.argwhere(self.ls>tt_lmax)[:,0]
-        #     ids = ids[ids<nbin*3]
-        #     self.cov[:,ids] = 0
-        #     self.cov[ids,:] = 0
-        #     self.cov[ids,ids] = infval
+
+
 
         self.cinv = np.linalg.inv(self.cov)
 

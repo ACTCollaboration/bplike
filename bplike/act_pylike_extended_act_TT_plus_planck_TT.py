@@ -168,7 +168,7 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
             np.save(path_to_output+'/ls_theory_'+self.flux+bps+'act_planck_'+self.root_theory_data_spectra+'.npy',ls_theory)
 
             for comp in comps:
-                print(ps['cibc'])
+                # print(ps['cibc'])
                 np.save(path_to_output+'/dls_theory_'+comp+'_'+self.flux+bps+'act_planck_'+self.root_theory_data_spectra+'.npy',ps[comp])
 
         logp = -0.5 * np.dot(delta,np.dot(self.sp.cinv,delta))
@@ -176,7 +176,7 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
             print('[debug] logp: ',logp)
         self.log.debug(
             f"ACT-like {self.flux} lnLike value = {logp} (chisquare = {-2 * logp})")
-        print(f"ACT-like {self.flux} lnLike value = {logp} (chisquare = {-2 * logp})")
+        # print(f"ACT-like {self.flux} lnLike value = {logp} (chisquare = {-2 * logp})")
         return logp
 
     def prepare_data(self, verbose=False):
