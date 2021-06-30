@@ -329,12 +329,21 @@ class StevePower_extended(object):
             self.cov[ids,:] = 0
             self.cov[ids,ids] = infval
 
-
-        # cutting lower bins (most power is filtered then):
-        ids = np.argwhere((self.ls<200))[:,0]
+        # cutting large scales on 353 and 545:
+        ids = np.argwhere((self.ls<tt_lmin) & ((rfband1 == '545') | (rfband1 == '353') | (rfband2 == '545') | (rfband2 == '353')))[:,0]
         self.cov[:,ids] = 0
         self.cov[ids,:] = 0
         self.cov[ids,ids] = infval
+
+        # cutting lower bins (most power is filtered then):
+
+        ids = np.argwhere((self.ls<200))[:,0]
+
+
+        self.cov[:,ids] = 0
+        self.cov[ids,:] = 0
+        self.cov[ids,ids] = infval
+
 
         # cutting higher bins for tests:
         # ids_act = np.argwhere((self.ls>3924))[:,0]
