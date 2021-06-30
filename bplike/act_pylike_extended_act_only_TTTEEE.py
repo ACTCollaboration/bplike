@@ -68,7 +68,7 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
 
         if self.use_act_planck == 'no':
             # self.l_max = 6000
-            self.l_max = 6051
+            self.l_max = 6000
             self.fparams = config_from_yaml('params.yml')['fixed']
             self.aparams = config_from_yaml('params.yml')['act_like']
             self.bpmodes = config_from_yaml('params.yml')['bpass_modes']
@@ -305,7 +305,8 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
         if self.theory_debug is not None:
             print('[debug] theory debug:',self.theory_debug)
             # ells,cltt,clee,clte = np.loadtxt(self.theory_debug,usecols=[0,1,2,4],unpack=True) # mat's debig
-            ells,cltt,clte,clee = np.loadtxt(self.theory_debug,usecols=[0,1,2,3],unpack=True) # boris's debug
+            # ells,cltt,clte,clee = np.loadtxt(self.theory_debug,usecols=[0,1,2,3],unpack=True) # boris's debug
+            ells,cltt,clte,clee = np.loadtxt(path_to_data+'/bf_ACTPol_lcdm.minimum.theory_cl',usecols=[0,1,2,3],unpack=True)
 
             assert ells[0] == 2
             assert ells[1] == 3
@@ -342,7 +343,6 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
         pte[l_min:nells_camb] = cl['te'][l_min:len(ptt[l_min:nells_camb])+l_min]
         pee[l_min:nells_camb] = cl['ee'][l_min:len(ptt[l_min:nells_camb])+l_min]
 
-        # print('starting get theory')
 
         comps = ['primary','tsz','ksz','cibc','cibp','tsz_x_cib','radio','galdust','galsyn']
 

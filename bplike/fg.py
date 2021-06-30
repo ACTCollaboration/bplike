@@ -198,10 +198,7 @@ class ForegroundPowers(ArraySED):
                 new_f1[:f1.size] = f1
                 new_f1[f1.size:] = np.repeat(f1[f1.size-1], lmax-f1.size)
                 f1 = new_f1
-            # print('f1,f2:',f1,f2)
             scale_str = 'galdust_t' if spec=='tt' else 'galdust_p'
-            # print('spec,scale_str:',spec,scale_str)
-            # print("params[f'a_g_{spec}']:",params[f'a_g_{spec}'])
             if self.fcut == '15mJy':
                 fnum = 15
             elif self.fcut == '100mJy':
@@ -314,7 +311,6 @@ class ForegroundPowers(ArraySED):
                     band2 = {0:'95',1:'150',2:'150'}[i]
                     c1 = params[f'cal_{band1}']
                     c2 = params[f'cal_{band2}']
-                    # print('dltt 0-10',dltt[0:10])
                     dls[i] = (dltt + self.get_power('TT',self.comps,params,
                                                 eff_freq_ghz1=self.effs[band1],array1=None,
                                                 eff_freq_ghz2=self.effs[band2],array2=None,lmax=lkl_setup.sp.l_max,ptsz=ptsz) ) * c1 * c2

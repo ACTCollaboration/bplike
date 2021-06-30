@@ -15,7 +15,7 @@ from pkg_resources import resource_filename
 import multiprocessing
 import functools
 
-infval = 1e200
+infval = 1e300
 
 class StevePower(object):
     def __init__(self,froot,flux,infval=infval,tt_lmin=600,tt_lmax=None,l_max_data = 0):

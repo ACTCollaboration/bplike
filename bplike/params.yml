@@ -19,35 +19,52 @@ act_like:
   b2: 0
   bpass_mode: 'eff_freq_coadd'
 
+  # effective frequencies d56 - 15mJy
+  # fsz(1)   = 98.4d0
+  # fsz(2)   = 150.1d0
+  # fdust(1) = 98.8d0
+  # fdust(2) = 151.2d0
+  # fsyn(1)  = 95.8d0
+  # fsyn(2)  = 147.2d0
+
+  # effective frequencies wide - 100mJy
+  # fsz(1)   = 98.4d0
+  # fsz(2)   = 149.9d0
+  # fdust(1) = 98.8d0
+  # fdust(2) = 150.9d0
+  # fsyn(1)  = 95.8d0
+  # fsyn(2)  = 147.1d0
+
+
 fixed:
-  ftsz_95_15mJy   : 98.38
-  ftsz_150_15mJy   : 150.14
+  ftsz_95_15mJy   : 98.4
+  ftsz_150_15mJy   : 150.1
 
-  fdust_95_15mJy : 98.77
-  fdust_150_15mJy : 151.16
+  fdust_95_15mJy : 98.8
+  fdust_150_15mJy : 151.2
 
-  fdust_95_100mJy : 98.77
-  fdust_150_100mJy : 150.93
-
-  fsyn_95_15mJy  : 95.76
-  fsyn_150_15mJy  : 147.24
-
-  ftsz_95_100mJy   : 98.38
-  ftsz_150_100mJy   : 149.94
+  fsyn_95_15mJy  : 95.8
+  fsyn_150_15mJy  : 147.2
 
 
 
-  fsyn_95_100mJy  : 95.76
-  fsyn_150_100mJy  : 147.14
+  ftsz_95_100mJy   : 98.4
+  ftsz_150_100mJy   : 149.9
 
-  beta_galdust : 1.5 #was 3.8
-  # beta_radio : -0.5 # 
-  beta_galsyn : -1.
+  fdust_95_100mJy : 98.8
+  fdust_150_100mJy : 150.9
 
-  high_ell0 : 3000
+  fsyn_95_100mJy  : 95.8
+  fsyn_150_100mJy  : 147.1
 
-  low_ell0 : 500
-  nu0 : 150
+  beta_galdust : 1.5 # same as f90
+  # beta_radio : -0.5 #
+  beta_galsyn : -1. # same as f90
+
+  high_ell0 : 3000 # same as f90
+
+  low_ell0 : 500 # same as f90
+  nu0 : 150 # same as f90
 
 
   Tdust_CIB : 9.7 # same as f90

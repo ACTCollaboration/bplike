@@ -71,28 +71,22 @@ If set up properly, this should return the following:
 [bplike.act15_act_only_ttteee] Average evaluation time for bplike.act15_act_only_TTTEEE: 1.6663 s  (1 evaluations)
 [classy] Average evaluation time for classy: 1.7928 s  (1 evaluations)
 ```
-The same example, without the bandpass integration is obtained by running:
+To compute the Choi et al 20 best-fit model, without the bandpass integration, run:
 
 ```
-$ cobaya-run run_scripts/act_extended_act_only.evaluate_bestfit.260621.yaml -f
+$ cobaya-run run_scripts/act_extended_act_only.evaluate_bestfit.choietal20.yaml -f
 ```
 
-and should return:
+which should return:
 
 ```
-[evaluate] log-likelihood = -533.471
-[evaluate]    chi2_bplike.act100_act_only_TTTEEE = 562.963
-[evaluate]    chi2_bplike.act15_act_only_TTTEEE = 503.98
-[evaluate] Derived params:
-[evaluate]    A_s = 2.07049e-09
-[evaluate]    H0 = 67.0126
-[evaluate]    sigma8 = 0.82004
-[bplike.act100_act_only_ttteee] Average evaluation time for bplike.act100_act_only_TTTEEE: 0.0561554 s  (1 evaluations)
-[bplike.act15_act_only_ttteee] Average evaluation time for bplike.act15_act_only_TTTEEE: 0.0566746 s  (1 evaluations)
-[classy] Average evaluation time for classy: 1.83636 s  (1 evaluations)
+[evaluate]    chi2_bplike.act100_act_only_TTTEEE = 560.389
+[evaluate]    chi2_bplike.act15_act_only_TTTEEE = 500.279
 ```
 
-This reproduces the best-fitting chi^2 reported in Choi el al (chi^2=1061) to 0.4%.
+This reproduces exactly the best-fitting chi^2 reported in Choi el al (chi^2=1061).
+
+(The dr4 fortran code returns 500.36 for deep and 560.25 for wide on this model.)
 
 
 For these examples to run smoothly, you need to set your local path in the yaml file at the following entries:
