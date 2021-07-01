@@ -289,7 +289,7 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
         if self.theory_debug is not None:
             print('[debug] theory debug:',self.theory_debug)
             # ells,cltt,clee,clte = np.loadtxt(self.theory_debug,usecols=[0,1,2,4],unpack=True) # mat's debig
-            ells,cltt,clte,clee = np.loadtxt(self.theory_debug,usecols=[0,1,2,3],unpack=True) # boris's debug
+            ells,cltt,clte,clee = np.loadtxt(path_to_data+'/bf_ACTPol_lcdm.minimum.theory_cl',usecols=[0,1,2,3],unpack=True)
             # print('ell0,ell1:',ells[0],ells[1],ells[:self.l_max])
 
             assert ells[0] == 2

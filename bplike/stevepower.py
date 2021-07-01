@@ -291,7 +291,10 @@ class StevePower_extended(object):
 
 
         self.bbl = bbl_2.reshape((n_specs,n_bins,n_ells))
+        # cut low part of bpwf
         self.bbl[:,:,:100] = 0
+
+
         self.spec = spec[:,1]
         self.cov = cov
         # print('shape cov : ', np.shape(self.cov))
@@ -329,52 +332,41 @@ class StevePower_extended(object):
             self.cov[ids,:] = 0
             self.cov[ids,ids] = infval
 
-        # cutting large scales on 353 and 545:
-        ids = np.argwhere((self.ls<tt_lmin) & ((rfband1 == '545') | (rfband1 == '353') | (rfband2 == '545') | (rfband2 == '353')))[:,0]
-        self.cov[:,ids] = 0
-        self.cov[ids,:] = 0
-        self.cov[ids,ids] = infval
+        # # # cutting large scales on 353 and 545:
+        # ids = np.argwhere((self.ls<600) & ((rfband1 == '545') | (rfband1 == '353') | (rfband2 == '545') | (rfband2 == '353')))[:,0]
+        # self.cov[:,ids] = 0
+        # self.cov[ids,:] = 0
+        # self.cov[ids,ids] = infval
 
         # cutting lower bins (most power is filtered then):
-
         ids = np.argwhere((self.ls<200))[:,0]
-
-
         self.cov[:,ids] = 0
         self.cov[ids,:] = 0
         self.cov[ids,ids] = infval
 
 
-        # cutting higher bins for tests:
-        # ids_act = np.argwhere((self.ls>3924))[:,0]
-        #     #
-        # ids = ids_act
+        # # cutting higher bins for tests:
+        # ids = np.argwhere((self.ls>3924))[:,0]
         # self.cov[:,ids] = 0
         # self.cov[ids,:] = 0
         # self.cov[ids,ids] = infval
 
 
         # cutting out some spectra
-
-        # ps_list = ['090x090', '090x100', '090x143', '090x150', '090x217', '090x353', '090x545', '100x100', '100x143', '143x143', '100x150', '143x150', '150x150', '150x217', '150x353', '150x545', '100x217', '143x217', '217x217', '100x353', '143x353', '217x353', '353x353', '100x545', '143x545', '217x545', '353x545', '545x545']
-        # ps_list_to_keep = ps_list#['090x100','090x143','150x545']
-        # # label_bps = []
-        # print(self.rfband1)
-        # print(self.rfband2)
-        #
-        # for ps in ps_list:
-        #     if ps in ps_list_to_keep:
-        #         continue
-        #     # print(ps)
-        #     # print(ids)
-        #
-        #     ids_act = np.argwhere( (self.rfband1 == ps.split('x')[0]) & (self.rfband2 == ps.split('x')[1]) )[:,0]
-        #     ids = ids_act
-        #     # print(ps)
-        #     # print(ids)
-        #     self.cov[:,ids] = 0
-        #     self.cov[ids,:] = 0
-        #     self.cov[ids,ids] = infval
+        # list of all available spectra:
+        ps_list = ['090x090', '090x100', '090x143', '090x150', '090x217', '090x353', '090x545', '100x100', '100x143', '143x143', '100x150', '143x150', '150x150', '150x217', '150x353', '150x545', '100x217', '143x217', '217x217', '100x353', '143x353', '217x353', '353x353', '100x545', '143x545', '217x545', '353x545', '545x545']
+        # here list the spectra that you want to remove,
+        ps_list_to_throw = ['090x545','100x545','143x545','150x545','217x545', # thrown because no SNR
+                            '353x353','353x545','545x545','150x353','217x353'] # thrown because inconsistent with Choi et al FG modeling
+        # ps_list_to_throw = ['']
+        for ps in ps_list:
+            if ps in ps_list_to_throw:
+                ids = np.argwhere( (self.rfband1 == ps.split('x')[0]) & (self.rfband2 == ps.split('x')[1]) )[:,0]
+                self.cov[:,ids] = 0
+                self.cov[ids,:] = 0
+                self.cov[ids,ids] = infval
+            else:
+                continue
 
         # keeping only diagonal elements to covmat
         # self.cov = np.diag(np.diagonal(self.cov))
