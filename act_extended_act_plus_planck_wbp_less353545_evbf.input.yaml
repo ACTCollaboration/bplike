@@ -1,0 +1,386 @@
+theory:
+  classy:
+    speed: 0.2
+    stop_at_error: false
+    extra_args:
+      perturbations_verbose: 0
+      thermodynamics_verbose: 0
+      background_verbose: 0
+      harmonic_verbose: 0
+      fourier_verbose: 0
+      input_verbose: 0
+      lensing_verbose: 0
+      N_ur: 2.0328
+      N_ncdm: 1
+      m_ncdm: 0.06
+      T_ncdm: 0.71611
+      YHe: BBN
+    use_renames: false
+    renames:
+      As: A_s
+      ns: n_s
+      nrun: alpha_s
+      nrunrun: beta_s
+      nt: n_t
+      ntrun: alpha_t
+      rdrag: rs_drag
+      omegak: Omega_k
+      omegal: Omega_Lambda
+      w: w0_fld
+      wa: wa_fld
+      omegabh2: omega_b
+      omegab: Omega_b
+      omegach2: omega_cdm
+      omegac: Omega_cdm
+      omegam: Omega_m
+      omegan: Omega_nu
+      tau: tau_reio
+      zrei: z_reio
+      deltazrei: reionization_width
+      helium_redshift: helium_fullreio_redshift
+      helium_delta_redshift: helium_fullreio_width
+      yhe: YHe
+      yheused: YHe
+    version: v3.0.1
+    input_params:
+    - 100*theta_s
+    - A_s
+    - n_s
+    - omega_b
+    - omega_cdm
+    - tau_reio
+    output_params:
+    - H0
+    - sigma8
+likelihood:
+  bplike.act100_act_TT_plus_planck_TT:
+    flux: 100mJy
+    use_act_planck: 'yes'
+    bandpass: true
+    use_classy_sz_tsz: 'no'
+    l_max_data: 7924
+    save_theory_data_spectra: false
+    root_theory_data_spectra: ''
+    theory_debug: null
+    type: []
+    speed: -1
+    stop_at_error: false
+    version: null
+    input_params:
+    - a_tsz
+    - a_ksz
+    - xi
+    - a_d
+    - a_c
+    - beta_CIB
+    - a_p_tt_15
+    - a_p_tt_100
+    - a_g_tt_15
+    - a_g_tt_100
+    - cal_150
+    - cal_090
+    - cal_100
+    - cal_143
+    - cal_217
+    - cal_353
+    - cal_545
+    - a_g_ee_100
+    - a_g_ee_15
+    - a_g_te_100
+    - a_g_te_15
+    - a_p_ee
+    - a_p_te
+    - a_s_ee
+    - a_s_te
+    - beta_radio
+    output_params: []
+  bplike.act15_act_TT_plus_planck_TT:
+    flux: 15mJy
+    use_act_planck: 'yes'
+    bandpass: true
+    use_classy_sz_tsz: 'no'
+    l_max_data: 7924
+    save_theory_data_spectra: false
+    root_theory_data_spectra: ''
+    theory_debug: null
+    type: []
+    speed: -1
+    stop_at_error: false
+    version: null
+    input_params:
+    - a_tsz
+    - a_ksz
+    - xi
+    - a_d
+    - a_c
+    - beta_CIB
+    - a_p_tt_15
+    - a_p_tt_100
+    - a_g_tt_15
+    - a_g_tt_100
+    - cal_150
+    - cal_090
+    - cal_100
+    - cal_143
+    - cal_217
+    - cal_353
+    - cal_545
+    - a_g_ee_100
+    - a_g_ee_15
+    - a_g_te_100
+    - a_g_te_15
+    - a_p_ee
+    - a_p_te
+    - a_s_ee
+    - a_s_te
+    - beta_radio
+    output_params: []
+prior:
+  tau_reio_prior: 'lambda tau_reio: stats.norm.logpdf(tau_reio, loc=0.065, scale=0.015)'
+  a_c_prior: 'lambda a_c: stats.norm.logpdf(a_c, loc=4.9, scale=0.9)'
+  a_p_tt_15_prior: 'lambda a_p_tt_15: stats.norm.logpdf(a_p_tt_15, loc=3.1, scale=0.4)'
+  a_g_tt_15_prior: 'lambda a_g_tt_15: stats.norm.logpdf(a_g_tt_15, loc=2.79, scale=0.45)'
+  a_g_tt_100_prior: 'lambda a_g_tt_100: stats.norm.logpdf(a_g_tt_100, loc=8.77, scale=0.30)'
+params:
+  theta_MC_100:
+    prior:
+      min: 0.5
+      max: 10
+    ref:
+      dist: norm
+      loc: 1.04109
+      scale: 0.0004
+    proposal: 0.0002
+    latex: 100\theta_\mathrm{MC}
+    drop: true
+    renames: theta
+  100*theta_s:
+    value: 'lambda theta_MC_100: theta_MC_100'
+    derived: false
+  logA:
+    prior:
+      min: 2
+      max: 4
+    ref:
+      dist: norm
+      loc: 3.0448
+      scale: 0.001
+    proposal: 0.001
+    drop: true
+    latex: \log(10^{10} A_\mathrm{s})
+  A_s:
+    value: 'lambda logA: 1e-10*np.exp(logA)'
+    latex: A_\mathrm{s}
+    derived: 'lambda A_s: A_s'
+    renames:
+    - As
+  n_s:
+    prior:
+      min: 0.8
+      max: 1.2
+    ref:
+      dist: norm
+      loc: 0.96605
+      scale: 0.004
+    proposal: 0.002
+    latex: n_\mathrm{s}
+    renames:
+    - ns
+  omega_b:
+    prior:
+      min: 0.005
+      max: 0.1
+    ref:
+      dist: norm
+      loc: 0.0223828
+      scale: 0.0001
+    proposal: 0.0001
+    latex: \Omega_\mathrm{b}h^2
+    renames:
+    - omegabh2
+  omega_cdm:
+    prior:
+      min: 0.001
+      max: 0.99
+    ref:
+      dist: norm
+      loc: 0.120108
+      scale: 0.001
+    proposal: 0.0005
+    latex: \Omega_\mathrm{c}h^2
+    renames:
+    - omegach2
+  tau_reio:
+    prior:
+      min: 0.01
+      max: 0.8
+    ref:
+      dist: norm
+      loc: 0.0543
+      scale: 0.01
+    proposal: 0.005
+    latex: \tau_\mathrm{reio}
+    renames:
+    - tau
+  H0:
+    latex: H_0
+    derived: true
+  sigma8:
+    latex: \sigma_8
+    derived: true
+  a_tsz:
+    latex: a_\mathrm{tSZ}
+    prior:
+      max: 10
+      min: 0
+    proposal: 0.2
+    ref:
+      dist: norm
+      loc: 5.80612
+      scale: 0.5
+  a_ksz:
+    latex: a_\mathrm{kSZ}
+    prior:
+      max: 10
+      min: 0
+    proposal: 0.5
+    ref:
+      dist: norm
+      loc: 0.000102473
+      scale: 0.5
+  xi:
+    latex: \xi^{tSZ-CIB}
+    prior:
+      max: 0.2
+      min: 0
+    proposal: 0.05
+    ref:
+      dist: norm
+      loc: 0.199822
+      scale: 0.05
+  a_d:
+    latex: a_\mathrm{d}
+    prior:
+      max: 11
+      min: 0
+    proposal: 1
+    ref:
+      dist: norm
+      loc: 6.87297
+      scale: 1
+  a_c:
+    latex: a_\mathrm{c}
+    prior:
+      max: 15
+      min: 0
+    proposal: 1
+    ref:
+      dist: norm
+      loc: 3.6481
+      scale: 1
+  beta_CIB:
+    latex: \beta_c
+    prior:
+      max: 5
+      min: 0
+    proposal: 0.2
+    ref:
+      dist: norm
+      loc: 2.44791
+      scale: 0.5
+  a_p_tt_15:
+    latex: a_\mathrm{p,TT,15}
+    prior:
+      max: 6
+      min: 0
+    proposal: 0.4
+    ref:
+      dist: norm
+      loc: 3.68224
+      scale: 0.5
+  a_p_tt_100:
+    latex: a_\mathrm{p,TT,100}
+    prior:
+      max: 40
+      min: 0.0
+    proposal: 3
+    ref:
+      dist: norm
+      loc: 22.4901
+      scale: 6
+  a_g_tt_15:
+    latex: a_\mathrm{g,TT,15}
+    prior:
+      max: 5
+      min: 0.0
+    proposal: 0.4
+    ref:
+      dist: norm
+      loc: 2.81171
+      scale: 0.4
+  a_g_tt_100:
+    latex: a_\mathrm{g,TT,100}
+    prior:
+      max: 20.0
+      min: 0.0
+    proposal: 0.3
+    ref:
+      dist: norm
+      loc: 8.71725
+      scale: 0.3
+  cal_150:
+    value: 1.0
+  cal_090:
+    value: 1.0
+  cal_100:
+    value: 1.0
+  cal_143:
+    value: 1.0
+  cal_217:
+    value: 1.0
+  cal_353:
+    value: 1.0
+  cal_545:
+    value: 1.0
+  a_g_ee_100:
+    value: 0.1293905
+  a_g_ee_15:
+    value: 0.03436806
+  a_g_te_100:
+    value: 0.355993
+  a_g_te_15:
+    value: 0.104994
+  a_p_ee:
+    value: 5.342375e-05
+  a_p_te:
+    value: 0.04443353
+  a_s_ee:
+    value: 0.0
+  a_s_te:
+    value: 0.0
+  beta_radio:
+    value: -0.5
+sampler:
+  evaluate:
+    override:
+      logA: 3.0407297
+      n_s: 0.93850109
+      tau_reio: 0.052274659
+      theta_MC_100: 1.0398725
+      omega_b: 0.021483203
+      omega_cdm: 0.11152307
+      a_c: 6.2055946
+      a_d: 5.3300691
+      a_g_tt_100: 8.5427472
+      a_g_tt_15: 3.5778725
+      a_ksz: 0.0074123684
+      a_p_tt_100: 22.433325
+      a_p_tt_15: 2.9416629
+      a_tsz: 9.5562573
+      beta_CIB: 2.1860373
+      xi: 0.19485805
+timing: true
+output: act_extended_act_plus_planck_wbp_less353545_evbf
+packages_path: null
+test: false
+version: 3.0.4

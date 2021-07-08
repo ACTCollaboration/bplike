@@ -334,6 +334,14 @@ sampler:
       beta_CIB: 2.447908
       xi: 0.199822
 
+# set some custom values
+# here from steve:
+      # a_d :  0.
+      # a_g_tt_15 :  2.8
+      # a_g_tt_100 :  4.5
+      # a_c : 8.5
+      # beta_CIB :  2.2
+
       #act_plus_planck_bp.likestat
       # a_c: 14.992451
       # a_d: 1.068492

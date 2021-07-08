@@ -10,6 +10,7 @@ likelihood:
     - a_d
     - a_c
     - beta_CIB
+    - beta_radio
     - a_p_tt_15
     - a_p_tt_100
     - a_g_tt_15
@@ -29,6 +30,7 @@ likelihood:
     - a_p_te
     - a_s_ee
     - a_s_te
+    l_max_data: 3924
     output_params: []
     root_theory_data_spectra: act_extended_act_plus_planck_bp
     save_theory_data_spectra: 'true'
@@ -49,6 +51,7 @@ likelihood:
     - a_d
     - a_c
     - beta_CIB
+    - beta_radio
     - a_p_tt_15
     - a_p_tt_100
     - a_g_tt_15
@@ -77,6 +80,7 @@ likelihood:
     type: []
     use_act_planck: 'yes'
     version: null
+    l_max_data: 3924
 output: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/chains/act_extended_act_plus_planck_bp_mcmc_classy_test_lmax_3924
 packages_path: null
 params:
