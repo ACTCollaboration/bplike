@@ -10,8 +10,18 @@
 a_c:    4.9
 # Amplitude of Poisson CIB
 a_d:    6.9
-# Amplitude of tSZ
+# Amplitude of tSZ @ l=3000 (no multiple tsz bpw)
 a_tsz:    3.3
+# Amplitude of tSZ @ l=3000
+a_tsz_3000:    3.3
+# Amplitude of tSZ @ l=2500
+a_tsz_2500:    3.3
+# Amplitude of tSZ @ l=2000
+a_tsz_2000:    3.3
+# Amplitude of tSZ @ l=1500
+a_tsz_1500:    3.3
+# Amplitude of tSZ @ l=1000
+a_tsz_1000:    3.3
 # Amplitude of kSZ
 a_ksz:    4.950210
 # Correlation coefficient between tSZ and CIB

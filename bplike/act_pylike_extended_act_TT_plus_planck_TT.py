@@ -24,26 +24,60 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
     def initialize(self):
 
         self.log.info("Initialising.")
-        self.expected_params = [
-            "a_tsz", # tSZ
-            "xi", # tSZ-CIB cross-correlation coefficient
-            "a_c", # clustered CIB power
-            "beta_CIB", # CIB frequency scaling
-            "beta_radio", # radio frequency scaling
-            "a_ksz", # kSZ
-            "a_d", # dusty/CIB Poisson
-            "a_p_tt_15", # TT radio Poisson with given flux cut
-            "a_p_tt_100", # TT radio Poisson with given flux cut
-            "a_p_te", # TE Poisson sources
-            "a_p_ee", # EE Poisson sources
-            "a_g_tt_15", # TT Galactic dust at ell=500
-            "a_g_tt_100", # TT Galactic dust at ell=500
-            "a_g_te_15", # TE Galactic dust at ell=500
-            "a_g_te_100", # TE Galactic dust at ell=500
-            "a_g_ee_15", # EE Galactic dust at ell=500
-            "a_g_ee_100", # EE Galactic dust at ell=500
-            "a_s_te", # TE Synchrotron at ell=500
-            "a_s_ee"] # EE Synchrotron at ell=500
+        if self.use_multiple_tsz_bpw == 'yes':
+            # print('multiple tsz bpw')
+            # print(self.params)
+            # # self.params.pop('a_tsz')
+            # print(self.params)
+            # exit(0)
+            self.expected_params = [
+                "a_tsz_3000", # tSZ
+                "a_tsz_2500",
+                # Amplitude of tSZ @ l=2000
+                "a_tsz_2000",
+                # Amplitude of tSZ @ l=1500
+                "a_tsz_1500",
+                # Amplitude of tSZ @ l=1000
+                "a_tsz_1000",
+                "xi", # tSZ-CIB cross-correlation coefficient
+                "a_c", # clustered CIB power
+                "beta_CIB", # CIB frequency scaling
+                "beta_radio", # radio frequency scaling
+                "a_ksz", # kSZ
+                "a_d", # dusty/CIB Poisson
+                "a_p_tt_15", # TT radio Poisson with given flux cut
+                "a_p_tt_100", # TT radio Poisson with given flux cut
+                "a_p_te", # TE Poisson sources
+                "a_p_ee", # EE Poisson sources
+                "a_g_tt_15", # TT Galactic dust at ell=500
+                "a_g_tt_100", # TT Galactic dust at ell=500
+                "a_g_te_15", # TE Galactic dust at ell=500
+                "a_g_te_100", # TE Galactic dust at ell=500
+                "a_g_ee_15", # EE Galactic dust at ell=500
+                "a_g_ee_100", # EE Galactic dust at ell=500
+                "a_s_te", # TE Synchrotron at ell=500
+                "a_s_ee"] # EE Synchrotron at ell=500
+        else:
+            self.expected_params = [
+                "a_tsz", # tSZ
+                "xi", # tSZ-CIB cross-correlation coefficient
+                "a_c", # clustered CIB power
+                "beta_CIB", # CIB frequency scaling
+                "beta_radio", # radio frequency scaling
+                "a_ksz", # kSZ
+                "a_d", # dusty/CIB Poisson
+                "a_p_tt_15", # TT radio Poisson with given flux cut
+                "a_p_tt_100", # TT radio Poisson with given flux cut
+                "a_p_te", # TE Poisson sources
+                "a_p_ee", # EE Poisson sources
+                "a_g_tt_15", # TT Galactic dust at ell=500
+                "a_g_tt_100", # TT Galactic dust at ell=500
+                "a_g_te_15", # TE Galactic dust at ell=500
+                "a_g_te_100", # TE Galactic dust at ell=500
+                "a_g_ee_15", # EE Galactic dust at ell=500
+                "a_g_ee_100", # EE Galactic dust at ell=500
+                "a_s_te", # TE Synchrotron at ell=500
+                "a_s_ee"] # EE Synchrotron at ell=500
 
         self.cal_yp_act_only =[
             "cal_95",

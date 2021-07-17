@@ -1,5 +1,6 @@
 bandpass: false
 use_classy_sz_tsz : 'no'
+use_multiple_tsz_bpw : 'no'
 l_max_data: 7924
 save_theory_data_spectra: false
 root_theory_data_spectra: ''
@@ -155,6 +156,15 @@ params:
     #   loc: 1
     #   scale: 0.02
   a_tsz: 0.5806115E+01
+  a_tsz_3000:    3.3
+  # Amplitude of tSZ @ l=2500
+  a_tsz_2500:    3.3
+  # Amplitude of tSZ @ l=2000
+  a_tsz_2000:    3.3
+  # Amplitude of tSZ @ l=1500
+  a_tsz_1500:    3.3
+  # Amplitude of tSZ @ l=1000
+  a_tsz_1000:    3.3
     # latex: a_\mathrm{tSZ}
     # prior:
     #   max: 10

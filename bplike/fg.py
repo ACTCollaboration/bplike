@@ -35,6 +35,7 @@ class ForegroundPowers(ArraySED):
         self.ksz_temp = get_template(ells,ksz_temp_file,ell_pivot=params['high_ell0'])
         self.tsz_x_cib_temp = get_template(ells,sz_x_cib_temp_file,ell_pivot=None)
         self.fcut = flux_cut
+        self.lkl_setup  = lkl_setup
 
         self.effs = {}
         if lkl_setup.use_act_planck == 'no' or lkl_setup == None:
@@ -120,7 +121,45 @@ class ForegroundPowers(ArraySED):
                 if ptsz is not None:
                     tpow = tpow + f1_tsz *f2_tsz *ptsz
                 else:
-                    tpow = tpow + f1_tsz *f2_tsz *params['a_tsz']*self.get_component_scale_dependence('tSZ',params)
+                    if self.lkl_setup.use_multiple_tsz_bpw == 'yes':
+                        # print(params['a_tsz'])
+                        # print(params['a_tsz_3000'])
+                        # print(params['a_tsz_2500'])
+                        # print(params['a_tsz_2000'])
+                        # print(params['a_tsz_1500'])
+                        # print(params['a_tsz_1000'])
+                        # self.get_component_scale_dependence('tSZ',params)
+                        l_full = np.arange(2,np.shape(self.get_component_scale_dependence('tSZ',params))[0]+2)
+                        l_1000 = np.where(l_full>1250)
+                        # print(l_full[l_1000])
+                        l_1500 = np.where((l_full<1250) | (l_full >=1750))
+                        # print(l_full[l_1500])
+                        l_2000 = np.where((l_full<1750) | (l_full >=2250))
+                        # print(l_full[l_2000])
+                        l_2500 = np.where((l_full<2250) | (l_full >=2750))
+                        # print(l_full[l_2500])
+                        l_3000 = np.where((l_full<2750))
+                        full_tsz_temp = self.get_component_scale_dependence('tSZ',params).copy()
+                        tsz_temp_1000 = full_tsz_temp.copy()
+                        tsz_temp_1500 = full_tsz_temp.copy()
+                        tsz_temp_2000 = full_tsz_temp.copy()
+                        tsz_temp_2500 = full_tsz_temp.copy()
+                        tsz_temp_3000 = full_tsz_temp.copy()
+                        tsz_temp_1000[l_1000] = 0
+                        tsz_temp_1500[l_1500] = 0
+                        tsz_temp_2000[l_2000] = 0
+                        tsz_temp_2500[l_2500] = 0
+                        tsz_temp_3000[l_3000] = 0
+                        # exit(0)
+                        tpow = tpow \
+                        + f1_tsz *f2_tsz *params['a_tsz_3000']*tsz_temp_3000\
+                        + f1_tsz *f2_tsz *params['a_tsz_2500']*tsz_temp_2500\
+                        + f1_tsz *f2_tsz *params['a_tsz_2000']*tsz_temp_2000\
+                        + f1_tsz *f2_tsz *params['a_tsz_1500']*tsz_temp_1500\
+                        + f1_tsz *f2_tsz *params['a_tsz_1000']*tsz_temp_1000
+                        # exit(0)
+                    else:
+                        tpow = tpow + f1_tsz *f2_tsz *params['a_tsz']*self.get_component_scale_dependence('tSZ',params)
             if ('cibc' in ocomps):
                 tpow = tpow + f1_cib*f2_cib*params['a_c']*self.get_component_scale_dependence('cibc',params)
             if ('cibp' in ocomps):
@@ -128,11 +167,49 @@ class ForegroundPowers(ArraySED):
             if ('ksz' in ocomps):
                 tpow = tpow + params['a_ksz']*self.get_component_scale_dependence('kSZ',params)
             if ('tsz_x_cib' in ocomps):
-                a_c = params['a_c']
-                a_sz = params['a_tsz']
-                xi = params['xi']
-                fp = (f1_tsz*f2_cib + f2_tsz*f1_cib)/2.
-                tpow = tpow - 2.*fp*xi*np.sqrt(a_sz*a_c)*self.get_component_scale_dependence('tsz_x_cib',params)
+                if self.lkl_setup.use_multiple_tsz_bpw == 'yes':
+                    l_full = np.arange(2,np.shape(self.get_component_scale_dependence('tSZ',params))[0]+2)
+                    l_1000 = np.where(l_full>1250)
+                    # print(l_full[l_1000])
+                    l_1500 = np.where((l_full<1250) | (l_full >=1750))
+                    # print(l_full[l_1500])
+                    l_2000 = np.where((l_full<1750) | (l_full >=2250))
+                    # print(l_full[l_2000])
+                    l_2500 = np.where((l_full<2250) | (l_full >=2750))
+                    # print(l_full[l_2500])
+                    l_3000 = np.where((l_full<2750))
+                    full_tsz_temp = self.get_component_scale_dependence('tSZ_x_cib',params).copy()
+                    tsz_temp_1000 = full_tsz_temp.copy()
+                    tsz_temp_1500 = full_tsz_temp.copy()
+                    tsz_temp_2000 = full_tsz_temp.copy()
+                    tsz_temp_2500 = full_tsz_temp.copy()
+                    tsz_temp_3000 = full_tsz_temp.copy()
+                    tsz_temp_1000[l_1000] = 0
+                    tsz_temp_1500[l_1500] = 0
+                    tsz_temp_2000[l_2000] = 0
+                    tsz_temp_2500[l_2500] = 0
+                    tsz_temp_3000[l_3000] = 0
+
+                    a_c = params['a_c']
+                    a_sz_3000 = params['a_tsz_3000']
+                    a_sz_2500 = params['a_tsz_2500']
+                    a_sz_2000 = params['a_tsz_2000']
+                    a_sz_1500 = params['a_tsz_1500']
+                    a_sz_1000 = params['a_tsz_1000']
+                    xi = params['xi']
+                    fp = (f1_tsz*f2_cib + f2_tsz*f1_cib)/2.
+                    tpow = tpow \
+                    - 2.*fp*xi*np.sqrt(a_sz_3000*a_c)*tsz_temp_3000 \
+                    - 2.*fp*xi*np.sqrt(a_sz_2500*a_c)*tsz_temp_2500 \
+                    - 2.*fp*xi*np.sqrt(a_sz_2000*a_c)*tsz_temp_2000 \
+                    - 2.*fp*xi*np.sqrt(a_sz_1500*a_c)*tsz_temp_1500 \
+                    - 2.*fp*xi*np.sqrt(a_sz_1000*a_c)*tsz_temp_1000
+                else:
+                    a_c = params['a_c']
+                    a_sz = params['a_tsz']
+                    xi = params['xi']
+                    fp = (f1_tsz*f2_cib + f2_tsz*f1_cib)/2.
+                    tpow = tpow - 2.*fp*xi*np.sqrt(a_sz*a_c)*self.get_component_scale_dependence('tsz_x_cib',params)
         if 'radio' in ocomps:
             e1syn = eff_freq_ghz1['syn'] if eff_freq_ghz1 is not None else None
             e2syn = eff_freq_ghz2['syn'] if eff_freq_ghz2 is not None else None
