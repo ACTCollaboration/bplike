@@ -116,7 +116,7 @@ class act_pylike_extended_act_only_TTTEEE(InstallableLikelihood):
             self.input_params = new_l
 
     def get_requirements(self):
-        l_max = 5000
+        l_max = 4000
         # l_max = self.l_max
         if self.use_act_planck == 'no':
             # reqs = {'Cl': {'tt': self.l_max}}

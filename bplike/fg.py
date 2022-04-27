@@ -130,6 +130,8 @@ class ForegroundPowers(ArraySED):
                         # print(params['a_tsz_1000'])
                         # self.get_component_scale_dependence('tSZ',params)
                         l_full = np.arange(2,np.shape(self.get_component_scale_dependence('tSZ',params))[0]+2)
+                        #bin_mid = np.linspace(np.log(1e3),np.log(3e3),5)
+                        #[1000.,1316.07401295,1732.05080757,2279.50705695,3000.]
                         l_1000 = np.where(l_full>=1147.20269044)
                         # print(l_full[l_1000])
                         l_1500 = np.where((l_full<1147.20269044) | (l_full >=1509.80364848))

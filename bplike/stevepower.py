@@ -168,9 +168,9 @@ class StevePower_extended(object):
         if l_max_data == 7924:
             # spec = np.load(data_root+f'{rfroot}_all_ps_mean_C_ell_data_210610.npy')
             # cov = np.load(data_root+f'{rfroot}_all_ps_Cov_from_coadd_ps_210610.npy')
-            spec = np.load(data_root+f'{rfroot}_all_ps_mean_C_ell_data_210627.npy')
-            cov = np.load(data_root+f'{rfroot}_all_ps_Cov_from_coadd_ps_210627.npy')
-            covx = np.load(data_root+f'{rfroot}_all_covmat_anal_210610.npy')
+            spec = np.load(data_root+f'{rfroot}_all_ps_mean_C_ell_data_210702.npy')
+            cov = np.load(data_root+f'{rfroot}_all_ps_Cov_from_coadd_ps_210702.npy')
+            covx = np.load(data_root+f'{rfroot}_all_covmat_anal_210702.npy')
             bbl = np.load(data_root+f'{rfroot}_bpwf_210610.npy')
         else:
             spec = np.load(data_root+f'{rfroot}_all_ps_mean_C_ell_data_210327.npy')
@@ -354,10 +354,6 @@ class StevePower_extended(object):
         '150x353', '150x545', '100x217', '143x217', '217x217', '100x353', '143x353', '217x353',
         '353x353', '100x545', '143x545', '217x545', '353x545', '545x545']
         # here list the spectra that you want to remove,
-        # ps_list_to_throw = ['090x545','100x545','143x545','150x545','217x545', # thrown because no SNR
-        #                     '353x353','353x545','545x545','150x353','217x353']#, # thrown because inconsistent with Choi et al FG modeling
-        #                     #'090x353','100x353','143x353']
-
         ps_list_to_throw = ['090x545','100x545','143x545','150x545','217x545', # thrown because no SNR
                             '353x545','545x545'] # thrown because inconsistent with Choi et al FG modeling
         # ps_list_to_throw = ['']
@@ -371,9 +367,9 @@ class StevePower_extended(object):
                 continue
 
 
-        # enhancing diagonal to avoid lambda<0:
-        diag_cov_dl = np.diag(np.diagonal(self.cov))
-        self.cov = 1.130*(diag_cov_dl*np.identity(np.shape(self.cov)[0]))+ self.cov - diag_cov_dl
+        # # enhancing diagonal to avoid lambda<0:
+        # diag_cov_dl = np.diag(np.diagonal(self.cov))
+        # self.cov = 1.130*(diag_cov_dl*np.identity(np.shape(self.cov)[0]))+ self.cov - diag_cov_dl
 
         # keeping only diagonal elements to covmat
         # self.cov = np.diag(np.diagonal(self.cov))

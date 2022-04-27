@@ -1,5 +1,6 @@
 bandpass: false
 use_classy_sz_tsz : 'no'
+use_multiple_tsz_bpw : 'no'
 l_max_data: 7924
 save_theory_data_spectra: false
 root_theory_data_spectra: ''

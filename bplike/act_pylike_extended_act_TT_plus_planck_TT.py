@@ -217,7 +217,7 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
         str_current = '[bplike prepare_data] '
         flux = self.flux
         if self.l_max_data == 7924:
-            data_root = path_to_data + '/act_planck_data_210610/'
+            data_root = path_to_data + '/act_planck_data_260422/'
         else:
             data_root = path_to_data + '/act_planck_data_210328/'
         self.sp = StevePower_extended(data_root,self.flux,l_max_data = self.l_max_data)
