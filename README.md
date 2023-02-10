@@ -1,12 +1,13 @@
 # bplike
 
-This is a version of Erminia's multi-frequency likelihood
-for the ACT DR4 release, but with the following changes:
+This is a band-passed likelihood code for CMB power spectrum analysis, currently implemented primarily with interfaces to the ACT DR4 measurement.
+
+It is similar to the official likelihood for the ACT DR4 release, but with the following changes:
 - includes (optional) scale-dependent bandpass corrections 
 - it is re-written in Python 
-- it interfaces with Cobaya (use the `devel` branch)
+- it interfaces with Cobaya
 
-It reproduces Erminia's results when run without the 
+It reproduces the official results when run without the 
 bandpass corrections.
 
 It currently has dependencies that include soapack and tilec,
@@ -37,5 +38,5 @@ cobaya-run act.yml
 with your preferred OpenMP-MPI method. `act.yml` is an example YAML
 file for the run with bandpass corrections. You can copy and modify it,
 e.g. to change priors or add additional parameters. `act_baseline.yml`
-contains an example for reproducing Erminia's runs, i.e. without the
+contains an example for reproducing the official DR4 runs, i.e. without the
 bandpass corrections.
