@@ -122,7 +122,7 @@ class StevePower(object):
 
 
 class StevePower_extended(object):
-    def __init__(self,data_root,flux,infval=infval,tt_lmin=600,tt_lmax=None,l_max_data = 0):
+    def __init__(self,data_root,flux,infval=infval,tt_lmin=600,tt_lmax=None,l_max_data = 0, diag_cov_only = False):
         self.l_max = l_max_data
         # data_root = path_to_data + '/act_planck_data_210328/'
         specs = ['f090xf090','f090xf100','f090xf143','f090xf150',
@@ -172,6 +172,11 @@ class StevePower_extended(object):
             cov = np.load(data_root+f'{rfroot}_all_ps_Cov_from_coadd_ps_210702.npy')
             covx = np.load(data_root+f'{rfroot}_all_covmat_anal_210702.npy')
             bbl = np.load(data_root+f'{rfroot}_bpwf_210610.npy')
+
+            # spec = np.load(data_root+f'{rfroot}_all_ps_mean_C_ell_data_210610.npy')
+            # cov = np.load(data_root+f'{rfroot}_all_ps_Cov_from_coadd_ps_210610.npy')
+            # covx = np.load(data_root+f'{rfroot}_all_covmat_anal_210610.npy')
+            # bbl = np.load(data_root+f'{rfroot}_bpwf_210610.npy')
         else:
             spec = np.load(data_root+f'{rfroot}_all_ps_mean_C_ell_data_210327.npy')
             cov = np.load(data_root+f'{rfroot}_all_ps_Cov_from_coadd_ps_210327.npy')
@@ -372,7 +377,8 @@ class StevePower_extended(object):
         # self.cov = 1.130*(diag_cov_dl*np.identity(np.shape(self.cov)[0]))+ self.cov - diag_cov_dl
 
         # keeping only diagonal elements to covmat
-        # self.cov = np.diag(np.diagonal(self.cov))
+        if diag_cov_only:
+            self.cov = np.diag(np.diagonal(self.cov))
 
             # j = label_bps.index(ps)
             # self.cov[j*self.n_bins:(j+1)*self.n_bins,j*self.n_bins:(j+1)*self.n_bins] = infval
