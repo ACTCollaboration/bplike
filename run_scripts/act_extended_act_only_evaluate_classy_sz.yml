@@ -1,4 +1,4 @@
-debug: False
+debug: True
 timing: True
 # boss 100mJy
 # deep56 15mJy
@@ -7,7 +7,7 @@ timing: True
 likelihood:
   # The 100 mJy likelihood
   # WIDE
-  bplike.act100:
+  bplike.act100_act_only_TTTEEE:
     #path: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/
     stop_at_error: True
     bandpass: False
@@ -19,7 +19,7 @@ likelihood:
 
   # # The 15 mJy likelihood
   # DEEP
-  bplike.act15:
+  bplike.act15_act_only_TTTEEE:
     stop_at_error: True
     bandpass: False
     # Optional line to do some debugging with an input theory curve
@@ -392,9 +392,9 @@ prior:
 
 theory:
   soliket.ymap.classy_sz:
-    path: /Users/boris/Work/CLASS-SZ/SO-SZ/class_public
+    # path: /Users/boris/Work/CLASS-SZ/SO-SZ/class_sz
     extra_args:
-      non linear: halofit
+      non_linear: hmcode
       # k_min_tau0 : 0.002
       # k_max_tau0_over_l_max : 3.
       # k_step_sub : 0.015
@@ -408,7 +408,7 @@ theory:
       transfer_verbose : 0
       input_verbose : 10
       lensing_verbose : 10
-      sz_verbose: 10
+      class_sz_verbose: 10
       # The base model features two massless
       # and one massive neutrino with m=0.06eV.
       # The settings below ensures that Neff=3.046
@@ -494,5 +494,5 @@ sampler:
   #   covmat: 'data/ACTPol_b5_new_cosmomc_theta2.covmat'
 
 
-output: chains/act_extended_act_only_evaluate
+output: chains/act_extended_act_only_evaluate_classy_sz
 resume: False

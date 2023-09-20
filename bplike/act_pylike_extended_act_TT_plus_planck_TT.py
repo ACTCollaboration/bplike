@@ -87,7 +87,7 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
                         "a_g_ee_15", # EE Galactic dust at ell=500
                         "a_g_ee_100", # EE Galactic dust at ell=500
                         "a_s_te", # TE Synchrotron at ell=500
-                        "a_s_ee"] # EE Synchrotron at ell=500                
+                        "a_s_ee"] # EE Synchrotron at ell=500
 
             # print('self.expected_params',self.expected_params)
             # exit(0)
@@ -236,9 +236,12 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
 
         if self.save_theory_data_spectra:
             np.save(path_to_output+'/ls_theory_'+self.flux+bps+'act_planck_'+self.root_theory_data_spectra+'.npy',ls_theory)
+            print('spectra saved in:')
+            print(path_to_output+'/ls_theory_'+self.flux+bps+'act_planck_'+self.root_theory_data_spectra+'.npy')
 
             for comp in comps:
                 # print(ps['cibc'])
+                print('saving comp:',comp)
                 np.save(path_to_output+'/dls_theory_'+comp+'_'+self.flux+bps+'act_planck_'+self.root_theory_data_spectra+'.npy',ps[comp])
 
         logp = -0.5 * np.dot(delta,np.dot(self.sp.cinv,delta))
@@ -257,7 +260,7 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
             # data_root = path_to_data + '/act_planck_data_210610/'
         else:
             data_root = path_to_data + '/act_planck_data_210328/'
-        self.sp = StevePower_extended(data_root,self.flux,l_max_data = self.l_max_data, 
+        self.sp = StevePower_extended(data_root,self.flux,l_max_data = self.l_max_data,
                                       diag_cov_only = self.diag_cov_only,
                                       cov_fac = self.cov_fac,
                                       apply_cov_fac_to_full_diag = self.apply_cov_fac_to_full_diag)

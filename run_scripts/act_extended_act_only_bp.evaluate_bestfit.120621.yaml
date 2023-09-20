@@ -398,18 +398,23 @@ sampler:
       yp_95: 0.98518108
 test: false
 theory:
-  classy:
+  # classy:
+    # path: /Users/boris/Downloads/class_public-2.9.4 # doesnt work because of:
+    #cobaya.tools.VersionCheckError: Module classy at /Users/boris/Downloads/class_public-2.9.4/python/build/lib.macosx-11.0-arm64-cpython-39 is version v2.9.4 but the minimum required version is v3.2.0.
+  #hence, cheating with classy_sz:
+  soliket.ymap.classy_sz:
     extra_args:
       N_ncdm: 1
       N_ur: 2.0328
       T_ncdm: 0.71611
+      m_ncdm: 0.06
       YHe: BBN
       background_verbose: 0
-      fourier_verbose: 0
-      harmonic_verbose: 0
+      # fourier_verbose: 0
+      # harmonic_verbose: 0
       input_verbose: 0
       lensing_verbose: 0
-      m_ncdm: 0.06
+
       perturbations_verbose: 0
       thermodynamics_verbose: 0
     input_params:

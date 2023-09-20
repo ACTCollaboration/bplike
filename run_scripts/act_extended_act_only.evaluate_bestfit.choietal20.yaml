@@ -77,7 +77,7 @@ likelihood:
     type: []
     use_act_planck: 'no'
     version: null
-output: /Users/boris/Work/CLASS-SZ/ATSZ_ACMB/analysis/atsz_analysis/act_extended_act_only.evaluate_bestfit
+output: /Users/boris/Work/CLASS-SZ/ATSZ_ACMB/analysis/atsz_analysis/act_extended_act_only_choietal.evaluate_bestfit
 packages_path: null
 params:
   100*theta_s:
@@ -399,15 +399,18 @@ sampler:
       yp_95: 0.9860632
 test: false
 theory:
-  classy:
+  # classy:
+  #   path: /Users/boris/Downloads/class_public-2.9.4
+  #cheating with classy_sz:
+  soliket.ymap.classy_sz:
     extra_args:
       N_ncdm: 1
       N_ur: 2.0328
       T_ncdm: 0.71611
       YHe: BBN
       background_verbose: 0
-      fourier_verbose: 0
-      harmonic_verbose: 0
+      # fourier_verbose: 0
+      # harmonic_verbose: 0
       input_verbose: 0
       lensing_verbose: 0
       m_ncdm: 0.06
@@ -423,7 +426,7 @@ theory:
     output_params:
     - H0
     - sigma8
-    path: /Users/boris/Work/CLASS-SZ/SO-SZ/class_public
+    # path: /Users/boris/Work/CLASS-SZ/SO-SZ/class_public
     renames:
       As: A_s
       deltazrei: reionization_width
@@ -455,3 +458,4 @@ theory:
     version: v3.0.1
 timing: true
 version: 3.0.4
+debug: true

@@ -1,5 +1,5 @@
 debug: False
-timing: True
+timing: False
 # boss 100mJy
 # deep56 15mJy
 
@@ -15,7 +15,7 @@ likelihood:
     # theory_debug: /data/ctpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat
     # theory_debug: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/data/actpolfull_dr4.01/data/bf_ACTPol_lcdm.minimum.theory_cl
     # theory_debug: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/data/bplike_data/cls_model.txt # boris's debug
-
+    use_act_planck: 'no'
 
   # # The 15 mJy likelihood
   # DEEP
@@ -25,31 +25,43 @@ likelihood:
     # Optional line to do some debugging with an input theory curve
     #theory_debug: data/actpol_2f_full_s1316_2flux_fin/data/cosmo2017_10K_acc3_lensedCls.dat # mat's debug
     # theory_debug: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/data/bplike_data/cls_model.txt # boris's debug
-
+    use_act_planck: 'no'
 
 
 
 params:
 
-  theta_MC_100:
-    prior:
-      min: 0.5
-      max: 10
-    ref:
-      dist: norm
-      loc: 1.04109
-      scale: 0.0004
-    proposal: 0.0002
-    latex: 100\theta_\mathrm{MC}
-    drop: true
-    renames: theta
-
-  100*theta_s:
-    value: 'lambda theta_MC_100: theta_MC_100'
-    derived: false
+  # theta_MC_100:
+  #   prior:
+  #     min: 0.5
+  #     max: 10
+  #   ref:
+  #     dist: norm
+  #     loc: 1.04109
+  #     scale: 0.0004
+  #   proposal: 0.0002
+  #   latex: 100\theta_\mathrm{MC}
+  #   drop: true
+  #   renames: theta
+  #
+  # 100*theta_s:
+  #   value: 'lambda theta_MC_100: theta_MC_100'
+  #   derived: false
   # cosmomc_theta:
   #   value: 'lambda theta_MC_100: 1.e-2*theta_MC_100'
   #   derived: false
+  H0:
+    prior:
+      min: 40.
+      max: 99.
+    ref:
+      dist: norm
+      loc: 67.27
+      scale: 0.6
+    proposal: 0.04
+    latex: H0
+
+
 
   logA:
     prior:
@@ -60,13 +72,13 @@ params:
       loc:   3.1
       scale: 0.001
     proposal: 0.001
-    drop: True
+    # drop: True
     latex: \log(10^{10} A_\mathrm{s})
 
 
-  A_s:
-    value: "lambda logA: 1e-10*np.exp(logA)"
-    latex: A_\mathrm{s}
+  # A_s:
+  #   value: "lambda logA: 1e-10*np.exp(logA)"
+  #   latex: A_\mathrm{s}
 
 
   n_s:
@@ -111,17 +123,17 @@ params:
     proposal: 0.005
     latex: \tau_\mathrm{reio}
 
-  H0:
-    latex: H_0
-  sigma8:
-    latex: \sigma_8
+  # H0:
+  #   latex: H_0
+  # sigma8:
+  #   latex: \sigma_8
 
   a_tsz: #0.5806115E+01
     latex: a_\mathrm{tSZ}
     prior:
       max: 10
       min: 0
-    proposal: 0.2
+    proposal: 0.05
     ref:
       dist: norm
       loc: 0.5806115E+01
@@ -133,7 +145,7 @@ params:
     prior:
       max: 10
       min: 0
-    proposal: 0.5
+    proposal: 0.05
     ref:
       dist: norm
       loc: 0.1024734E-03
@@ -151,12 +163,12 @@ params:
       loc: 0.1998220E+00
       scale: 0.05
 
-  a_d: #0.6872966E+01
+  a_d: #0.6872966E+01 # corresponds to a_p in mflike .
     latex: a_\mathrm{d}
     prior:
       max: 11
       min: 0
-    proposal: 1
+    proposal: 0.5
     ref:
       dist: norm
       loc: 0.6872966E+01
@@ -167,7 +179,7 @@ params:
     prior:
       max: 15
       min: 0
-    proposal: 1
+    proposal: 0.5
     ref:
       dist: norm
       loc: 4.9
@@ -185,12 +197,13 @@ params:
       scale: 0.5
 
 
+  # probably a_s in mflike/choi et al 
   a_p_tt_15:  #0.3682240E+01
     latex: a_\mathrm{p,TT,15}
     prior:
       max: 6
       min: 0
-    proposal: 0.4
+    proposal: 0.05
     ref:
       dist: norm
       loc: 3.1
@@ -201,47 +214,47 @@ params:
     prior:
       max: 40
       min: 0.0
-    proposal: 3
+    proposal: 0.5
     ref:
       dist: norm
       loc: 22.5
       scale: 6
 
   a_g_tt_15: #0.2811710E+01
-    latex: a_g_tt_15
+    latex: a_\mathrm{g,TT,15}
     prior:
       max: 5
       min: 0.0
-    proposal: 0.4
+    proposal: 0.05
     ref:
       dist: norm
       loc: 0.2811710E+01
       scale: 0.4
 
   a_g_tt_100: #0.8717251E+01
-    latex: a_g_tt_100
+    latex: a_\mathrm{g,TT,100}
     prior:
       max: 20.
       min: 0.0
-    proposal: 0.3
+    proposal: 0.05
     ref:
       dist: norm
       loc: 0.8717251E+01
       scale: 0.3
 
   a_g_te_15: #0.1049940E+00
-    latex: a_g_te_15
+    latex: a_\mathrm{g,TE,15}
     prior:
       max: 11
       min: 0.0
-    proposal: 0.1
+    proposal: 0.05
     ref:
       dist: norm
       loc: 0.1049940E+00
       scale: 0.1
 
   a_g_te_100: #0.3559930E+00
-    latex: a_g_te_100
+    latex: a_\mathrm{g,TE,100}
     prior:
       max: 11
       min: 0.0
@@ -253,7 +266,7 @@ params:
 
 
   a_g_ee_15: #0.3436806E-01
-    latex: a_g_ee_15
+    latex: a_\mathrm{g,EE,15}
     prior:
       max: 5.
       min: 0.0
@@ -264,7 +277,7 @@ params:
       scale: 0.03
 
   a_g_ee_100: #0.1293905E+00
-    latex: a_g_ee_100
+    latex: a_\mathrm{g,EE,100}
     prior:
       max: 11
       min: 0.0
@@ -297,66 +310,66 @@ params:
       loc: 0.5342375E-04
       scale: 0.1
 
-  a_s_ee: #0.
-    latex: a_s_ee
-    prior:
-      max: 1.1
-      min: 0.0
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  a_s_te: #0.
-    latex: a_s_te
-    prior:
-      max: 1.1
-      min: 0.0
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  cal_150: #1.
-    latex: c_{150}
-    prior:
-      max: 11
-      min: 0.0
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  cal_95: #1.
-    latex: c_{95}
-    prior:
-      max: 11
-      min: 0.0
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  leak_150: #1.
-    latex: l_{150}
-    prior:
-      max: 11
-      min: 0.0
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
-  leak_95: #1.
-    latex: l_{95}
-    prior:
-      max: 11
-      min: 0.0
-    proposal: 0.01
-    ref:
-      dist: norm
-      loc: 1
-      scale: 0.02
+  a_s_ee: 0.
+    # latex: a_s_ee
+    # prior:
+    #   max: 1.1
+    #   min: 0.0
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  a_s_te: 0.
+    # latex: a_s_te
+    # prior:
+    #   max: 1.1
+    #   min: 0.0
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  cal_150: 1.
+    # latex: c_{150}
+    # prior:
+    #   max: 11
+    #   min: 0.0
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  cal_95: 1.
+    # latex: c_{95}
+    # prior:
+    #   max: 11
+    #   min: 0.0
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  leak_150: 1.
+    # latex: l_{150}
+    # prior:
+    #   max: 11
+    #   min: 0.0
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
+  leak_95: 1.
+    # latex: l_{95}
+    # prior:
+    #   max: 11
+    #   min: 0.0
+    # proposal: 0.01
+    # ref:
+    #   dist: norm
+    #   loc: 1
+    #   scale: 0.02
   yp_150: #1.
     latex: y_{150}
     prior:
@@ -391,32 +404,14 @@ prior:
   a_g_ee_100_prior: "lambda a_g_ee_100: stats.norm.logpdf(a_g_ee_100, loc=0.13, scale=0.03)"
 
 theory:
-  classy:
-    path: /Users/boris/Work/CLASS-SZ/SO-SZ/class_public
-    extra_args:
-      # non linear: halofit
-      # k_min_tau0 : 0.002
-      # k_max_tau0_over_l_max : 3.
-      # k_step_sub : 0.015
-      # k_step_super : 0.0001
-      # k_step_super_reduction : 0.1
+  soliket.cosmopower.cosmopower:
+    path_to_trained_models: /Users/boris/Work/CLASS-SZ/SO-SZ/trained_emulators/cp_oct22_bao_pks_A/
+    TT_emulator_name: TT_cp_NN_Oct22_bao_pks_nozpk
+    TE_emulator_name: TE_cp_PCAplusNN_Oct22_bao_pks_nozpk
+    EE_emulator_name: EE_cp_NN_Oct22_bao_pks_nozpk
+    PP_emulator_name: PP_cp_NN_Oct22_bao_pks_notau_nozpk
 
-      perturbations_verbose: 0
-      thermodynamics_verbose: 0
-      background_verbose: 0
-      harmonic_verbose: 0
-      fourier_verbose : 0
-      input_verbose : 0
-      lensing_verbose : 0
-      # The base model features two massless
-      # and one massive neutrino with m=0.06eV.
-      # The settings below ensures that Neff=3.046
-      # and m/omega = 93.14 eV
-      N_ur : 2.0328
-      N_ncdm : 1
-      m_ncdm : 0.06
-      T_ncdm : 0.71611
-      YHe: 'BBN'
+      # P_k_max_h/Mpc: 20.
   # camb:
   #   stop_at_error: False
   #   extra_args:
@@ -427,69 +422,72 @@ theory:
 
 sampler:
   # Example for evaluating at a specific point
-  evaluate:
-    override:
-      theta_MC_100: 1.045
-      logA : 3.05
-      n_s : 0.956159
-      omega_b : 0.022219
-      omega_cdm : 0.119883
-      tau_reio : 0.0754047
-
-      # foreground paramateres
-      a_tsz:    0.5806115E+01 ##3.3 OK CHECKED
-      a_ksz:   0.1024734E-03 #4.950210 OK CHECKED
-      xi:   0.1998220E+00 #1.654936e-2 OK CHECKED
-      a_d:   0.6872966E+01 #6.9 OK CHECKED
-      a_p_tt_15:   0.3682240E+01 #3.1
-      a_p_tt_100:   0.2249012E+02 #24.6
-      a_c:    0.3648102E+01 #4.9 OK CHECKED
-
-      a_p_te:   0.4443353E-01 # 0.1
-      a_p_ee:    0.5342375E-04 # 0.0
-
-      a_g_tt_15: 0.2811710E+01  #0.3436806E-01 #0
-      a_g_tt_100:  0.8717251E+01 #0.2811710E+01  #0.3436806E-01 #0
-
-      a_g_te_15: 0.1049940E+00 #0.1049940E+00 # 0
-      a_g_te_100: 0.3559930E+00 #0.1049940E+00 # 0
-      a_g_ee_15:  0.3436806E-01 #0.3436806E-01 #0
-      a_g_ee_100:  0.1293905E+00 #0.3436806E-01 #0
-
-      a_s_te: 0.
-      a_s_ee: 0.
-
-      beta_CIB : 0.2447908E+01 #2.2 OK CHECKED
-      # for the act only lkl
-      yp_95: 0.9860632E+00  #OK CHECKED
-      yp_150: 0.9714017E+00 #OK CHECKED
-
-
-
-
-
-
-      cal_95: 1.
-      cal_150: 1.
-
-      leak_95: 1.
-      leak_150: 1.
+  # evaluate:
+  #   override:
+  #     H0: 70.
+  #     logA : 3.05
+  #     n_s : 0.956159
+  #     omega_b : 0.022219
+  #     omega_cdm : 0.119883
+  #     tau_reio : 0.0754047
+  #
+  #     # foreground paramateres
+  #     a_tsz:    0.5806115E+01 ##3.3 OK CHECKED
+  #     a_ksz:   0.1024734E-03 #4.950210 OK CHECKED
+  #     xi:   0.1998220E+00 #1.654936e-2 OK CHECKED
+  #     a_d:   0.6872966E+01 #6.9 OK CHECKED
+  #     a_p_tt_15:   0.3682240E+01 #3.1
+  #     a_p_tt_100:   0.2249012E+02 #24.6
+  #     a_c:    0.3648102E+01 #4.9 OK CHECKED
+  #
+  #     a_p_te:   0.4443353E-01 # 0.1
+  #     a_p_ee:    0.5342375E-04 # 0.0
+  #
+  #     a_g_tt_15: 0.2811710E+01  #0.3436806E-01 #0
+  #     a_g_tt_100:  0.8717251E+01 #0.2811710E+01  #0.3436806E-01 #0
+  #
+  #     a_g_te_15: 0.1049940E+00 #0.1049940E+00 # 0
+  #     a_g_te_100: 0.3559930E+00 #0.1049940E+00 # 0
+  #     a_g_ee_15:  0.3436806E-01 #0.3436806E-01 #0
+  #     a_g_ee_100:  0.1293905E+00 #0.3436806E-01 #0
+  #
+  #     a_s_te: 0.
+  #     a_s_ee: 0.
+  #
+  #     beta_CIB : 0.2447908E+01 #2.2 OK CHECKED
+  #     # for the act only lkl
+  #     yp_95: 0.9860632E+00  #OK CHECKED
+  #     yp_150: 0.9714017E+00 #OK CHECKED
+  #
+  #
+  #
+  #
+  #
+  #
+  #     cal_95: 1.
+  #     cal_150: 1.
+  #
+  #     leak_95: 1.
+  #     leak_150: 1.
 
   # Example MCMC run
-  # mcmc:
-  #   burn_in: 100
-  #   max_samples: .inf
-  #   max_tries: 400
-  #   learn_proposal: True
-  #   drag: True
-  #   Rminus1_stop: 0.001
+  mcmc:
+    burn_in: 100
+    max_samples: .inf
+    max_tries: 5000
+    learn_proposal: True
+    drag: True
+    Rminus1_stop: 0.001
+    proposal_scale: 1.
+    # learn_proposal_Rminus1_max: 100.
+    learn_proposal_Rminus1_max_early: 50.
   #   # Optionally use a covmat with the right theta convention
-  #   covmat: 'data/ACTPol_b5_new_cosmomc_theta2.covmat'
+    # covmat: '/Users/boris/Work/CLASS-SZ/SO-SZ/bplike/input_covmat/act_extended_act_only_mcmc_cosmopower.covmat'
 
   # Example for running the minimizer
   # minimize:
   #   covmat: 'data/ACTPol_b5_new_cosmomc_theta2.covmat'
 
 
-output: chains/act_extended_act_only_evaluate_classy
+output: chains/act_extended_act_only_mcmc_cosmopower_noleak_nosynch
 resume: False
