@@ -131,7 +131,12 @@ class ForegroundPowers(ArraySED):
                         # self.get_component_scale_dependence('tSZ',params)
                         l_full = np.arange(2,np.shape(self.get_component_scale_dependence('tSZ',params))[0]+2)
                         #bin_mid = np.linspace(np.log(1e3),np.log(3e3),5)
-                        #[1000.,1316.07401295,1732.05080757,2279.50705695,3000.]
+                        #[1000.,1316.07401295,1732.05080757,2279.50705695,3000.]\
+                        # bin_edge = (bin_mid[1:] + bin_mid[:-1])/2.
+                        # print(np.exp(bin_edge))
+                        # [1147.20269044 1509.80364848 1987.01334642 2615.05662862]
+                        
+                        # here we set to 0's everything outside of the bin
                         l_1000 = np.where(l_full>=1147.20269044)
                         # print(l_full[l_1000])
                         l_1500 = np.where((l_full<1147.20269044) | (l_full >=1509.80364848))
@@ -141,6 +146,10 @@ class ForegroundPowers(ArraySED):
                         l_2500 = np.where((l_full<1987.01334642) | (l_full >=2615.05662862))
                         # print(l_full[l_2500])
                         l_3000 = np.where((l_full<2615.05662862))
+                        
+                        
+                        
+                        
                         full_tsz_temp = self.get_component_scale_dependence('tSZ',params).copy()
                         tsz_temp_1000 = full_tsz_temp.copy()
                         tsz_temp_1500 = full_tsz_temp.copy()
@@ -159,7 +168,58 @@ class ForegroundPowers(ArraySED):
                         + f1_tsz *f2_tsz *params['a_tsz_2000']*tsz_temp_2000\
                         + f1_tsz *f2_tsz *params['a_tsz_1500']*tsz_temp_1500\
                         + f1_tsz *f2_tsz *params['a_tsz_1000']*tsz_temp_1000
+                        
                         # exit(0)
+                        # 18-sept-23 use more bins to higher l's
+                        #bin_mid = np.linspace(np.log(1e3),np.log(1e4),8)
+                        #bin_edge = (bin_mid[1:] + bin_mid[:-1])/2.
+                        #print(np.exp(bin_edge))
+                        # [1178.76863479 1637.89370695 2275.84592607 3162.27766017 4393.97056076 6105.40229659 8483.42898244]
+                        if self.lkl_setup.use_more_tsz_bins == 'yes':
+                            # here we set to 0's everything outside of the bin
+                            l_1000 = np.where(l_full>=1178.76863479)
+                            # print(l_full[l_1000])
+                            l_1500 = np.where((l_full<1178.76863479) | (l_full >=1637.89370695))
+                            # print(l_full[l_1500])
+                            l_2000 = np.where((l_full<1637.89370695) | (l_full >=2275.84592607))
+                            # print(l_full[l_2000])
+                            l_2500 = np.where((l_full<2275.84592607) | (l_full >=3162.27766017))
+                            # print(l_full[l_2500])
+                            l_3000 = np.where((l_full<3162.27766017) | (l_full >=4393.97056076))
+                            
+                            l_3000_p = np.where((l_full<4393.97056076) | (l_full >=6105.40229659))
+                            
+                            l_3000_pp = np.where((l_full<6105.40229659) | (l_full >=8483.42898244))
+                            
+                            l_3000_ppp = np.where((l_full<8483.42898244))
+
+                            full_tsz_temp = self.get_component_scale_dependence('tSZ',params).copy()
+                            tsz_temp_1000 = full_tsz_temp.copy()
+                            tsz_temp_1500 = full_tsz_temp.copy()
+                            tsz_temp_2000 = full_tsz_temp.copy()
+                            tsz_temp_2500 = full_tsz_temp.copy()
+                            tsz_temp_3000 = full_tsz_temp.copy()
+                            tsz_temp_3000_p = full_tsz_temp.copy()
+                            tsz_temp_3000_pp = full_tsz_temp.copy()
+                            tsz_temp_3000_ppp = full_tsz_temp.copy()
+                            tsz_temp_1000[l_1000] = 0
+                            tsz_temp_1500[l_1500] = 0
+                            tsz_temp_2000[l_2000] = 0
+                            tsz_temp_2500[l_2500] = 0
+                            tsz_temp_3000[l_3000] = 0
+                            tsz_temp_3000_p[l_3000_p] = 0
+                            tsz_temp_3000_pp[l_3000_pp] = 0
+                            tsz_temp_3000_ppp[l_3000_ppp] = 0
+                            # exit(0)
+                            tpow = tpow \
+                            + f1_tsz *f2_tsz *params['a_tsz_3000_ppp']*tsz_temp_3000_ppp\
+                            + f1_tsz *f2_tsz *params['a_tsz_3000_pp']*tsz_temp_3000_pp\
+                            + f1_tsz *f2_tsz *params['a_tsz_3000_p']*tsz_temp_3000_p\
+                            + f1_tsz *f2_tsz *params['a_tsz_3000']*tsz_temp_3000\
+                            + f1_tsz *f2_tsz *params['a_tsz_2500']*tsz_temp_2500\
+                            + f1_tsz *f2_tsz *params['a_tsz_2000']*tsz_temp_2000\
+                            + f1_tsz *f2_tsz *params['a_tsz_1500']*tsz_temp_1500\
+                            + f1_tsz *f2_tsz *params['a_tsz_1000']*tsz_temp_1000
                     else:
                         tpow = tpow + f1_tsz *f2_tsz *params['a_tsz']*self.get_component_scale_dependence('tSZ',params)
             if ('cibc' in ocomps):
@@ -181,11 +241,13 @@ class ForegroundPowers(ArraySED):
                     # print(l_full[l_2500])
                     l_3000 = np.where((l_full<2615.05662862))
                     full_tsz_temp = self.get_component_scale_dependence('tSZ_x_cib',params).copy()
+                    
                     tsz_temp_1000 = full_tsz_temp.copy()
                     tsz_temp_1500 = full_tsz_temp.copy()
                     tsz_temp_2000 = full_tsz_temp.copy()
                     tsz_temp_2500 = full_tsz_temp.copy()
                     tsz_temp_3000 = full_tsz_temp.copy()
+                    
                     tsz_temp_1000[l_1000] = 0
                     tsz_temp_1500[l_1500] = 0
                     tsz_temp_2000[l_2000] = 0
@@ -206,6 +268,63 @@ class ForegroundPowers(ArraySED):
                     - 2.*fp*xi*np.sqrt(a_sz_2000*a_c)*tsz_temp_2000 \
                     - 2.*fp*xi*np.sqrt(a_sz_1500*a_c)*tsz_temp_1500 \
                     - 2.*fp*xi*np.sqrt(a_sz_1000*a_c)*tsz_temp_1000
+
+                    if self.lkl_setup.use_more_tsz_bins == 'yes':
+                        l_full = np.arange(2,np.shape(self.get_component_scale_dependence('tSZ',params))[0]+2)
+                        # here we set to 0's everything outside of the bin
+                        l_1000 = np.where(l_full>=1178.76863479)
+                        # print(l_full[l_1000])
+                        l_1500 = np.where((l_full<1178.76863479) | (l_full >=1637.89370695))
+                        # print(l_full[l_1500])
+                        l_2000 = np.where((l_full<1637.89370695) | (l_full >=2275.84592607))
+                        # print(l_full[l_2000])
+                        l_2500 = np.where((l_full<2275.84592607) | (l_full >=3162.27766017))
+                        # print(l_full[l_2500])
+                        l_3000 = np.where((l_full<3162.27766017) | (l_full >=4393.97056076))
+
+                        l_3000_p = np.where((l_full<4393.97056076) | (l_full >=6105.40229659))
+
+                        l_3000_pp = np.where((l_full<6105.40229659) | (l_full >=8483.42898244))
+
+                        l_3000_ppp = np.where((l_full<8483.42898244))
+                        full_tsz_temp = self.get_component_scale_dependence('tSZ_x_cib',params).copy()
+                        tsz_temp_1000 = full_tsz_temp.copy()
+                        tsz_temp_1500 = full_tsz_temp.copy()
+                        tsz_temp_2000 = full_tsz_temp.copy()
+                        tsz_temp_2500 = full_tsz_temp.copy()
+                        tsz_temp_3000 = full_tsz_temp.copy()
+                        tsz_temp_3000_p = full_tsz_temp.copy()
+                        tsz_temp_3000_pp = full_tsz_temp.copy()
+                        tsz_temp_3000_ppp = full_tsz_temp.copy()
+                        tsz_temp_1000[l_1000] = 0
+                        tsz_temp_1500[l_1500] = 0
+                        tsz_temp_2000[l_2000] = 0
+                        tsz_temp_2500[l_2500] = 0
+                        tsz_temp_3000[l_3000] = 0
+                        tsz_temp_3000_p[l_3000_p] = 0
+                        tsz_temp_3000_pp[l_3000_pp] = 0
+                        tsz_temp_3000_ppp[l_3000_ppp] = 0
+
+                        a_c = params['a_c']
+                        a_sz_3000_ppp = params['a_tsz_3000_ppp']
+                        a_sz_3000_pp = params['a_tsz_3000_pp']
+                        a_sz_3000_p = params['a_tsz_3000_p']
+                        a_sz_3000 = params['a_tsz_3000']
+                        a_sz_2500 = params['a_tsz_2500']
+                        a_sz_2000 = params['a_tsz_2000']
+                        a_sz_1500 = params['a_tsz_1500']
+                        a_sz_1000 = params['a_tsz_1000']
+                        xi = params['xi']
+                        fp = (f1_tsz*f2_cib + f2_tsz*f1_cib)/2.
+                        tpow = tpow \
+                        - 2.*fp*xi*np.sqrt(a_sz_3000_ppp*a_c)*tsz_temp_3000_ppp \
+                        - 2.*fp*xi*np.sqrt(a_sz_3000_pp*a_c)*tsz_temp_3000_pp \
+                        - 2.*fp*xi*np.sqrt(a_sz_3000_p*a_c)*tsz_temp_3000_p \
+                        - 2.*fp*xi*np.sqrt(a_sz_3000*a_c)*tsz_temp_3000 \
+                        - 2.*fp*xi*np.sqrt(a_sz_2500*a_c)*tsz_temp_2500 \
+                        - 2.*fp*xi*np.sqrt(a_sz_2000*a_c)*tsz_temp_2000 \
+                        - 2.*fp*xi*np.sqrt(a_sz_1500*a_c)*tsz_temp_1500 \
+                        - 2.*fp*xi*np.sqrt(a_sz_1000*a_c)*tsz_temp_1000                        
                 else:
                     a_c = params['a_c']
                     a_sz = params['a_tsz']

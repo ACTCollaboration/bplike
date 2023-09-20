@@ -57,6 +57,40 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
                 "a_g_ee_100", # EE Galactic dust at ell=500
                 "a_s_te", # TE Synchrotron at ell=500
                 "a_s_ee"] # EE Synchrotron at ell=500
+            if self.use_more_tsz_bins == 'yes':
+                    self.expected_params = [
+                        "a_tsz_3000_ppp", # tSZ
+                        "a_tsz_3000_pp", # tSZ
+                        "a_tsz_3000_p", # tSZ
+                        "a_tsz_3000", # tSZ
+                        "a_tsz_2500",
+                        # Amplitude of tSZ @ l=2000
+                        "a_tsz_2000",
+                        # Amplitude of tSZ @ l=1500
+                        "a_tsz_1500",
+                        # Amplitude of tSZ @ l=1000
+                        "a_tsz_1000",
+                        "xi", # tSZ-CIB cross-correlation coefficient
+                        "a_c", # clustered CIB power
+                        "beta_CIB", # CIB frequency scaling
+                        "beta_radio", # radio frequency scaling
+                        "a_ksz", # kSZ
+                        "a_d", # dusty/CIB Poisson
+                        "a_p_tt_15", # TT radio Poisson with given flux cut
+                        "a_p_tt_100", # TT radio Poisson with given flux cut
+                        "a_p_te", # TE Poisson sources
+                        "a_p_ee", # EE Poisson sources
+                        "a_g_tt_15", # TT Galactic dust at ell=500
+                        "a_g_tt_100", # TT Galactic dust at ell=500
+                        "a_g_te_15", # TE Galactic dust at ell=500
+                        "a_g_te_100", # TE Galactic dust at ell=500
+                        "a_g_ee_15", # EE Galactic dust at ell=500
+                        "a_g_ee_100", # EE Galactic dust at ell=500
+                        "a_s_te", # TE Synchrotron at ell=500
+                        "a_s_ee"] # EE Synchrotron at ell=500                
+
+            # print('self.expected_params',self.expected_params)
+            # exit(0)
         else:
             self.expected_params = [
                 "a_tsz", # tSZ
@@ -136,6 +170,8 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
         l = self.input_params
         l_pop_cal_yp = [s for s in self.cal_yp_act_only  if s not in self.cal_yp_act_plus_planck]
         new_l = [s for s in l if s not in l_pop_cal_yp ]
+        # print('self.input_params',self.input_params)
+        # exit(0)
         self.input_params = new_l
 
     def get_requirements(self):
@@ -221,7 +257,10 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
             # data_root = path_to_data + '/act_planck_data_210610/'
         else:
             data_root = path_to_data + '/act_planck_data_210328/'
-        self.sp = StevePower_extended(data_root,self.flux,l_max_data = self.l_max_data, diag_cov_only = self.diag_cov_only)
+        self.sp = StevePower_extended(data_root,self.flux,l_max_data = self.l_max_data, 
+                                      diag_cov_only = self.diag_cov_only,
+                                      cov_fac = self.cov_fac,
+                                      apply_cov_fac_to_full_diag = self.apply_cov_fac_to_full_diag)
     # exit(0)
         if self.bandpass:
             self.coadd_data = {}

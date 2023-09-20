@@ -13,6 +13,12 @@ a_d:    6.9
 # Amplitude of tSZ @ l=3000 (no multiple tsz bpw)
 a_tsz:    3.3
 # Amplitude of tSZ @ l=3000
+a_tsz_3000_ppp:    3.3
+# Amplitude of tSZ @ l=3000
+a_tsz_3000_pp:    3.3
+# Amplitude of tSZ @ l=3000
+a_tsz_3000_p:    3.3
+# Amplitude of tSZ @ l=3000
 a_tsz_3000:    3.3
 # Amplitude of tSZ @ l=2500
 a_tsz_2500:    3.3
