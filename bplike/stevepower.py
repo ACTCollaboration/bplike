@@ -122,7 +122,7 @@ class StevePower(object):
 
 
 class StevePower_extended(object):
-    def __init__(self,data_root,flux,infval=infval,tt_lmin=600,tt_lmax=None,l_max_data = 0, diag_cov_only = False, 
+    def __init__(self,data_root,flux,infval=infval,tt_lmin=600,tt_lmax=None,l_max_data = 0, diag_cov_only = False,
                 cov_fac = 1. , apply_cov_fac_to_full_diag = False):
         self.cov_fac = cov_fac
         self.l_max = l_max_data
@@ -378,9 +378,12 @@ class StevePower_extended(object):
         # diag_cov_dl = np.diag(np.diagonal(self.cov))
         # self.cov = 1.130*(diag_cov_dl*np.identity(np.shape(self.cov)[0]))+ self.cov - diag_cov_dl
 
-        #From steve: At this point, this is a bit of an unsatisfactory approach, but the quickest route would be to inflate the errors by 10% for deep56 and 20% for boss (so the diagonals of the covmats by twice this).        
+        #From steve: At this point, this is a bit of an unsatisfactory approach, but the quickest route would be to inflate the errors by 10% for deep56 and 20% for boss (so the diagonals of the covmats by twice this).
         diag_cov_dl = np.diag(np.diagonal(self.cov))
+        # print('before inflating: ',
+        # np.savetxt("diag_before_inflating"np.diagonal(self.cov))
         if apply_cov_fac_to_full_diag == False:
+            print('applying covfac to act only bands')
             for ps in ps_list:
                 ids = np.argwhere( (self.rfband1 == ps.split('x')[0]) & (self.rfband2 == ps.split('x')[1]) )[:,0]
                 block_diag_cov_dl = self.cov[ids,ids]
@@ -391,9 +394,11 @@ class StevePower_extended(object):
                 elif ps.split('x')[1] in ['090','150'] and ps.split('x')[0] in ['100','143','217','353','545']:
                     self.cov[ids,ids] = self.cov_fac**1.*(block_diag_cov_dl*np.ones(len(block_diag_cov_dl)))+ self.cov[ids,ids] - block_diag_cov_dl
         else:
-        ## apply cov fac to all diagonal: 
+        ## apply cov fac to all diagonal:
             self.cov = self.cov_fac*(diag_cov_dl*np.identity(np.shape(self.cov)[0]))+ self.cov - diag_cov_dl
-        
+
+
+
         # print('before inflating: ',np.diag(np.diagonal(self.cov)))
         # covfac = 1.
         # if rfroot == 'deep56':
@@ -405,7 +410,7 @@ class StevePower_extended(object):
         # print('after inflating: ',np.diag(np.diagonal(self.cov)))
         # exit(0)
 
-        
+
         # keeping only diagonal elements to covmat
         if diag_cov_only:
             self.cov = np.diag(np.diagonal(self.cov))

@@ -1,13 +1,13 @@
 likelihood:
   bplike.act100_act_TT_plus_planck_TT:
-    apply_cov_fac_to_full_diag: true
+    apply_cov_fac_to_full_diag: False
     bandpass: false
     cov_fac: 1.4
     diag_cov_only: false
     flux: 100mJy
     l_max_data: 7924
     output_params: []
-    root_theory_data_spectra: act_plus_planck_mcmc_d1p2_w1p4
+    root_theory_data_spectra: act_plus_planck_mcmc_d1p2_w1p4_more_szbins_ACTonlycorr
     save_theory_data_spectra: true
     speed: -1
     stop_at_error: false
@@ -19,14 +19,14 @@ likelihood:
     use_multiple_tsz_bpw: 'yes'
     version: null
   bplike.act15_act_TT_plus_planck_TT:
-    apply_cov_fac_to_full_diag: true
+    apply_cov_fac_to_full_diag: False
     bandpass: false
     cov_fac: 1.2
     diag_cov_only: false
     flux: 15mJy
     l_max_data: 7924
     output_params: []
-    root_theory_data_spectra: act_plus_planck_mcmc_d1p2_w1p4
+    root_theory_data_spectra: act_plus_planck_mcmc_d1p2_w1p4_more_szbins_ACTonlycorr
     save_theory_data_spectra: true
     speed: -1
     stop_at_error: false
@@ -37,7 +37,7 @@ likelihood:
     use_more_tsz_bins: 'no'
     use_multiple_tsz_bpw: 'yes'
     version: null
-output: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/chains/act_plus_planck_mcmc_d1p2_w1p4.evaluate_bestfit
+output: /Users/boris/Work/CLASS-SZ/SO-SZ/bplike/chains/act_plus_planck_mcmc_d1p2_w1p4_more_szbins_ACTonlycorr.evaluate_bestfit
 packages_path: null
 params:
   H0:

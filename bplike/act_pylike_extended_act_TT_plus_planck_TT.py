@@ -255,6 +255,7 @@ class act_pylike_extended_act_TT_plus_planck_TT(InstallableLikelihood):
     def prepare_data(self, verbose=False):
         str_current = '[bplike prepare_data] '
         flux = self.flux
+        print('path_to_data:',path_to_data)
         if self.l_max_data == 7924:
             data_root = path_to_data + '/act_planck_data_260422/'
             # data_root = path_to_data + '/act_planck_data_210610/'
